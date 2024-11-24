@@ -65,22 +65,23 @@ const Login = ({setUp, ...props}) => {
 
   return (
     <div className="login">
-        <div className="rectangle-parent32">
-        <div className="freshsight15">
-          <b className="freshsight16">FreshSight</b>
-        </div>
-        <div className="earnings35">Login</div>
-        <div className="earnings-parent12">
-          <div className="earnings36">Email</div>
-          <input 
-            className="group-child68" 
-            placeholder="Enter your email"
-            onChange={handleChange}  
-            type="email"
-            name="email" 
-            value={formData.email} 
-          />
-        </div>
+      <div className="rectangle-parent32">
+          <div className="freshsight-group">
+              <img className="image-5-icon3" alt="" src="/image-52@2x.png" />
+              <div className="freshsight4">DAIRY FARMER CO.</div>
+          </div>
+          <div className="earnings35">Login</div>
+          <div className="earnings-parent12">
+            <div className="earnings36">Email</div>
+            <input 
+              className="group-child68" 
+              placeholder="Enter your email"
+              onChange={handleChange}  
+              type="email"
+              name="email" 
+              value={formData.email} 
+            />
+          </div>
         <div className="earnings-parent13">
           <div className="earnings36">Password</div>
           <input 
@@ -108,15 +109,7 @@ const Login = ({setUp, ...props}) => {
           Sign Up
         </div>
       </div>
-      <div className="freshsight-group">
-        <div className="freshsight3">
-          <div className="freshsight4">DAIRY FARMER CO.</div>
-          <img className="image-5-icon3" alt="" src="/image-52@2x.png" />
-          {/* <div className="nourishing-lives-reducing1">
-            Nourishing Lives, Reducing Waste
-          </div> */}
-        </div>
-      </div>
+      
     </div>
   );
 };
