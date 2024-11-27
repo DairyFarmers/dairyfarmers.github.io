@@ -31,7 +31,7 @@ const CreateAccount = () => {
     }
 
     try {
-      const response = await axios.post('http://localhost:5000/register', formData);
+      const response = await axios.post('http://ec2-54-224-236-69.compute-1.amazonaws.com/api/v1/users/signup', formData);
       if (response.status === 201) {
         console.log('User registered successfully');
         alert('User registered successfully');
@@ -100,7 +100,7 @@ const CreateAccount = () => {
             value={formData.password} 
             onChange={handleChange}
           />
-          <div onClick={toggleShowPassword} className="toggle-password-button">
+          <div onClick={toggleShowPassword} className="toggle-password-button1">
             <img 
               className="mdieye-off-icon5" 
               alt="" 
@@ -118,7 +118,7 @@ const CreateAccount = () => {
             value={formData.confirmpassword} 
             onChange={handleChange}
           />
-          <div onClick={toggleConfirmShowPassword} className="toggle-password-button">
+          <div onClick={toggleConfirmShowPassword} className="toggle-password-button1">
             <img 
               className="mdieye-off-icon5" 
               alt="" 
