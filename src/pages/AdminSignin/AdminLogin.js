@@ -1,12 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import "./Login.css";
+import "../Signin/Login.css";
 import { useCallback, useState } from "react";
 import axios from "axios";
 import { jwtDecode } from 'jwt-decode';
 
-const Login = ({setUp}) => {
+const AdminLogin = ({setUp}) => {
 
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false)
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
 
   const onSignUpTextClick = useCallback(() => {
     navigate("/create-account");
@@ -70,7 +74,13 @@ const Login = ({setUp}) => {
             name="password" 
             value={formData.password} 
           />
-          <img className="mdieye-off-icon4" alt="" src="/mdieyeoff.svg" />
+          <div onClick={toggleShowPassword} className="toggle-password-button">
+            <img 
+                className="mdieye-off-icon4" 
+                alt="" 
+                src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
+            />
+          </div>
         </div>
         <div className="frame-wrapper5" onClick={handleLogin}>
           <div className="login-container">
@@ -82,9 +92,9 @@ const Login = ({setUp}) => {
         </div>
       </div>
       <div className="freshsight-group">
-        <div className="freshsight3">
-          <div className="freshsight4">DAIRY FARMER CO.</div>
-          <img className="image-5-icon3" alt="" src="/image-52@2x.png" />
+        <div className="freshsight3" style={{margin:'24.33%'}}>
+          <img className="image-5-icon3" alt="" src="./Images/logo.png" />
+          <div className="freshsight4" style={{marginLeft:'-33.33%'}} >DAIRY FARMER CO.</div>
           {/* <div className="nourishing-lives-reducing1">
             Nourishing Lives, Reducing Waste
           </div> */}
@@ -94,4 +104,4 @@ const Login = ({setUp}) => {
   );
 };
 
-export default Login;
+export default AdminLogin;
