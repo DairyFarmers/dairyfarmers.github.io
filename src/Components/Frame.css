@@ -1,0 +1,143 @@
+.mingcuteclose-line-icon1 {
+  position: absolute;
+ 
+  top: 27px;
+  left: 1006px;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+}
+.rectangle-icon {
+  position: absolute;
+  top: 180px;
+  left: 170px;
+  border-radius: 12px;
+  width: 202px;
+  height: 230px;
+  object-fit: cover;
+}
+.phplus-thin-icon1 {
+  position: absolute;
+  top: 368px;
+  left: 315px;
+  width: 59px;
+  height: 59px;
+  overflow: hidden;
+}
+.frame-child6 {
+  position: absolute;
+  top: 532px;
+  left: 70px;
+  border-radius: 12px;
+  background-color: #505056;
+  width: 402px;
+  height: 60px;
+}
+.apple1,
+.red1 {
+  position: absolute;
+  font-weight: 500;
+}
+.red1 {
+  top: 547px;
+  left: 235px;
+  display: inline-block;
+  width: 249px;
+}
+.apple1 {
+  top: 0;
+  left: 0;
+}
+.iconamoonedit-light1 {
+  position: absolute;
+  top: 7px;
+  left: 70px;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+}
+.apple-group {
+  position: absolute;
+  top: 76px;
+  left: 566px;
+  width: 86px;
+  height: 30px;
+  color: #243465;
+}
+.add-now {
+  position: relative;
+  font-weight: 500;
+  left: 5px;
+}
+.add-now-wrapper,
+.frame-wrapper3 {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+.frame-wrapper3 {
+  position: absolute;
+  top: 532px;
+  left: 576px;
+  border-radius: 7px;
+  background-color: #284fd7;
+  width: 406px;
+  overflow: hidden;
+  flex-direction: column;
+  justify-content: center;
+  padding: 18px 115px;
+  box-sizing: border-box;
+  cursor: pointer;
+  text-align: center;
+  font-size: 16px;
+}
+.earnings,
+.group-item {
+  position: absolute;
+  left: 0;
+}
+.earnings {
+  top: calc(50% - 97px);
+  letter-spacing: 0.28px;
+  width: 200px;
+}
+.group-item {
+  border-radius: 4px;
+  background-color: #eff0f4;
+  width: 406px;
+  height: 60px;
+  font-size: 25px;
+}
+.earnings1 {
+  position: absolute;
+  top: calc(50% + 5px);
+  left: 4.53%;
+  letter-spacing: 0.28px;
+  color: #979797;
+}
+.earnings-parent {
+  position: absolute;
+  width: 42.93%;
+  top: calc(50% - 81.5px);
+  left: 52.5%;
+  height: 94px;
+  font-size: 16px;
+  color: #243465;
+}
+.mingcuteclose-line-parent-frame {
+  width: 110%;
+  top: -580px;
+  left: 150px;
+  z-index: 1;
+  position: relative;
+  border-radius: 16px;
+  background-color: #fff;
+  box-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  height: 600px;
+  overflow: hidden;
+  text-align: left;
+  font-size: 20px;
+  color: #fff;
+  font-family: Poppins;
+}

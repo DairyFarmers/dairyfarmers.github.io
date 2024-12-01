@@ -26,7 +26,10 @@
   margin-bottom: 2rem;
   text-align: center;
 }
-
+.image-5-icon3 {
+  width: 20%;
+  display: block;
+}
 .earnings35 {
   font-size: 1.5rem;
   font-weight: 600;
@@ -136,6 +139,7 @@
     font-weight: 600;
     text-transform: uppercase;
     padding-left: 33%;
+    width: 150%;
   }
 
   .image-5-icon3 {
@@ -181,12 +185,16 @@
   .freshsight-group {
     display: block;
     position: absolute;
-    margin-top: 1rem;
+    margin-top: 0.3rem;
     left: 50%;
     transform: translateX(-50%);
     width: 476px;
   }
-
+  .image-5-icon3 {
+    max-width: 30%;
+    margin: 0.5rem auto;
+    display: block;
+  }
   .earnings35 {
     font-size: 2rem;
     margin-top: 7rem;

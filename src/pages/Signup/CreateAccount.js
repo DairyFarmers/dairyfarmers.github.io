@@ -104,7 +104,7 @@ const CreateAccount = () => {
             <img 
               className="mdieye-off-icon5" 
               alt="" 
-              src={showPassword ? "/eye-icon.png" : "/mdieyeoff.svg"} 
+              src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
             />
           </div>
         </div>
@@ -122,7 +122,7 @@ const CreateAccount = () => {
             <img 
               className="mdieye-off-icon5" 
               alt="" 
-              src={confirmShowPassword ? "/eye-icon.png" : "/mdieyeoff.svg"} 
+              src={confirmShowPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
             />
           </div>
         </div>
@@ -138,7 +138,7 @@ const CreateAccount = () => {
           <div className="freshsight20">
             <div className="freshsight21">DAIRY FARMER CO.</div>
           </div>
-          <img className="image-5-icon13" alt="" src="/image-52@2x.png" />
+          <img className="image-5-icon13" alt="" src="/Images/logo.png" />
           {/* <div className="nourishing-lives-reducing7">
             Nourishing Lives, Reducing Waste
           </div> */}

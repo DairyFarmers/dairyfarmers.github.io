@@ -1,0 +1,267 @@
+.group-child147 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: 16px;
+  background-color: #fff;
+  width: 312px;
+  height: 588px;
+}
+.apple34 {
+  position: absolute;
+  top: 42px;
+  left: 20px;
+  font-weight: 600;
+}
+.mingcuteclose-line-icon9 {
+  position: absolute;
+  top: 14px;
+  left: 280px;
+  width: 20px;
+  height: 20px;
+  overflow: hidden;
+}
+.rectangle-parent89 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 312px;
+  height: 588px;
+  color: #32313d;
+}
+.group-child148 {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border-radius: 7px;
+  background-color: #284fd7;
+}
+.save4 {
+  position: absolute;
+  top: 31.25%;
+  left: 44.12%;
+  font-weight: 600;
+}
+.rectangle-parent90 {
+  position: absolute;
+  height: 8.16%;
+  width: 87.18%;
+  top: 90%;
+  left: 6.41%;
+  cursor: pointer;
+  text-align: center;
+  font-size: 14px;
+  color: #fff;
+  font-family: "Open Sans";
+}
+.freshness-level6 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  font-size: 16px;
+}
+.fresh28,
+.moderate6,
+.spoiled18 {
+  position: absolute;
+  top: 150px;
+  left: 30px;
+  color: #284fd7;
+  font-size: 20px;
+}
+.moderate6,
+.spoiled18 {
+  left: 109px;
+  color: #208dca;
+}
+.spoiled18 {
+  left: 232.7px;
+  color: #000;
+}
+.group-child149,
+.group-child150 {
+  position: absolute;
+  top: 39px;
+  left: 0;
+  width: 276px;
+  height: 12px;
+}
+.group-child149 {
+  background-color: #f1eded;
+}
+.group-child150 {
+  border-radius: 3px;
+  background: linear-gradient(90deg, #284fd7, #0cc308);
+}
+.group-child151,
+.group-child152,
+.group-child153 {
+  position: absolute;
+  top: 33.5px;
+  left: -0.5px;
+  border-right: 1px solid #20ca22;
+  box-sizing: border-box;
+  width: 1px;
+  height: 24px;
+}
+.group-child152,
+.group-child153 {
+  left: 275.5px;
+  border-right: 1px solid #0bc308;
+}
+.group-child153 {
+  left: 137.6px;
+}
+.freshness-level-parent1 {
+  position: absolute;
+  top: 116px;
+  left: 19px;
+  width: 277.7px;
+  height: 78px;
+  font-size: 12px;
+}
+.remaining-shelf-life6,
+.time-left3 {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.time-left3 {
+  top: 300px;
+  left: 33px;
+  font-size: 20px;
+  color: #20ca22;
+}
+.group-child154,
+.group-child155 {
+  position: absolute;
+  top: 39px;
+  left: 0;
+  width: 276px;
+  height: 12px;
+}
+.group-child154 {
+  background-color: #f1eded;
+}
+.group-child155 {
+  border-radius: 3px;
+  background: linear-gradient(90deg, #284fd7, #0cc308);
+}
+.group-child156,
+.group-child157 {
+  position: absolute;
+  top: 33.5px;
+  left: -0.5px;
+  border-right: 1px solid #20ca22;
+  box-sizing: border-box;
+  width: 1px;
+  height: 24px;
+}
+.group-child157 {
+  left: 275.5px;
+}
+.remaining-shelf-life-parent1 {
+  position: absolute;
+  top: 241px;
+  left: 19px;
+  width: 277px;
+  height: 78px;
+}
+.only-spoiled-child1,
+.only-spoiled-inner,
+.only-spoiled-item {
+  position: absolute;
+  top: 89.5px;
+  left: 17.5px;
+  border-top: 1px solid #e2e2e2;
+  box-sizing: border-box;
+  width: 273px;
+  height: 1px;
+}
+.only-spoiled-child1,
+.only-spoiled-inner {
+  top: 347.5px;
+  width: 278px;
+}
+.only-spoiled-child1 {
+  top: 222.5px;
+  width: 273px;
+}
+.mdiradiobox-blank-icon1 {
+  width: 16px;
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.yes1 {
+  position: relative;
+}
+.mdiradiobox-blank-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 12px;
+}
+.mdiradiobox-marked-icon1 {
+  width: 16px;
+  position: relative;
+  height: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.no1 {
+  position: relative;
+}
+.frame-parent37,
+.mdiradiobox-marked-group {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+.mdiradiobox-marked-group {
+  align-items: center;
+  gap: 12px;
+  color: #000;
+}
+.frame-parent37 {
+  position: absolute;
+  top: 74px;
+  left: 1px;
+  align-items: flex-start;
+  gap: 60px;
+}
+.hey-did-you1 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: #000;
+  display: inline-block;
+  width: 273px;
+}
+.frame-parent36 {
+  position: absolute;
+  top: 374px;
+  left: 19px;
+  width: 273px;
+  height: 98px;
+  color: #7e7c7c;
+}
+.only-spoiled1 {
+  width: 312px;
+  position: relative;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  height: 588px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  text-align: left;
+  font-size: 16px;
+  color: #424255;
+  font-family: Poppins;
+}

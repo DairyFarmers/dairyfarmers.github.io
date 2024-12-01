@@ -37,7 +37,7 @@ const Login = ({setUp, ...props}) => {
 
   const handleLogin = async () => {
     try {
-     const res =  await axios.post("http://localhost:5000/login",formData)
+     const res =  await axios.post("http://ec2-54-224-236-69.compute-1.amazonaws.com/api/v1/users/login",formData)
       .then(res =>{
         if (res.data.status==="ok") {
           const token = res.data.data;        
@@ -67,7 +67,7 @@ const Login = ({setUp, ...props}) => {
     <div className="login">
       <div className="rectangle-parent32">
           <div className="freshsight-group">
-              <img className="image-5-icon3" alt="" src="/image-52@2x.png" />
+              <img className="image-5-icon3" alt="" src="./Images/logo.png" />
               <div className="freshsight4">DAIRY FARMER CO.</div>
           </div>
           <div className="earnings35">Login</div>
@@ -96,7 +96,7 @@ const Login = ({setUp, ...props}) => {
             <img 
               className="mdieye-off-icon4" 
               alt="" 
-              src={showPassword ? "/eye-icon.png" : "/mdieyeoff.svg"} 
+              src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
             />
           </div>
         </div>

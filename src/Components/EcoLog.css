@@ -1,0 +1,266 @@
+.mingcuteclose-line-icon4 {
+  position: absolute;
+  top: 26px;
+  left: 757px;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+}
+.eco-log2 {
+  position: absolute;
+  top: 57px;
+  left: 69px;
+  font-size: var(--font-size-xl);
+  font-weight: 500;
+}
+.image2,
+.level2,
+.name2,
+.purchased-date-eco,
+.time-left1,
+.price1 {
+  position: absolute;
+  top: 135px;
+  left: 190px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  color: var(--color-dimgray-100);
+}
+.image2,
+.level2,
+.purchased-date-eco,
+.time-left1 {
+  left: 107px;
+}
+.level2,
+.purchased-date-eco,
+.time-left1 {
+  left: 285px;
+}
+.price1{
+  left: 420px;
+}
+.level2,
+.time-left1 {
+  left: 520px;
+}
+.level2 {
+  left: 659px;
+}
+.group-child50 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  background-color: var(--color-ghostwhite);
+  width: 675px;
+  height: 103px;
+}
+.component-1-child3 {
+  position: absolute;
+  height: 10%;
+  width: 11.13%;
+  top: 160px;
+  left: 80px;
+  border-radius: var(--br-xs);
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+.apple8 {
+  position: absolute;
+  top: 28.17%;
+  left: 15.66%;
+  font-weight: 500;
+}
+.div20 {
+  left: 31%;
+  font-weight: 500;
+}
+.days-left8,
+.div20,
+.fresh8 {
+  position: absolute;
+  top: 28.17%;
+}
+.unit1{
+  position: absolute;
+  top: 28.17%;
+  left: 55.66%;
+  font-weight: 500;
+}
+.fresh8 {
+  left: 91.73%;
+  font-weight: 500;
+  color: var(--color-black);
+  text-align: right;
+}
+.days-left8 {
+  left: 69.3%;
+  color: var(--color-limegreen-100);
+}
+.component-15 {
+  position: absolute;
+  top: 16px;
+  left: 37px;
+  width: 584px;
+  height: 71px;
+}
+.group-child51,
+.rectangle-parent23 {
+  position: absolute;
+  width: 675px;
+  height: 103px;
+}
+.rectangle-parent23 {
+  top: 168px;
+  left: 69px;
+  cursor: pointer;
+}
+.group-child51 {
+  top: 0;
+  left: 0;
+}
+.rectangle-parent24,
+.rectangle-parent25,
+.rectangle-parent26,
+.rectangle-parent27 {
+  position: absolute;
+  top:25px;
+  left: 369px;
+  width: 675px;
+  height: 103px;
+  cursor: pointer;
+}
+.rectangle-parent25,
+.rectangle-parent26,
+.rectangle-parent27 {
+  top: 477px;
+}
+.rectangle-parent26,
+.rectangle-parent27 {
+  top: 374px;
+}
+.rectangle-parent27 {
+  top: 580px;
+}
+.eco-log-child {
+  position: absolute;
+  top: 167.8px;
+  box-sizing: border-box;
+}
+.eco-log-child,
+.eco-log-inner,
+.eco-log-item {
+  left: 92.8px;
+  border-top: 0.5px solid var(--color-gainsboro-300);
+  width: 628.5px;
+  height: 0.5px;
+}
+.eco-log-item {
+  position: absolute;
+  top: 373.8px;
+  box-sizing: border-box;
+}
+.eco-log-inner {
+  top: 476.8px;
+}
+.eco-log-child1,
+.eco-log-inner,
+.group-child55 {
+  position: absolute;
+  box-sizing: border-box;
+}
+.eco-log-child1 {
+  top: 579.8px;
+  left: 92.8px;
+  border-top: 0.5px solid var(--color-gainsboro-300);
+  width: 628.5px;
+  height: 0.5px;
+}
+.group-child55 {
+  top: -0.2px;
+  left: -0.2px;
+  border-radius: var(--br-14xl);
+  background-color: var(--color-white);
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.03);
+  border: 0.5px solid var(--color-silver-100);
+  width: 419.5px;
+  height: 48.5px;
+}
+.iconamoonsearch3 {
+  position: absolute;
+  top: 13px;
+  left: 369px;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+  object-fit: contain;
+}
+.search3 {
+  position: absolute;
+  top: 14px;
+  left: 32px;
+  font-weight: 500;
+}
+.rectangle-parent28 {
+  position: absolute;
+  top: 48px;
+  left: 325px;
+  width: 419px;
+  height: 48px;
+  color: var(--color-silver-300);
+}
+.material-symbols-lightdate-ra-icon2 {
+  position: absolute;
+  top: 57px;
+  left: 278px;
+  width: 30px;
+  height: 30px;
+  overflow: hidden;
+}
+.table-eco{
+  margin-top: 100px;
+  padding-left: 100px;
+}
+.eco-log1 {
+  width: 813px;
+  left: 80px;
+  position: relative;
+  border-radius: var(--br-base);
+  background-color: var(--color-whitesmoke-100);
+  height: 717px;
+  overflow: hidden;
+  max-width: 100%;
+  max-height: 100%;
+  text-align: left;
+  font-size: var(--font-size-base);
+  color: var(--color-darkslateblue-100);
+  font-family: var(--font-poppins);
+  overflow-y: auto;
+}
+
+.rectangle-parent-search-eco {
+  position: absolute;
+  top: 44px;
+  height: 0;
+  left: 320px;
+  font-size: var(--font-size-base);
+}
+.group-item-search-eco {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-radius: var(--br-14xl); 
+  width: 410px;
+  height: 48px;
+  font-size: 25px;
+}
+.iconamoonsearch-eco {
+  position: absolute;
+  top: 13px;
+  left: 369px;
+  width: 26px;
+  height: 26px;
+  overflow: hidden;
+  object-fit: contain;
+}
