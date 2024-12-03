@@ -1,0 +1,32 @@
+*{
+    overflow-x: hidden !important;
+
+   }
+  .all_center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .all_end{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+  .all_start{
+    display: flex;
+    justify-content: flex-start;
+    align-items: center; 
+  }
+  a{
+    text-decoration: none !important;
+    color: black;
+  }
+  .seticon2 {
+    width: 90%;
+  }
+  .cl1{
+    color: var(--shades-white, #FFF);
+  }
+  .cl2{
+    color: var(--T2, rgba(9, 53, 45, 0.73));
+  }
