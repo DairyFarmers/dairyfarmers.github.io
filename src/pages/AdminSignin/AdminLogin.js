@@ -1,107 +1,143 @@
-import { useNavigate } from "react-router-dom";
-import "../Signin/Login.css";
-import { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
+import "../Signin/SignIn.css";
 import axios from "axios";
-import { jwtDecode } from 'jwt-decode';
+import { useNavigate } from "react-router-dom";
 
-const AdminLogin = ({setUp}) => {
+const Login = () => {
+
+  const [employeeId, setEmployeeId] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleEmployeeIdChange = (e) => {
+    setEmployeeId(e.target.value);
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+  };
 
   const navigate = useNavigate();
-  const [showPassword, setShowPassword] = useState(false)
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
+
+  const handleLogin = async () => {
+    try {
+      if (!employeeId) {
+        window.alert("Invalid credentials");
+        return;
+      }
+      if (!password) {
+        window.alert("Invalid password");
+        return;
+      }
+      await axios.post("http://localhost:5000/api/login", {
+        employeeId,
+        password,
+      })
+        .then((res) => {
+          if (res.data.status === "success") {
+            console.log(res.data.message);
+            navigate("/dashboard");
+          } else if (res.data.status === "failure") {
+            window.alert("Invalid Password");
+            console.error("Invalid Password:", res.data.message);
+          } else {
+            console.error("Invalid response format:", res);
+          }
+        });
+    } catch (error) {
+      console.error("Error during login:", error.res?.data?.message);
+      window.alert("Invalid credentials");
+    }
   };
 
   const onSignUpTextClick = useCallback(() => {
     navigate("/create-account");
   }, [navigate]);
 
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-  });
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const togglePasswordVisibility = () => {
+    setPasswordVisibility((prev) => !prev);
   };
 
-  const handleLogin = async () => {
-    try {
-      await axios.post("http://localhost:5000/login",formData)
-      .then(res =>{
-        if (res.data.status==="ok") {
-          const decodedToken = jwtDecode(res.data.data);
-          navigate('home1');
-          setUp(decodedToken)
-        } else {
-          console.error("Invalid response format:", res);
-          window.alert("Invalid response format")
-        }
-      })
-    
-    } catch (error) {
-      console.error("Error during login:", error.res?.data?.message);
-      window.alert("Invalid credentials")
-
-    }
-  };
-  
   return (
-    <div className="login">
-        <div className="rectangle-parent32">
-        {/* <div className="freshsight15">
-          <b className="freshsight16">DAIRY FARMER CO.</b>
-        </div> */}
-        <div className="earnings35" style={{left:'38.33%'}}>Admin Login</div>
-        <div className="earnings-parent12">
-          <div className="earnings36">Email</div>
-          <input 
-            className="group-child68" 
-            placeholder="Enter your email"
-            onChange={handleChange}  
-            type="email"
-            name="email" 
-            value={formData.email} 
-          />
-        </div>
-        <div className="earnings-parent13">
-          <div className="earnings36">Password</div>
-          <input 
-            className="group-child68" 
-            placeholder="Enter your password"
-            onChange={handleChange}
-            type="password"
-            name="password" 
-            value={formData.password} 
-          />
-          <div onClick={toggleShowPassword} className="toggle-password-button">
-            <img 
-                className="mdieye-off-icon4" 
-                alt="" 
-                src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
-            />
+    <div>
+      <div className="row">
+        <div className="bg_black col-12">
+          <div className="row">
+            {/* Right Side Content */}
+            <div className="col-6">
+              <div className="row bg_white">
+                <div className="col-12 ">
+                  <div className="row">
+                    <span className="logtx01">Login to Admin account</span>
+                  </div>
+                  <div className="row mt-1">
+                    <span className="logtx02 mb-3">Enter your organizational credentials to proceed</span>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Employee ID</label>
+                        <input className="loginput" type="text" placeholder="Enter your Employee ID"
+                          value={employeeId} onChange={handleEmployeeIdChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Password</label>
+                        <input 
+                          className="loginput" 
+                          type={passwordVisibility ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter your Password" 
+                          value={password} 
+                          onChange={handlePasswordChange}
+                        />
+                         <div
+                            className="toggle-password"
+                            onClick={togglePasswordVisibility}
+                          >
+                            <img
+                              className="mdieye-off-icon6"
+                              alt=""
+                              src={
+                                passwordVisibility
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center mt-3">
+                      <div className="col-7 space_bet">
+                        <span className="fog_tx">Forgot password?</span>
+                        <button className="btn btn-dark" onClick={handleLogin}>Login</button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="sign-up" onClick={onSignUpTextClick}>SignUp</div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6">
+              <div className="row upbox">
+                <span className="logotx"><img className="me-2" src="./images/logo.png" alt="" />DAIRY FARMER CO.</span>
+              </div>
+              <div className="row botbox">
+                <span className="bottx ">Revolutionizing poultry farming with our non-invasive pre-incubation gender determination system, utilizing machine learning for efficient and ethical chick sexing.</span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="frame-wrapper5" onClick={handleLogin}>
-          <div className="login-container">
-            <div className="login2">Login</div>
-          </div>
-        </div>
-        <div className="sign-up" onClick={onSignUpTextClick}>
-          Sign Up
-        </div>
-      </div>
-      <div className="freshsight-group">
-        <div className="freshsight3" style={{margin:'24.33%'}}>
-          <img className="image-5-icon3" alt="" src="./Images/logo.png" />
-          <div className="freshsight4" style={{marginLeft:'-33.33%'}} >DAIRY FARMER CO.</div>
-          {/* <div className="nourishing-lives-reducing1">
-            Nourishing Lives, Reducing Waste
-          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export default AdminLogin;
+export default Login;
