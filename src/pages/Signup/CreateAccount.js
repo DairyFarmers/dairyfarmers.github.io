@@ -65,94 +65,153 @@ const Signup = () => {
   };
 
   return (
-    <div className="create-account">
-      <div className="rectangle-parent33">
-        <div className="earnings40">Create Account</div>
-        <div className="earnings-parent14">
-          <div className="earnings41">Email</div>
-          <input 
-            className="group-child70" 
-            placeholder="Enter your email"
-            type="email" 
-            name="email" 
-            value={formData.email} 
-            onChange={handleChange}
-          />
-        </div>
-        <div className="earnings-parent15">
-          <div className="earnings41">First Name</div>
-          <input 
-            className="group-child70" 
-            placeholder="Enter your first name"
-            type="text" 
-            name="firstname" 
-            value={formData.firstname} 
-            onChange={handleChange}  
-          />
-        </div>
-        <div className="earnings-parent16">
-          <div className="earnings41">Last Name</div>
-          <input 
-            className="group-child70" 
-            placeholder="Enter your last name"
-            type="text" 
-            name="lastname" 
-            value={formData.lastname} 
-            onChange={handleChange}  
-          />
-        </div>
-        <div className="earnings-parent17">
-          <div className="earnings41">Password</div>
-          <input 
-            className="group-child70" 
-            placeholder="Enter your password"
-            type={showPassword ? 'text' : 'password'}
-            name="password"
-            value={formData.password} 
-            onChange={handleChange}
-          />
-          <div onClick={toggleShowPassword} className="toggle-password-button1">
-            <img 
-              className="mdieye-off-icon5" 
-              alt="" 
-              src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
-            />
+    <div>
+      <div className="row">
+        <div className="bg_black col-12">
+          <div className="row">
+            <div className="col-6">
+              <div className="row bg_white">
+                <div className="col-12">
+                  <div className="row">
+                    <span className="logtx01">Create Your Account</span>
+                  </div>
+                  <div className="row mt-1">
+                    <span className="logtx02 mb-3">
+                      Enter your details to create a new account
+                    </span>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">First Name</label>
+                        <input
+                          className="loginput"
+                          type="text"
+                          name="firstname"
+                          placeholder="Enter your First Name"
+                          value={formData.firstname}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Last Name</label>
+                        <input
+                          className="loginput"
+                          type="text"
+                          name="lastname"
+                          placeholder="Enter your Last Name"
+                          value={formData.lastname}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Email</label>
+                        <input
+                          className="loginput"
+                          type="email"
+                          name="email"
+                          placeholder="Enter your Email"
+                          value={formData.email}
+                          onChange={handleChange}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Password</label>
+                          <input
+                            className="loginput"
+                            type={passwordVisibility.password ? "text" : "password"}
+                            name="password"
+                            placeholder="Enter your Password"
+                            value={formData.password}
+                            onChange={handleChange}
+                          />
+                      <button
+                            className="toggle-password"
+                            onClick={() => togglePasswordVisibility("password")}>
+                            <img
+                              className="mdieye-off-icon5"
+                              alt=""
+                              src={
+                                passwordVisibility.password
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                      </button>
+                          
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Confirm Password</label>
+                          <input
+                            className="loginput"
+                            type={passwordVisibility.confirmPassword ? "text" : "password"}
+                            name="confirmPassword"
+                            placeholder="Confirm your Password"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                          />
+                          <div
+                            className="toggle-password"
+                            onClick={() => togglePasswordVisibility("confirmPassword")}
+                          >
+                            <img
+                              className="mdieye-off-icon6"
+                              alt=""
+                              src={
+                                passwordVisibility.confirmPassword
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                          </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="row mt-4">
+                    <div className="col-12 all_center mt-3">
+                      <div className="col-7 space_bet">
+                        <button className="btn btn-dark" id="button"  onClick={handleSignup}>
+                          Sign Up
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="content">If you have already account? <span className="signin">Sign In</span></div>
+                </div>
+              </div>
+            </div>
+            <div className="col-6">
+              <div className="row upbox">
+                <span className="logotx">
+                  <img className="me-2" src="./images/logo.png" alt="" />
+                  DAIRY FARMER CO.
+                </span>
+              </div>
+              <div className="row botbox">
+                <span className="bottx">
+                  Revolutionizing poultry farming with our non-invasive
+                  pre-incubation gender determination system, utilizing machine
+                  learning for efficient and ethical chick sexing.
+                </span>
+              </div>
+            </div>
           </div>
-        </div>
-        <div className="earnings-parent18">
-          <div className="earnings41">Confirm Password</div>
-          <input 
-            className="group-child70" 
-            placeholder="Enter your cofirm password"
-            type={confirmShowPassword ? 'text' : 'password'}
-            name="confirmpassword" 
-            value={formData.confirmpassword} 
-            onChange={handleChange}
-          />
-          <div onClick={toggleConfirmShowPassword} className="toggle-password-button1">
-            <img 
-              className="mdieye-off-icon5" 
-              alt="" 
-              src={confirmShowPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
-            />
-          </div>
-        </div>
-        <div className="frame-wrapper6"  onClick={handleSubmit}>
-          <div className="sign-up-wrapper">
-            <div className="sign-up1">Sign Up</div>
-          </div>
-        </div>
-        <div className="log-in" onClick={onLogInTextClick}>
-          Log In
-        </div>
-        <div className="freshsight-parent3">
-          <div className="freshsight20">
-            <div className="freshsight21">DAIRY FARMER CO.</div>
-          </div>
-          <img className="image-5-icon13" alt="" src="/Images/logo.png" />
-          {/* <div className="nourishing-lives-reducing7">
-            Nourishing Lives, Reducing Waste
-          </div> */}
         </div>
       </div>
     </div>
