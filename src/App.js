@@ -1,10 +1,13 @@
+import { Routes, Route } from 'react-router-dom';
+import CreateAccount from './pages/Signup/CreateAccount';
+import Login from './pages/Signin/Login';
+
 const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>Hello Dairy Farmers!</p>
-      </header>
-    </div>
+    <Routes>
+      <Route path="/signup" element={<CreateAccount />} />
+      <Route path="/login" element={<Login />} />
+    </Routes>
   );
 }
 
