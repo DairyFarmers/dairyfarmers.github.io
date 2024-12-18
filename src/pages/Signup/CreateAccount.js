@@ -1,56 +1,67 @@
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import "./CreateAccount.css";
 import axios from "axios";
-import { useCallback, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const CreateAccount = () => {
+const Signup = () => {
+  const [formData, setFormData] = useState({
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const [passwordVisibility, setPasswordVisibility] = useState({
+    password: false,
+    confirmPassword: false,
+  });
 
   const navigate = useNavigate();
 
-  const onLogInTextClick = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
-
-  const [formData, setFormData] = useState({
-    firstname: '',
-    lastname: '',
-    email: '',
-    password: '',
-    confirmpassword: ''
-  });
-
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const togglePasswordVisibility = (field) => {
+    setPasswordVisibility((prev) => ({
+      ...prev,
+      [field]: !prev[field],
+    }));
+  };
 
-    if (!formData.firstname || !formData.lastname || !formData.email || !formData.password) {
-      window.alert("Fill the reqired fields")
+  const handleSignup = async () => {
+    const { firstname, lastname, email, password, confirmPassword } = formData;
+
+    if (!firstname || !lastname || !email || !password || !confirmPassword) {
+      window.alert("All fields are required");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      window.alert("Passwords do not match");
+      return;
     }
 
     try {
-      const response = await axios.post('http://ec2-54-224-236-69.compute-1.amazonaws.com/api/v1/users/signup', formData);
-      if (response.status === 201) {
-        console.log('User registered successfully');
-        alert('User registered successfully');
-        navigate('/')
+      const res = await axios.post("http://localhost:5000/api/signup", {
+        firstname,
+        lastname,
+        email,
+        password,
+      });
+
+      if (res.data.status === "success") {
+        console.log("Signup successful:", res.data.message);
+        navigate("/welcome"); // Navigate to a welcome or login page
+      } else {
+        window.alert("Signup failed: " + res.data.message);
       }
     } catch (error) {
-      console.error('Error during registration:', error.message);
+      console.error("Error during signup:", error.response?.data?.message);
+      window.alert("Error during signup");
     }
-  };
-
-  const [showPassword, setShowPassword] = useState(false)
-  const [confirmShowPassword, setConfirmShowPassword] = useState(false);
-
-  const toggleShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const toggleConfirmShowPassword = () => {
-    setConfirmShowPassword(!confirmShowPassword);
   };
 
   return (
@@ -104,7 +115,7 @@ const CreateAccount = () => {
             <img 
               className="mdieye-off-icon5" 
               alt="" 
-              src={showPassword ? "/eye-icon.png" : "/mdieyeoff.svg"} 
+              src={showPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
             />
           </div>
         </div>
@@ -122,7 +133,7 @@ const CreateAccount = () => {
             <img 
               className="mdieye-off-icon5" 
               alt="" 
-              src={confirmShowPassword ? "/eye-icon.png" : "/mdieyeoff.svg"} 
+              src={confirmShowPassword ? "/Images/eye-icon.png" : "/Images/eyeoff.svg"} 
             />
           </div>
         </div>
@@ -138,7 +149,7 @@ const CreateAccount = () => {
           <div className="freshsight20">
             <div className="freshsight21">DAIRY FARMER CO.</div>
           </div>
-          <img className="image-5-icon13" alt="" src="/image-52@2x.png" />
+          <img className="image-5-icon13" alt="" src="/Images/logo.png" />
           {/* <div className="nourishing-lives-reducing7">
             Nourishing Lives, Reducing Waste
           </div> */}
@@ -148,4 +159,4 @@ const CreateAccount = () => {
   );
 };
 
-export default CreateAccount;
+export default Signup;

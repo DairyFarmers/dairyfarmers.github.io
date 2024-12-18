@@ -1,0 +1,58 @@
+.component-1-child8,
+.group-child67 {
+  position: absolute;
+  top: 10px;
+  margin-top: 10px;
+  width: 65px;
+  height: 103px;
+}
+.component-11-child8 {
+  height: 50px;
+  width: 50px;
+  border-radius: var(--br-xs);
+  overflow: hidden;
+  top: 10px;
+}
+.apple14 {
+  top: 28.17%;
+  left: 18.66%;
+  font-weight: 500;
+}
+.div25 {
+  left: 37.67%;
+  font-weight: 500;
+}
+.days-left13,
+.div25,
+.fresh14 {
+  top: 28.17%;
+}
+.fresh14 {
+  left: 88%;
+  font-weight: 500;
+  color: var(--color-steelblue-100);
+  text-align: right;
+}
+.days-left13 {
+  left: 61.3%;
+  color: var(--color-limegreen-100);
+}
+.component-110 {
+  position: absolute;
+  top: 16px;
+  left: 37px;
+  width: 584px;
+  height: 71px;
+}
+.rectangle-parent30 {
+  position: absolute;
+  top: 103px;
+  left: 0;
+  width: 675px;
+  height: 103px;
+  cursor: pointer;
+  text-align: left;
+  font-size: var(--font-size-base);
+  color: var(--color-darkslateblue-100);
+  font-family: var(--font-poppins);
+}
