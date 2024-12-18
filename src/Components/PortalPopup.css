@@ -1,0 +1,14 @@
+.portalPopupOverlay {
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  inset: 0;
+}
+
+@media (max-width: 1320px) {
+  .portalPopupOverlay {
+    justify-content: center;
+    align-items: center;
+    background-color: aliceblue;
+  }
+}
