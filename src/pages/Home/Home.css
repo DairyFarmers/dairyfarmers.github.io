@@ -63,8 +63,8 @@
   top: 0;
   left: 0;
   background-color: var(--color-royalblue);
-  width: 142px;
-  height: 1024px;
+  width: 20%;
+  height: 100%;
 }
 .freshsight,
 .image-5-icon {
@@ -74,9 +74,9 @@
   width: 200%;
 }
 .image-5-icon {
-  height: 71.64%;
+  height: 80%;
   width: 22.14%;
-  top: 20.9%;
+  top: 5%;
   right: 77.86%;
   bottom: 7.46%;
   left: 0;
@@ -96,9 +96,9 @@
 .freshsight-parent {
   position: absolute;
   top: 43px;
-  left: 200px;
-  width: 262px;
-  height: 67px;
+  left: 25%;
+  width: 25%;
+  height: 10%;
   font-size: var(--font-size-17xl);
   color: var(--color-royalblue);
 }
@@ -871,25 +871,93 @@ thead tr td{
   width: 74px;
   height: 74px;
 }
-.fa6-solidchart-line-icon {
-  width: 30px;
-  position: relative;
-  height: 30px;
-  overflow: hidden;
-  flex-shrink: 0;
-  cursor: pointer;
-}
+/* Sidebar Container */
 .octiconhome-16-parent {
-  position: absolute;
-  top: 195px;
-  left: 45px;
-  width: 32px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: var(--gap-41xl);
+  background-color: var(--color-royalblue); /* Dark sidebar */
+  color: #ffffff;
+  width: 80px; /* Collapsed width for desktop */
+  height: 100vh;
+  padding: 10px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  transition: width 0.3s ease;
 }
+
+.octiconhome-16-parent:hover {
+  width: 200px; /* Expand on hover */
+}
+
+.octiconhome-16 {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  padding: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s ease;
+}
+
+.octiconhome-16:hover {
+  background-color: #374151; /* Hover background color */
+}
+
+.octiconhome-16 img {
+  width: 24px;
+  height: 24px;
+  margin-right: 10px; /* Space between icon and text */
+}
+
+.fa6-solidchart-line-icon {
+  width: 24px;
+  height: 24px;
+  margin: 10px 0;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.fa6-solidchart-line-icon:hover {
+  transform: scale(1.2); /* Slight zoom on hover */
+}
+
+/* Text */
+.octiconhome-16 span {
+  display: none; /* Hide text by default for collapsed sidebar */
+  font-size: 14px;
+  color: #d1d5db;
+}
+
+.octiconhome-16-parent:hover span {
+  display: inline; /* Show text on hover */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .octiconhome-16-parent {
+    width: 60px; /* Smaller width for mobile */
+    flex-direction: row; /* Horizontal for mobile */
+    height: auto;
+  }
+
+  .octiconhome-16 {
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .fa6-solidchart-line-icon {
+    margin: 5px;
+  }
+
+  .octiconhome-16-parent:hover {
+    width: 60px; /* No hover expand on mobile */
+  }
+}
+
 .home-child7 {
   position: absolute;
   top: 35px;
@@ -945,9 +1013,9 @@ thead tr td{
 .group-div {
   position: absolute;
   top: 43px;
-  left: 30px;
-  width: 72px;
-  height: 72px;
+  left: 7%;
+  width: 5%;
+  height: 8%;
 }
 .home {
   width: 100%;

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import "./CreateAccount.css";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
@@ -18,6 +18,11 @@ const Signup = () => {
   });
 
   const navigate = useNavigate();
+
+  const onSignin = useCallback(() => {
+    navigate("/");
+  }, [navigate]);
+
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -192,7 +197,7 @@ const Signup = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="content">If you have already account? <span className="signin">Sign In</span></div>
+                  <div className="content">If you have already account? <span className="signin" onClick={onSignin}>Sign In</span></div>
                 </div>
               </div>
             </div>

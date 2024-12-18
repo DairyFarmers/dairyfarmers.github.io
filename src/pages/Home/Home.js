@@ -1,16 +1,13 @@
-import { useState, useCallback, useEffect, useMemo } from "react";
+import { useState, useCallback, useEffect } from "react";
 import OnlyFreshOrModerate from "../../Components/OnlyFreshOrModerate";
 import PortalPopup from "../../Components/PortalPopup";
 import PurchasedItem from "../../Components/PurchasedItem";
 import EcoLog from "../../Components/EcoLog";
-import FreshAppleContainer from "../../Components/FreshAppleContainer";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import SimpleLineChart from "../../Components/LineChart";
-import Calendar from 'react-calendar';
 import axios from "axios";
 import MyCalendar from "../../Components/Calender";
-import Frame from "../../Components/Frame1";
 import Frame1 from "../../Components/Frame1";
 
 const Home = ({ user }) => {
@@ -188,12 +185,12 @@ const Home = ({ user }) => {
 
     console.log(data);
 
-    if (event.target.value.toLowerCase() == "") {
+    if (event.target.value.toLowerCase() === "") {
       fetch('http://localhost:5000/homes') // Replace with your backend URL
       .then(response => response.json())
       .then(data => get_homes_data(data))
       .catch(error => console.error('Error fetching homes:', error));
-    } else if (data.nodes.length == 0) {
+    } else if (data.nodes.length === 0) {
       fetch('http://localhost:5000/homes') // Replace with your backend URL
       .then(response => response.json())
       .then(data => get_homes_data(data))
@@ -220,13 +217,13 @@ const Home = ({ user }) => {
       new Date(date)
       .toLocaleDateString('en-GB',{year:"numeric",month:'2-digit',day:"2-digit"}))
       if(homes[i].datetime != null && new Date(homes[i].datetime)
-      .toLocaleDateString('en-GB',{year:"numeric",month:'2-digit',day:"2-digit"}) == 
+      .toLocaleDateString('en-GB',{year:"numeric",month:'2-digit',day:"2-digit"}) === 
       new Date(date)
       .toLocaleDateString('en-GB',{year:"numeric",month:'2-digit',day:"2-digit"})){
         newhomes.push(homes[i])
       }
     }
-    if( newhomes.length == 0){
+    if( newhomes.length === 0){
       alert("No data found");
       fetch('http://localhost:5000/homes') // Replace with your backend URL
       .then(response => response.json())
@@ -308,10 +305,7 @@ const Home = ({ user }) => {
         <div className="group-container">
           <div className="rectangle-group">
             <div className="frame-wrapper">
-
- 
               <div className="upload" onClick={handleUpload}>Upload</div>
-
             </div>
             <div className="please-upload-your-image-parent">
               <div className="please-upload-your">Please upload your image</div>
@@ -319,21 +313,16 @@ const Home = ({ user }) => {
                 Use a mobile device for a better experience
               </div>
             </div>
-
-
             <label htmlFor="fileInput" className="icround-upload-parent" type="file">
-
               <div className="featherupload-cloud-parent zindez1">
                 <img
                   className="featherupload-cloud-icon"
                   alt=""
-                  src="/featheruploadcloud.svg"
+                  src="./Images/featheruploadcloud.svg"
                 />
                 <div className="bottom-content" onDrop={handleDrop}>
                   <div className="description">
-
-
-                    <div className="please-upload-your">
+                   <div className="please-upload-your">
                       <input
                         type="file"
                         id="fileInput"
@@ -349,24 +338,17 @@ const Home = ({ user }) => {
                           <div className="jpg-or-png">
                             JPG or PNG, file size no more than 10MB
                           </div>
-
-
                           <div className="button" >
                             SELECT FILE
                           </div>
-
                         </>
                       )}
                     </div>
-
-
                   </div>
                 </div>
               </div>
 
             </label>
-
-
           </div>
           <div className="upload-field zindez2" />
         </div>
@@ -389,44 +371,52 @@ const Home = ({ user }) => {
         <img
           className="group-icon"
           alt=""
-          src="/group-883.svg"
+          src="./Images/group-883.svg"
           onClick={openPurchasedItem}
         />
         <img
           className="home-child6"
           alt=""
-          src="/group-883.svg"
+          src="./Images/group-883.svg"
           onClick={openEcoLog}
         />
-        <img className="image-2-icon" alt="" src="/image-2@2x.png" />
+        <img className="image-2-icon" alt="" src="./Images/image-2@2x.png" />
         <b className="b">{item}</b>
         <b className="b1">{purchase}</b>
         <b className="b2">{spoil+spoilNo}</b>
-        <img className="image-3-icon" alt="" src="/image-3@2x.png" />
-        <img className="image-4-icon" alt="" src="/image-4@2x.png" />
+        <img className="image-3-icon" alt="" src="./Images/image-3@2x.png" />
+        <img className="image-4-icon" alt="" src="./Images/image-4@2x.png" />
         <div className="octiconhome-16-parent">
-          <img
-            className="fa6-solidchart-line-icon"
-            alt=""
-            src="./Images/home.svg"
-          />
-          <img
-            className="fa6-solidchart-line-icon"
-            alt=""
-            src="./Images/chartline.svg"
-            onClick={onFa6SolidchartLineIconClick}
-          />
-          <img
-            className="fa6-solidchart-line-icon"
-            alt=""
-            src="./Images/setting.svg"
-            onClick={onUilsettingIconClick}
-          />
-        </div>
+  <div className="octiconhome-16" onClick={() => console.log('Home clicked')}>
+    <img
+      className="fa6-solidchart-line-icon"
+      alt="Home Icon"
+      src="./Images/home.svg"
+    />
+    <span>Home</span>
+  </div>
+  <div className="octiconhome-16" onClick={onFa6SolidchartLineIconClick}>
+    <img
+      className="fa6-solidchart-line-icon"
+      alt="Chart Line Icon"
+      src="./Images/chartline.svg"
+    />
+    <span>Analytics</span>
+  </div>
+  <div className="octiconhome-16" onClick={onUilsettingIconClick}>
+    <img
+      className="fa6-solidchart-line-icon"
+      alt="Settings Icon"
+      src="./Images/setting.svg"
+    />
+    <span>Settings</span>
+  </div>
+</div>
+
         <img
           className="home-child7"
           alt=""
-          src="/group-902.svg"
+          src="./Images/group-902.svg"
           onClick={onGroupIcon2Click}
         />
         <div className="items">Items</div>
@@ -434,7 +424,7 @@ const Home = ({ user }) => {
         <img
           className="material-symbols-lightdate-ra-icon"
           alt=""
-          src="/materialsymbolslightdaterange.svg"
+          src="./Images/materialsymbolslightdaterange.svg"
           onClick={handleDatePickerToggle}
         />
 

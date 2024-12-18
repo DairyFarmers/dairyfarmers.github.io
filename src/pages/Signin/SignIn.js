@@ -23,7 +23,7 @@ const Login = (props) => {
 
   const handleLogin = async () => {
     try {
-      if (!employeeId) {
+      if (!) {
         window.alert("Invalid credentials");
         return;
       }
@@ -31,12 +31,12 @@ const Login = (props) => {
         window.alert("Invalid password");
         return;
       }
-      await axios.post("http://localhost:5000/api/login", {
-        employeeId,
+      await axios.post("http://ec2-54-224-236-69.compute-1.amazonaws.com/api/v1/users/login", {
+        email,
         password,
       })
         .then((res) => {
-          if (res.data.status === "success") {
+          if (res.status === 200) {
             console.log(res.data.message);
             navigate("/dashboard");
           } else if (res.data.status === "failure") {
@@ -55,6 +55,12 @@ const Login = (props) => {
   const onSignUpTextClick = useCallback(() => {
     navigate("/create-account");
   }, [navigate]);
+
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
+
+  const togglePasswordVisibility = () => {
+    setPasswordVisibility((prev) => !prev);
+  };
 
   return (
     <div>
@@ -85,9 +91,28 @@ const Login = (props) => {
                     <div className="col-12 all_center">
                       <div className="row col-7">
                         <label className="loglab mb-1">Password</label>
-                        <input className="loginput" type="password"
-                          placeholder="Enter your Password" value={password} onChange={handlePasswordChange}
+                        <input 
+                          className="loginput" 
+                          type={passwordVisibility ? "text" : "password"}
+                          name="password"
+                          placeholder="Enter your Password" 
+                          value={password} 
+                          onChange={handlePasswordChange}
                         />
+                         <div
+                            className="toggle-password"
+                            onClick={togglePasswordVisibility}
+                          >
+                            <img
+                              className="mdieye-off-icon6"
+                              alt=""
+                              src={
+                                passwordVisibility
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                          </div>
                       </div>
                     </div>
                   </div>
