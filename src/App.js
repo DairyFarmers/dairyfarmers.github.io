@@ -17,29 +17,32 @@ const App = () => {
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
-  // useEffect(() => {
-  //   async function fetchData() {
-  //     try {
-  //       const response = await axiosPrivate.get(token_verification_path);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axiosPrivate.get(token_verification_path);
 
-  //       if (response.status === 200) {
-  //         dispatch(login(response.data.data));
-  //       }
-  //     } catch (err) {
-  //       navigate('/', {
-  //         state: { from: location },
-  //         replace: true
-  //       });
-  //     }
-  //   }
-  //   fetchData();
-  // }, [isLoggedIn]);
+        if (response.status === 200) {
+          dispatch(login(response.data.data));
+        }
+      } catch (err) {
+        navigate('/', {
+          state: { from: location },
+          replace: true
+        });
+      }
+    }
+    fetchData();
+  }, [isLoggedIn]);
 
   return (
     <Routes>
       <Route path="/" element={<Login />} />
       <Route path="/error" element={<Error />} />
-      <Route path="/dashboard" element={<Home />}/>
+      <Route path="/dashboard" element={
+        <PrivateRoute>
+          <Home />
+        </PrivateRoute>}/>
     </Routes>
   );
 }
