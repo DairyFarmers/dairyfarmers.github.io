@@ -1,6 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./SignIn.css";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { axiosPrivate } from "../../api/axios";
@@ -18,11 +17,11 @@ const Login = () => {
     }
   }, [isLoggedIn]);
 
-  const [employeeId, setEmployeeId] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleEmployeeIdChange = (e) => {
-    setEmployeeId(e.target.value);
+    setEmail(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
@@ -31,7 +30,7 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      if (!employeeId) {
+      if (!email) {
         window.alert("Invalid credentials");
         return;
       }
@@ -41,7 +40,7 @@ const Login = () => {
       }
       
       const response = await axiosPrivate.post(login_path, {
-        email: employeeId,
+        email: email,
         password: password
       });
 
@@ -55,6 +54,12 @@ const Login = () => {
       navigate("/error", { replace: true });
     }
   };
+
+   const [passwordVisibility, setPasswordVisibility] = useState(false);
+  
+    const togglePasswordVisibility = () => {
+      setPasswordVisibility((prev) => !prev);
+    };
 
 return (
   <div>
@@ -74,23 +79,42 @@ return (
                 <div className="row mt-4">
                   <div className="col-12 all_center">
                     <div className="row col-7">
-                      <label className="loglab mb-1">Employee ID</label>
-                      <input className="loginput" type="text" placeholder="Enter your Employee ID"
-                        value={employeeId} onChange={handleEmployeeIdChange}
+                      <label className="loglab mb-1">Email</label>
+                      <input className="loginput" type="text" placeholder="Enter your Email"
+                        value={email} onChange={handleEmployeeIdChange}
                       />
                     </div>
                   </div>
                 </div>
                 <div className="row mt-4">
-                  <div className="col-12 all_center">
-                    <div className="row col-7">
-                      <label className="loglab mb-1">Password</label>
-                      <input className="loginput" type="password"
-                        placeholder="Enter your Password" value={password} onChange={handlePasswordChange}
-                      />
+                    <div className="col-12 all_center">
+                      <div className="row col-7">
+                        <label className="loglab mb-1">Password</label>
+                          <input 
+                            className="loginput" 
+                            type={passwordVisibility ? "text" : "password"}
+                            name="password"
+                            placeholder="Enter your Password" 
+                            value={password} 
+                            onChange={handlePasswordChange}
+                          />
+                         <div
+                            className="toggle-password"
+                            onClick={togglePasswordVisibility}
+                          >
+                            <img
+                              className="mdieye-off-icon6"
+                              alt=""
+                              src={
+                                passwordVisibility
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                          </div>           
+                      </div>
                     </div>
                   </div>
-                </div>
                 <div className="row mt-4">
                   <div className="col-12 all_center mt-3">
                     <div className="col-7 space_bet">
