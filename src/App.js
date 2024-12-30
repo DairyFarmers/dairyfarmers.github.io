@@ -5,11 +5,9 @@ import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { axiosPrivate } from './api/axios';
 import { token_verification_path } from './api/config';
-import { PrivateRoute } from "./Components/common/PrivateRoute";
+import { PrivateRoute } from "./Components/Common/PrivateRoute";
 import Login from "./pages/Signin/SignIn";
-// import AdminLogin from "./pages/AdminSignin/AdminLogin";
-import { useState } from "react";
-import Dashboard from "./pages/Home/Home";
+import Home from "./pages/Home/Home";
 import Error from "./pages/Error";
 import { login } from "./redux/slices/userSlice";
 
@@ -43,8 +41,8 @@ const App = () => {
       <Route path="/error" element={<Error />} />
       <Route path="/dashboard" element={
         <PrivateRoute>
-          <Dashboard />
-        </PrivateRoute>} />
+          <Home />
+        </PrivateRoute>}/>
     </Routes>
   );
 }

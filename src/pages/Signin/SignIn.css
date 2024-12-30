@@ -74,6 +74,7 @@
     font-style: normal;
     font-weight: 500;
     margin-left: -2%;
+    width: 100%;
 }
 
 .loginput {
@@ -132,3 +133,27 @@
 .sign-up:hover {
     color: #1B4444;
 }
+
+.all_center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.row.col-7{
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.toggle-password {
+   position: absolute;
+   transform: translateY(70%);
+   cursor: pointer;
+   left: 35%;
+  }
+  
+  .mdieye-off-icon6 {
+    width: 24px;
+    height: 24px;
+  }
