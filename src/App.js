@@ -10,6 +10,9 @@ import Login from "./pages/Signin/SignIn";
 import Home from "./pages/Home/Home";
 import Error from "./pages/Error";
 import { login } from "./redux/slices/userSlice";
+import Password from "./pages/ForgotPassword/Password";
+import Verification from "./pages/Verification/Verification";
+import NewPassword from "./pages/NewPassword/NewPassword";
 
 const App = () => {
   const location = useLocation();
@@ -43,6 +46,9 @@ const App = () => {
         <PrivateRoute>
           <Home />
         </PrivateRoute>}/>
+      <Route path="/forgotPassword" element={<Password/> }/>  
+      <Route path="/verification" element={<Verification/> }/>
+      <Route path="/newPassword" element={<NewPassword/> }/>
     </Routes>
   );
 }
