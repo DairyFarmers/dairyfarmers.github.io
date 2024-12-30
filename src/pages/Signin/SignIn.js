@@ -60,6 +60,12 @@ const Login = () => {
     const togglePasswordVisibility = () => {
       setPasswordVisibility((prev) => !prev);
     };
+
+   const [passwordVisibility, setPasswordVisibility] = useState(false);
+  
+    const togglePasswordVisibility = () => {
+      setPasswordVisibility((prev) => !prev);
+    };
   
   const handlePassword = async () => {
     navigate("/forgotPassword")
