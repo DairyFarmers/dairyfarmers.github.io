@@ -99,6 +99,7 @@
     font-style: normal;
     font-weight: 400;
     text-decoration-line: underline;
+    cursor: pointer;
 }
 
 .btn {
@@ -118,7 +119,6 @@
 }
 
 .col-7.space_bet {
-    overflow-y: hidden; 
     border-radius: 8px; 
 }
 

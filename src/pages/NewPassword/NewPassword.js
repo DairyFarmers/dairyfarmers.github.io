@@ -1,69 +1,33 @@
-import React, { useEffect, useState } from "react";
-import "./SignIn.css";
+import React, { useState } from "react";
+import "../Signin/SignIn.css";
+import "./NewPassword.css"
 import { useNavigate } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { axiosPrivate } from "../../api/axios";
-import { login_path } from "../../api/config";
-import { login } from "../../redux/slices/userSlice";
 
-const Login = () => {
+const NewPassword = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isLoggedIn]);
-
-  const [email, setEmail] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleEmployeeIdChange = (e) => {
-    setEmail(e.target.value);
+  const handleNewPasswordChange = (e) => {
+    setNewPassword(e.target.value);
   };
 
   const handlePasswordChange = (e) => {
     setPassword(e.target.value);
   };
 
-  const handleLogin = async () => {
-    try {
-      if (!email) {
-        window.alert("Invalid credentials");
-        return;
-      }
-      if (!password) {
-        window.alert("Invalid password");
-        return;
-      }
-      
-      const response = await axiosPrivate.post(login_path, {
-        email: email,
-        password: password
-      });
-
-      if (response.data.status) {
-        dispatch(login(response.data.data));
-        navigate("/dashboard");
-      } else {
-        navigate("/error", { replace: true });
-      }
-    } catch (error) {
-      navigate("/error", { replace: true });
-    }
-  };
-
-   const [passwordVisibility, setPasswordVisibility] = useState(false);
+   const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
   
-    const togglePasswordVisibility = () => {
-      setPasswordVisibility((prev) => !prev);
+    const toggleNewPasswordVisibility = () => {
+      setNewPasswordVisibility((prev) => !prev);
     };
-  
-  const handlePassword = async () => {
-    navigate("/forgotPassword")
-  }
+
+    const [passwordVisibility, setPasswordVisibility] = useState(false);
+
+    const togglePasswordVisibility = () => {
+        setPasswordVisibility((prev) => !prev);
+    }
 
 return (
   <div>
@@ -75,7 +39,7 @@ return (
             <div className="row bg_white">
               <div className="col-12 ">
                 <div className="row">
-                  <span className="logtx01">Login to your account</span>
+                  <span className="logtx01">New Password</span>
                 </div>
                 <div className="row mt-1">
                   <span className="logtx02 mb-3">Enter your organizational credentials to proceed</span>
@@ -83,22 +47,41 @@ return (
                 <div className="row mt-4">
                   <div className="col-12 all_center">
                     <div className="row col-7">
-                      <label className="loglab mb-1">Email</label>
-                      <input className="loginput" type="text" placeholder="Enter your Email"
-                        value={email} onChange={handleEmployeeIdChange}
-                      />
+                      <label className="loglab mb-1">New Password</label>
+                      <input 
+                            className="loginput" 
+                            type={newPasswordVisibility ? "text" : "password"}
+                            name="newPassword"
+                            placeholder="Enter your NewPassword" 
+                            value={newPassword} 
+                            onChange={handleNewPasswordChange}
+                          />
+                         <div
+                            className="toggle-password"
+                            onClick={toggleNewPasswordVisibility}
+                          >
+                            <img
+                              className="mdieye-off-icon6"
+                              alt=""
+                              src={
+                                newPasswordVisibility
+                                  ? "./Images/eye-icon.png"
+                                  : "./Images/eyeoff.svg"
+                              }
+                            />
+                          </div>           
                     </div>
                   </div>
                 </div>
                 <div className="row mt-4">
                     <div className="col-12 all_center">
                       <div className="row col-7">
-                        <label className="loglab mb-1">Password</label>
+                        <label className="loglab mb-1">Confirm Password</label>
                           <input 
                             className="loginput" 
                             type={passwordVisibility ? "text" : "password"}
                             name="password"
-                            placeholder="Enter your Password" 
+                            placeholder="Enter your Confirm Password" 
                             value={password} 
                             onChange={handlePasswordChange}
                           />
@@ -121,9 +104,8 @@ return (
                   </div>
                 <div className="row mt-4">
                   <div className="col-12 all_center mt-3">
-                    <div className="col-7 space_bet">
-                      <span className="fog_tx" onClick={handlePassword}>Forgot password?</span>
-                      <button className="btn btn-dark" onClick={handleLogin}>Login</button>
+                    <div className="col-7 space_bet" id="send">
+                      <button className="btn btn-dark" id="button">Send</button>
                     </div>
                   </div>
                 </div>
@@ -145,4 +127,4 @@ return (
 );
 };
 
-export default Login;
+export default NewPassword;
