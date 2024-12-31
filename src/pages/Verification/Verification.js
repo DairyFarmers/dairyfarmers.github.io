@@ -1,9 +1,20 @@
-import { useRef, useState } from "react";
+
+import { useRef, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 import "../Signin/SignIn.css";
 import "./Verification.css";
-import { useNavigate } from "react-router-dom";
 
 const Verification = () => {
+  const navigate = useNavigate();
+  const isEmailVerified = useSelector((state) => state.user.is_verified);
+
+  useEffect(() => {
+    console.log('email:::', isEmailVerified)
+    if (isEmailVerified) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isEmailVerified]);
 
   const [code, setCode] = useState(["", "", "", ""]);
   const inputRefs = useRef([]);
@@ -28,8 +39,6 @@ const Verification = () => {
       }
     }
   };
-
-  const navigate = useNavigate();
 
   const onSend = async () => {
     navigate("/newPassword")

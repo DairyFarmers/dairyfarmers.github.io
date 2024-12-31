@@ -10,6 +10,7 @@ const Login = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const isEmailVerified = useSelector((state) => state.user.is_verified);
 
   useEffect(() => {
     if (isLoggedIn) {

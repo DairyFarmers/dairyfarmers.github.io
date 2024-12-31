@@ -6,6 +6,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { axiosPrivate } from './api/axios';
 import { token_verification_path } from './api/config';
 import { PrivateRoute } from "./components/common/PrivateRoute";
+import { EmailVerification } from "./components/common/EmailVerification";
 import Login from "./pages/Signin/SignIn";
 import Home from "./pages/Home/Home";
 import Error from "./pages/Error";
@@ -44,11 +45,18 @@ const App = () => {
       <Route path="/error" element={<Error />} />
       <Route path="/dashboard" element={
         <PrivateRoute>
-          <Home />
-        </PrivateRoute>}/>
-      <Route path="/forgotPassword" element={<Password/> }/>  
-      <Route path="/verification" element={<Verification/> }/>
-      <Route path="/newPassword" element={<NewPassword/> }/>
+          <EmailVerification>
+            <Home />
+          </EmailVerification>
+        </PrivateRoute>
+      }/>
+      <Route path="/forgotPassword" element={<Password />}/>  
+      <Route path="/verification" element={
+        <PrivateRoute>
+          <Verification />
+        </PrivateRoute>
+       }/>
+      <Route path="/newPassword" element={<NewPassword />}/>
     </Routes>
   );
 }
