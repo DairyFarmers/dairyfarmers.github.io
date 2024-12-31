@@ -7,13 +7,13 @@ import { axiosPrivate } from './api/axios';
 import { token_verification_path } from './api/config';
 import { PrivateRoute } from "./components/common/PrivateRoute";
 import { EmailVerification } from "./components/common/EmailVerification";
-import Login from "./pages/Signin/SignIn";
+import SignIn from "./pages/Signin/SignIn";
 import Home from "./pages/Home/Home";
 import Error from "./pages/Error";
 import { login } from "./redux/slices/userSlice";
 import Password from "./pages/ForgotPassword/Password";
 import Verification from "./pages/Verification/Verification";
-import NewPassword from "./pages/NewPassword/NewPassword";
+import ChangePassword from "./pages/ChangePassword/ChangePassword";
 
 const App = () => {
   const location = useLocation();
@@ -41,7 +41,7 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<Login />} />
+      <Route path="/" element={<SignIn />} />
       <Route path="/error" element={<Error />} />
       <Route path="/dashboard" element={
         <PrivateRoute>
@@ -51,12 +51,12 @@ const App = () => {
         </PrivateRoute>
       }/>
       <Route path="/forgotPassword" element={<Password />}/>  
-      <Route path="/verification" element={
+      <Route path="/verifyEmail" element={
         <PrivateRoute>
           <Verification />
         </PrivateRoute>
        }/>
-      <Route path="/newPassword" element={<NewPassword />}/>
+      <Route path="/changePassword/:uid/:token" element={<ChangePassword />}/>
     </Routes>
   );
 }
