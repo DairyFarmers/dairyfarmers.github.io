@@ -14,6 +14,7 @@ import { login } from "./redux/slices/userSlice";
 import Password from "./pages/ForgotPassword/Password";
 import Verification from "./pages/Verification/Verification";
 import ChangePassword from "./pages/ChangePassword/ChangePassword";
+import ChangePassword from "./pages/ChangePassword/ChangePassword";
 
 const App = () => {
   const location = useLocation();
@@ -42,6 +43,7 @@ const App = () => {
 
   return (
     <Routes>
+      <Route path="/" element={<SignIn />} />
       <Route path="/" element={<SignIn />} />
       <Route path="/error" element={<Error />} />
       <Route path="/dashboard" element={
