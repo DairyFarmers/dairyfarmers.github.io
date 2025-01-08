@@ -5,6 +5,7 @@ const initialState = {
   email: null,
   full_name: null,
   is_verified: false,
+  role: null,
   isLoggedIn: false,
 };
 
@@ -13,11 +14,12 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     login: (state, action) => {
-      const { user_id, email, full_name, is_verified } = action.payload;
+      const { user_id, email, full_name, is_verified, role } = action.payload;
       state.user_id = user_id;
       state.email = email;
       state.full_name = full_name;
       state.is_verified = is_verified;
+      state.role = role;
       state.isLoggedIn = true;
     },
     logout: (state) => {
@@ -25,6 +27,7 @@ const userSlice = createSlice({
       state.email = null;
       state.full_name = null;
       state.is_verified = false;
+      state.role = null;
       state.isLoggedIn = false;
     },
   },

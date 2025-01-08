@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/sidebar';
+import Sidebar from '../../components/sidebar/CustomerSidebar';
 import Navbar from '../../components/Navbar';
-import Dashboard from '../../components/Dashboard';
+import Dashboard from '../../components/dashboard/CustomerDashboard';
 import 'boxicons/css/boxicons.min.css';
-import './Home.css';
+import './CustomerPage.css';
 
-function App() {
+const CustomerPage = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -30,5 +30,5 @@ function App() {
   );
 }
 
-export default App;
+export default CustomerPage;
 

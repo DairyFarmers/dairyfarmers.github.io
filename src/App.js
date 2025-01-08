@@ -8,8 +8,8 @@ import { token_verification_path } from './api/config';
 import { PrivateRoute } from "./components/common/PrivateRoute";
 import { EmailVerification } from "./components/common/EmailVerification";
 import SignIn from "./pages/Signin/SignIn";
-import Home from "./pages/Home/Home";
-import Error from "./pages/Error";
+import DashboardRouter from "./components/DashboardRouter";
+import Error from "./pages/Error/ErrorPage";
 import { login } from "./redux/slices/userSlice";
 import Password from "./pages/ForgotPassword/Password";
 import Verification from "./pages/Verification/Verification";
@@ -20,6 +20,7 @@ const App = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.user.isLoggedIn);
+  const userRole = useSelector((state) => state.user.role);
 
   useEffect(() => {
     async function fetchData() {
@@ -46,7 +47,7 @@ const App = () => {
       <Route path="/dashboard" element={
         <PrivateRoute>
           <EmailVerification>
-            <Home />
+            <DashboardRouter userRole={userRole} />
           </EmailVerification>
         </PrivateRoute>
       }/>

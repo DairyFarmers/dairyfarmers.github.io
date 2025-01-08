@@ -1,6 +1,6 @@
 import React from 'react';
 
-const Sidebar = ({ isSidebarVisible }) => {
+const BusinessSidebar = ({ isSidebarVisible }) => {
   const handleActiveMenu = (e) => {
     const allMenus = document.querySelectorAll('#sidebar .side-menu li');
     allMenus.forEach((menu) => menu.classList.remove('active'));
@@ -63,4 +63,4 @@ const Sidebar = ({ isSidebarVisible }) => {
   );
 };
 
-export default Sidebar;
+export default BusinessSidebar;

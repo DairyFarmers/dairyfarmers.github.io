@@ -1,13 +1,13 @@
 import React from 'react';
-import OrdersTable from './OrdersTable';
-import Todos from './Todos';
+import OrdersTable from '../OrdersTable';
+import Todos from '../Todos';
 
-const Dashboard = () => {
+const CustomerDashboard = () => {
   return (
     <main>
       <div className="head-title">
         <div className="left">
-          <h1>Dashboard</h1>
+          <h1>Customer Dashboard</h1>
           <ul className="breadcrumb">
             <li><a href="#">Dashboard</a></li>
             <li><i className="bx bx-chevron-right"></i></li>
@@ -50,4 +50,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard;
+export default CustomerDashboard;
