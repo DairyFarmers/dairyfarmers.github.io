@@ -1,11 +1,26 @@
 import React, { useState } from 'react';
-import Sidebar from '../../components/sidebar';
+import { useSelector } from 'react-redux';
+import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
-import Dashboard from '../../components/Dashboard';
+import Dashboard from '../../components/Dashboard/Dashboard';
+import Inventory from '../../components/Inventory/Inventory';
+import Orders from '../../components/Orders/Orders';
 import 'boxicons/css/boxicons.min.css';
 import './Home.css';
 
-function App() {
+const Content = () => {
+  const activePage = useSelector(state => state.layout.activePage);
+  
+  const pages = {
+    dashboard: <Dashboard />,
+    inventory: <Inventory />,
+    orders: <Orders />,
+  };
+
+  return pages[activePage] || <Dashboard />;
+};
+
+const Home = () => {
   const [darkMode, setDarkMode] = useState(false);
 
   const toggleDarkMode = () => {
@@ -24,11 +39,13 @@ function App() {
       <Sidebar isSidebarVisible={isSidebarVisible}/>
       <div id="content">
         <Navbar toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar}/>
-        <Dashboard />
+        <main className="main-content">
+            <Content />
+          </main>
       </div>
     </div>
   );
 }
 
-export default App;
+export default Home;
 
