@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
-import Sidebar from '../../components/Sidebar';
-import Navbar from '../../components/Navbar';
+import Sidebar from '../../components/shared/Sidebar';
+import Navbar from '../../components/shared/Navbar';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import Inventory from '../../components/Inventory/Inventory';
 import Orders from '../../components/Orders/Orders';
@@ -41,7 +41,7 @@ const Home = () => {
         <Navbar toggleDarkMode={toggleDarkMode} toggleSidebar={toggleSidebar}/>
         <main className="main-content">
             <Content />
-          </main>
+        </main>
       </div>
     </div>
   );
