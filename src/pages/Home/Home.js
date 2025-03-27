@@ -5,6 +5,7 @@ import Navbar from '../../components/shared/Navbar';
 import Dashboard from '../../components/Dashboard/Dashboard';
 import Inventory from '../../components/Inventory/Inventory';
 import Orders from '../../components/Orders/Orders';
+import UserManagement from '../../components/Users/UserManagement';
 import 'boxicons/css/boxicons.min.css';
 import './Home.css';
 
@@ -15,6 +16,7 @@ const Content = () => {
     dashboard: <Dashboard />,
     inventory: <Inventory />,
     orders: <Orders />,
+    users: <UserManagement />,
   };
 
   return pages[activePage] || <Dashboard />;

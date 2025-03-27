@@ -12,6 +12,7 @@ const Sidebar = () => {
       { id: 'dashboard', icon: 'bx bxs-dashboard', label: 'Dashboard' },
       { id: 'inventory', icon: 'bx bxs-user', label: 'Inventory' },
       { id: 'orders', icon: 'bx bxs-cog', label: 'Orders' },
+      { id: 'users', icon: 'bx bxs-cog', label: 'Users' },
     ],
     business: [
       { id: 'dashboard', icon: 'bx bxs-dashboard', label: 'Dashboard' },

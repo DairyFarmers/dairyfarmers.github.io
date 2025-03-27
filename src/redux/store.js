@@ -3,6 +3,7 @@ import userReducer from './slices/userSlice';
 import layoutReducer from './slices/layoutSlice';
 import inventoryReducer from './slices/inventorySlice';
 import ordersReducer from './slices/orderSlice';
+import usersReducer from './slices/usersSlice';
 
 const store = configureStore({
   reducer: {
@@ -10,6 +11,7 @@ const store = configureStore({
     layout: layoutReducer,
     inventory: inventoryReducer,
     orders: ordersReducer,
+    users: usersReducer,
   },
 });
 
