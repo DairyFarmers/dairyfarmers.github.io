@@ -1,23 +1,21 @@
-import { useState, useEffect } from "react";
-import InventoryRow from "./InventoryRow";
+import React, { useState } from "react";
+import InventoryTable from "./InventoryTable";
 
-export default function InventoryList() {
-  const [inventory, setInventory] = useState([]);
+const InventoryList = () => {
+  const [selectedItem, setSelectedItem] = useState(null);
 
-  useEffect(() => {
-    fetch("/api/inventory")
-      .then((res) => res.json())
-      .then((data) => setInventory(data));
-  }, []);
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    console.log("Editing Item:", item);
+    // Open a modal or form for editing
+  };
 
   return (
-    <div>
-      <h2 className="text-xl font-bold">Inventory Management</h2>
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {inventory.map((item) => (
-          <InventoryRow key={item.id} item={item} />
-        ))}
-      </div>
+    <div className="bg-white p-4 mt-4 shadow rounded">
+      <InventoryTable onEdit={handleEdit} />
+      {selectedItem && <p>Editing: {selectedItem.name}</p>}
     </div>
   );
-}
+};
+
+export default InventoryList;

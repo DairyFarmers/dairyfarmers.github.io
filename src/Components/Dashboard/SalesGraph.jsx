@@ -35,7 +35,7 @@ const SalesGraph = () => {
   };
 
   return (
-    <div className="bg-white p-4 shadow-md rounded-lg">
+    <div className="bg-white p-4 mt-4 shadow-md rounded-lg">
       <h2 className="text-lg font-semibold">Sales Graph</h2>
       <Line data={data} />
     </div>
