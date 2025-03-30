@@ -9,7 +9,7 @@ import { EmailVerification } from "./components/common/EmailVerification";
 import SignIn from "./pages/Signin/SignIn";
 import Home from "./pages/Home/Home";
 import Error from "./pages/Error";
-import { login } from "./redux/slices/userSlice";
+import { login, logout, setAuth } from "./redux/slices/userSlice";
 import Password from "./pages/ForgotPassword/Password";
 import Verification from "./pages/Verification/Verification";
 import ChangePassword from "./pages/ChangePassword/ChangePassword";
@@ -27,12 +27,13 @@ const App = () => {
 
         if (response.status === 200) {
           dispatch(login(response.data.data));
+          navigate(location.pathname, {
+            state: { from: location },
+            replace: true,
+          });
         }
       } catch (err) {
-        navigate('/login', {
-          state: { from: location },
-          replace: true
-        });
+        dispatch(logout());
       }
     }
     fetchData();

@@ -1,55 +1,42 @@
-import React, { useState } from "react";
+import React, { useState} from "react";
+import { useDispatch } from "react-redux";
+import "./ChangePassword.scss";
 import { useNavigate, useParams } from "react-router-dom";
-import "../Signin/SignIn.scss";
-import "./ChangePassword.css";
 import { axiosPrivate } from "../../api/axios";
-import { reset_password_path } from "../../api/config";
+import { change_password_path } from "../../api/config";
 import OrgIntro from "../../components/shared/OrgIntro";
 
-const ChangePassword = () => {
+const Password = () => {
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
   const { uid, token } = useParams();
 
-  const [newPassword, setNewPassword] = useState("");
-  const [password, setPassword] = useState("");
-  const [isPasswordReset, setIsPasswordReset] = useState(false);
-
-  const handleSignin = () => {
-    navigate("/");
-  };
-
-  const handleNewPasswordChange = (e) => {
-    setNewPassword(e.target.value);
-  };
-
-  const handlePasswordChange = (e) => {
+  const handlePassword = (e) => {
     setPassword(e.target.value);
   };
 
-  const [newPasswordVisibility, setNewPasswordVisibility] = useState(false);
-
-  const toggleNewPasswordVisibility = () => {
-    setNewPasswordVisibility((prev) => !prev);
-  };
-
-  const [passwordVisibility, setPasswordVisibility] = useState(false);
-
-  const togglePasswordVisibility = () => {
-    setPasswordVisibility((prev) => !prev);
-  }
-
   const handleChangePassword = async () => {
     try {
-      const response = await axiosPrivate.post(reset_password_path, {
-        password: newPassword,
+      const response = await axiosPrivate.post(change_password_path, {
         uid: uid,
-        token: token
+        token: token,
+        password: password
       });
   
       if (response.data.status) {
-        setIsPasswordReset(true);
+        setIsSuccess(true);
+        setStatusMessage("✅ Password changed successfully!");
+        setTimeout(() => {
+          navigate("/login", { replace: true });
+        }, 3000);
       } else {
-        navigate("/error", { replace: true });
+        setIsError(true);
+        setStatusMessage("❌ Could not change the password");
       }
     } catch (error) {
       navigate("/error", { replace: true });
@@ -57,117 +44,65 @@ const ChangePassword = () => {
   }
 
   return (
-    <div>
-      <div className="row">
-        <div className="bg_black col-12">
-          <div className="row">
-            {!isPasswordReset ? (
-              <div className="col-6">
-                <div className="row bg_white">
-                  <div className="col-12 ">
-                    <div className="row">
-                      <span className="logtx01">New Password</span>
-                    </div>
-                    <div className="row mt-1">
-                      <span className="logtx02 mb-3">Enter your new password...</span>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center">
-                        <div className="row col-7">
-                          <label className="loglab mb-1">New Password</label>
-                          <input
-                            className="loginput"
-                            type={newPasswordVisibility ? "text" : "password"}
-                            name="newPassword"
-                            placeholder="Enter your NewPassword"
-                            value={newPassword}
-                            onChange={handleNewPasswordChange}
-                          />
-                          <div
-                            className="toggle-password"
-                            onClick={toggleNewPasswordVisibility}
-                          >
-                            <img
-                              className="mdieye-off-icon6"
-                              alt=""
-                              src={
-                                newPasswordVisibility
-                                  ? "./Images/eye-icon.png"
-                                  : "./Images/eyeoff.svg"
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center">
-                        <div className="row col-7">
-                          <label className="loglab mb-1">Confirm New Password</label>
-                          <input
-                            className="loginput"
-                            type={passwordVisibility ? "text" : "password"}
-                            name="password"
-                            placeholder="Enter your Confirm Password"
-                            value={password}
-                            onChange={handlePasswordChange}
-                          />
-                          <div
-                            className="toggle-password"
-                            onClick={togglePasswordVisibility}
-                          >
-                            <img
-                              className="mdieye-off-icon6"
-                              alt=""
-                              src={
-                                passwordVisibility
-                                  ? "./Images/eye-icon.png"
-                                  : "./Images/eyeoff.svg"
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center mt-3">
-                        <div className="col-7 space_bet" id="send">
-                          <button className="btn btn-dark" id="button" onClick={handleChangePassword}>Change Password</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="col-6">
-                <div className="row bg_white">
-                  <div className="col-12 ">
-                    <div className="row">
-                      <span className="logtx01">New Password</span>
-                    </div>
-                    <div className="row mt-1">
-                      <span className="logtx02 mb-3">Your password has been changed successfully...</span>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center mt-3">
-                        <div className="col-7 space_bet">
-                          <span className="fog_tx" onClick={handleSignin}>Back to SignIn</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+    <div className="container-fluid password-container d-flex align-items-center justify-content-center">
+      <div className="row password-box shadow">
+        {/* Left Side */}
+        <div className="col-md-6 col-12 p-4 left-box">
+          <div className="left-box-content">
+            <h2 className="text-center fw-bold">
+              Change Password
+            </h2>
+            <p className="text-center text-muted">
+              {isSuccess ? "Password changed successfully!" : "Enter your new password to proceed"}
+            </p>
+
+            {statusMessage && (
+              <div className={`alert alert-fgpassword ${isSuccess ? "alert-success" : "alert-danger"}`} role="alert">
+                {statusMessage}
               </div>
             )}
-            <div className="col-6">
-              <OrgIntro />
-            </div>
+
+            {!isSuccess && (
+              <>
+                <label className="form-label mt-3">New Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Enter your Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <label className="form-label mt-3">Confirm Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  placeholder="Confirm Your Password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                />
+
+                <button className="btn btn-dark w-100 mt-4" onClick={handleChangePassword}>
+                  Change Password
+                </button>
+              </>
+            )}
           </div>
+
+          <div className="mt-4 text-end">
+            <span className="text-primary forgot-password" onClick={() => navigate("/login")}>
+              Login
+            </span>
+          </div>
+        </div>
+
+        {/* Right Side */}
+        <div className="col-md-6 d-none d-md-block p-4 right-box">
+          <OrgIntro />
         </div>
       </div>
     </div>
   );
 };
 
-export default ChangePassword;
+export default Password;
