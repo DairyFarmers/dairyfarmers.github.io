@@ -15,7 +15,7 @@ const SignIn = () => {
 
   useEffect(() => {
     if (isLoggedIn) {
-      navigate("/dashboard", { replace: true });
+      navigate("/", { replace: true });
     }
   }, [isLoggedIn]);
 
@@ -48,7 +48,7 @@ const SignIn = () => {
 
       if (response.data.status) {
         dispatch(login(response.data.data));
-        navigate("/dashboard");
+        navigate("/", { replace: true });
       } else {
         navigate("/error", { replace: true });
       }

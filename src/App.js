@@ -29,7 +29,7 @@ const App = () => {
           dispatch(login(response.data.data));
         }
       } catch (err) {
-        navigate('/', {
+        navigate('/login', {
           state: { from: location },
           replace: true
         });

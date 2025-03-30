@@ -8,14 +8,15 @@ import OrgIntro from "../../components/shared/OrgIntro";
 
 const Password = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
-  const [isEmailSent, setIsEmailSent] = useState(true);
+  const [statusMessage, setStatusMessage] = useState(null);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isError, setIsError] = useState(false);
 
   const handleEmail = (e) => {
     setEmail(e.target.value);
   };
-
-  const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
     try {
@@ -24,9 +25,11 @@ const Password = () => {
       });
   
       if (response.data.status) {
-        navigate("/dashboard");
+        setIsSuccess(true);
+        setStatusMessage("✅ Password reset email has been sent successfully!");
       } else {
-        navigate("/error", { replace: true });
+        setIsError(true);
+        setStatusMessage("❌ Could not find the account");
       }
     } catch (error) {
       navigate("/error", { replace: true });
@@ -34,8 +37,8 @@ const Password = () => {
   }
 
   return (
-    <div className="container-fluid signin-container d-flex align-items-center justify-content-center">
-      <div className="row signin-box shadow">
+    <div className="container-fluid password-container d-flex align-items-center justify-content-center">
+      <div className="row password-box shadow">
         {/* Left Side */}
         <div className="col-md-6 col-12 p-4 left-box">
           <div className="left-box-content">
@@ -43,25 +46,35 @@ const Password = () => {
               Forgot Password
             </h2>
             <p className="text-center text-muted">
-              Enter your email address to proceed...
+              {isSuccess ? "Check your inbox for password reset instructions" : "Enter your email address to proceed"}
             </p>
 
-          <label className="form-label mt-3">Email</label>
-          <input
-            type="text"
-            className="form-control"
-            placeholder="Enter your Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
+            {statusMessage && (
+              <div className={`alert alert-fgpassword ${isSuccess ? "alert-success" : "alert-danger"}`} role="alert">
+                {statusMessage}
+              </div>
+            )}
 
-          <button className="btn btn-dark w-100 mt-4" onClick={handleForgotPassword}>
-            Send Password Reset Email
-          </button>
+            {!isSuccess && (
+              <>
+                <label className="form-label mt-3">Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  placeholder="Enter your Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <button className="btn btn-dark w-100 mt-4" onClick={handleForgotPassword}>
+                  Send Password Reset Email
+                </button>
+              </>
+            )}
           </div>
 
           <div className="mt-4 text-end">
-            <span className="text-primary forgot-password" onClick={() => navigate("/")}>
+            <span className="text-primary forgot-password" onClick={() => navigate("/login")}>
               Try to Login
             </span>
           </div>
