@@ -1,0 +1,27 @@
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+
+$primary: #ff5722;
+$secondary: #00bcd4; 
+$font-family-base: "Poppins", sans-serif;
+
+@import "bootstrap/scss/bootstrap";
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: #fff;
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+}
+
+li {
+    list-style-type: none;
+}

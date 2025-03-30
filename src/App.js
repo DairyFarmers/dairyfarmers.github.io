@@ -1,4 +1,3 @@
-import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect } from "react";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
@@ -41,9 +40,9 @@ const App = () => {
 
   return (
     <Routes>
-      <Route path="/" element={<SignIn />} />
+      <Route path="/login" element={<SignIn />} />
       <Route path="/error" element={<Error />} />
-      <Route path="/dashboard" element={
+      <Route path="/" element={
         <PrivateRoute>
           <EmailVerification>
             <Home />

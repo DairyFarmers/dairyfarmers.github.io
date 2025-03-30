@@ -1,7 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import "../Signin/SignIn.css";
+import "../Signin/SignIn.scss";
 import "./Verification.css";
 import OrgIntro from "../../components/shared/OrgIntro";
 import { axiosPrivate } from "../../api/axios";

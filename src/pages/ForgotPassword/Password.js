@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import "../Signin/SignIn.css";
+import "./password.scss";
 import { useNavigate } from "react-router-dom";
 import { axiosPrivate } from "../../api/axios";
 import { forgot_password_path } from "../../api/config";
@@ -17,11 +17,7 @@ const Password = () => {
 
   const navigate = useNavigate();
 
-  const handleSignin = async () => {
-    navigate("/")
-  }
-
-  const handleSend = async () => {
+  const handleForgotPassword = async () => {
     try {
       const response = await axiosPrivate.post(forgot_password_path, {
         email: email
@@ -38,66 +34,42 @@ const Password = () => {
   }
 
   return (
-    <div>
-      <div className="row">
-        <div className="bg_black col-12">
-          <div className="row">
-            {!isEmailSent ? (
-              <div className="col-6">
-                <div className="row bg_white">
-                  <div className="col-12 ">
-                    <div className="row">
-                      <span className="logtx01">Forgot Password</span>
-                    </div>
-                    <div className="row mt-1">
-                      <span className="logtx02 mb-3">Enter your email address to proceed...</span>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center">
-                        <div className="row col-7">
-                          <label className="loglab mb-1">Email</label>
-                          <input className="loginput" type="text" placeholder="Enter your Email"
-                            value={email} onChange={handleEmail}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center mt-3">
-                        <div className="col-7 space_bet">
-                          <span className="fog_tx" onClick={handleSignin}>Back to SignIn</span>
-                          <button className="btn btn-dark" onClick={handleSend}>Verify</button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="col-6">
-                <div className="row bg_white">
-                  <div className="col-12 ">
-                    <div className="row">
-                      <span className="logtx01">Forgot Password</span>
-                    </div>
-                    <div className="row mt-1">
-                      <span className="logtx02 mb-3">An email has been sent to your email address. Please check your inbox...</span>
-                    </div>
-                    <div className="row mt-4">
-                      <div className="col-12 all_center mt-3">
-                        <div className="col-7 space_bet">
-                          <span className="fog_tx" onClick={handleSignin}>Back to SignIn</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div className="col-6">
-              <OrgIntro />
-            </div>
+    <div className="container-fluid signin-container d-flex align-items-center justify-content-center">
+      <div className="row signin-box shadow">
+        {/* Left Side */}
+        <div className="col-md-6 col-12 p-4 left-box">
+          <div className="left-box-content">
+            <h2 className="text-center fw-bold">
+              Forgot Password
+            </h2>
+            <p className="text-center text-muted">
+              Enter your email address to proceed...
+            </p>
+
+          <label className="form-label mt-3">Email</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <button className="btn btn-dark w-100 mt-4" onClick={handleForgotPassword}>
+            Send Password Reset Email
+          </button>
           </div>
+
+          <div className="mt-4 text-end">
+            <span className="text-primary forgot-password" onClick={() => navigate("/")}>
+              Try to Login
+            </span>
+          </div>
+        </div>
+
+        {/* Right Side */}
+        <div className="col-md-6 d-none d-md-block p-4 right-box">
+          <OrgIntro />
         </div>
       </div>
     </div>

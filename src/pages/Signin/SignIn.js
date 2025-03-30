@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./SignIn.css";
+import "./SignIn.scss";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { axiosPrivate } from "../../api/axios";
@@ -68,74 +68,60 @@ const SignIn = () => {
   }
 
   return (
-    <div>
-      <div className="row">
-        <div className="bg_black col-12">
-          <div className="row">
-            {/* Right Side Content */}
-            <div className="col-6">
-              <div className="row bg_white">
-                <div className="col-12 ">
-                  <div className="row">
-                    <span className="logtx01">Login to your account</span>
-                  </div>
-                  <div className="row mt-1">
-                    <span className="logtx02 mb-3">Enter your organizational credentials to proceed</span>
-                  </div>
-                  <div className="row mt-4">
-                    <div className="col-12 all_center">
-                      <div className="row col-7">
-                        <label className="loglab mb-1">Email</label>
-                        <input className="loginput" type="text" placeholder="Enter your Email"
-                          value={email} onChange={handleEmployeeIdChange}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row mt-4">
-                    <div className="col-12 all_center">
-                      <div className="row col-7">
-                        <label className="loglab mb-1">Password</label>
-                        <input
-                          className="loginput"
-                          type={passwordVisibility ? "text" : "password"}
-                          name="password"
-                          placeholder="Enter your Password"
-                          value={password}
-                          onChange={handlePasswordChange}
-                        />
-                        <div
-                          className="toggle-password"
-                          onClick={togglePasswordVisibility}
-                        >
-                          <img
-                            className="mdieye-off-icon6"
-                            alt=""
-                            src={
-                              passwordVisibility
-                                ? "./Images/eye-icon.png"
-                                : "./Images/eyeoff.svg"
-                            }
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="row mt-4">
-                    <div className="col-12 all_center mt-3">
-                      <div className="col-7 space_bet">
-                        <span className="fog_tx" onClick={handlePassword}>Forgot password?</span>
-                        <button className="btn btn-dark" onClick={handleLogin}>Login</button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-6">
-              <OrgIntro />
-            </div>
+    <div className="container-fluid signin-container d-flex align-items-center justify-content-center">
+      <div className="row signin-box shadow">
+        {/* Left Side */}
+        <div className="col-md-6 col-12 p-4 left-box">
+          <div className="left-box-content">
+            <h2 className="text-center fw-bold">
+              Login
+            </h2>
+            <p className="text-center text-muted">
+              Enter your credentials to login
+            </p>
+
+          <label className="form-label mt-3">Email</label>
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Enter your Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <label className="form-label mt-3">Password</label>
+          <div className="input-group">
+            <input
+              type={passwordVisibility ? "text" : "password"}
+              className="form-control"
+              placeholder="Enter your Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="btn btn-outline-secondary" onClick={() => setPasswordVisibility(!passwordVisibility)}>
+              <img
+                src={passwordVisibility ? "./Images/eye-icon.png" : "./Images/eyeoff.svg"}
+                alt="Toggle Password"
+                width="20"
+              />
+            </button>
           </div>
+
+          <div className="mt-3 text-end">
+            <span className="text-primary forgot-password" onClick={() => navigate("/forgotPassword")}>
+              Forgot password?
+            </span>
+          </div>
+
+          <button className="btn btn-dark w-100 mt-4" onClick={handleLogin}>
+            Login
+          </button>
+          </div>
+        </div>
+
+        {/* Right Side */}
+        <div className="col-md-6 d-none d-md-block p-4 right-box">
+          <OrgIntro />
         </div>
       </div>
     </div>

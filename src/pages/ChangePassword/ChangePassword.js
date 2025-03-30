@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import "../Signin/SignIn.css";
+import "../Signin/SignIn.scss";
 import "./ChangePassword.css";
 import { axiosPrivate } from "../../api/axios";
 import { reset_password_path } from "../../api/config";
