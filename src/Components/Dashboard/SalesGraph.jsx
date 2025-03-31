@@ -6,8 +6,6 @@ import { Chart, registerables } from "chart.js";
 Chart.register(...registerables);
 
 const SalesGraph = () => {
-  //const { reports } = useSelector((state) => state.reports);
-
   const reports = [
     { date: "2021-01-01", revenue: 1000 },
     { date: "2021-01-02", revenue: 1500 },

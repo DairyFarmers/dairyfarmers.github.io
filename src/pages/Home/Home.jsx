@@ -59,7 +59,7 @@ const Home = () => {
           activePage={activePage} 
           darkMode={darkMode}/>
 
-        <main className="main-content">
+        <main>
             <Content />
         </main>
       </div>

@@ -1,0 +1,56 @@
+.activity-log-container {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 8px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 600px; // Prevents table from squeezing on small screens
+
+    thead {
+      background-color: rgba(78, 76, 76, 0.7);
+      color: white;
+      text-align: left;
+
+      th {
+        padding: 12px;
+        font-weight: bold;
+      }
+    }
+
+    tbody {
+      tr {
+        &:nth-child(odd) {
+          background-color: #f8f9fa;
+        }
+
+        &:nth-child(even) {
+          background-color: #e9ecef;
+        }
+
+        &:hover {
+          background-color: #d6d8db;
+        }
+
+        td {
+          padding: 12px;
+          font-size: 14px;
+          white-space: nowrap; // Prevents text wrapping
+        }
+      }
+    }
+  }
+
+  // Makes the table scrollable horizontally on small screens
+  @media (max-width: 768px) {
+    overflow-x: auto;
+
+    table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+  }
+}

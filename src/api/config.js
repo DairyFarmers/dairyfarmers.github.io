@@ -23,3 +23,5 @@ export const profile_path = '/users/profile';
 export const forgot_password_path = '/users/password-reset-request';
 export const change_password_path = '/users/password-reset';
 
+export const dashboard_summary_path = '/dashboard/summary';
+

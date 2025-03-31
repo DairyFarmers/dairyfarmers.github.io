@@ -1,0 +1,35 @@
+.user-card-box {
+  background: #ffffff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  display: flex;
+  justify-content: center;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .icon {
+    font-size: 2rem;
+    color: #007bff;
+  }
+
+  .title {
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .number {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+  }
+}
+
+.user-card {
+  background-color: rgba(201, 204, 204, 0.1);
+  color: var(--dark);
+}

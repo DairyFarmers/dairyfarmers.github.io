@@ -1,0 +1,28 @@
+.card-box {
+  background: #ffffff;
+  padding: 50px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-5px);
+  }
+
+  .icon {
+    font-size: 4rem;
+    color: #007bff;
+  }
+
+  .title {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 0;
+  }
+
+  .number {
+    font-size: 2rem;
+    font-weight: bold;
+    margin: 0;
+  }
+}
