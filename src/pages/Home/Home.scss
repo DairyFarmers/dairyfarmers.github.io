@@ -61,7 +61,7 @@ body {
 		height: 56px;
 		color: var(--blue);
 		position: relative;
-		top: 32px;
+		top: 22px;
 		left: 0;
 		background: var(--light);
 		z-index: 50;
@@ -225,6 +225,40 @@ body {
 				font-size: 24px;
 				display: flex;
 				padding: 0 0.7rem;
+			}
+
+			.icon {
+				@include medium {
+					color: var(--dark);
+					font-size: 24px;
+					transition: all .3s ease;
+				}
+			}
+		}
+
+		.dark-mode-btn {
+			background: transparent;
+			border: none;
+			cursor: pointer;
+		}
+
+		.notification {
+			.icon {
+				color: var(--dark);
+				transition: all .3s ease;
+			}
+
+			.text {
+				font-size: 14px;
+				color: var(--dark);
+				font-weight: 700;
+			}
+		}
+
+		.profile {
+			.icon {
+				color: var(--dark);
+				transition: all .3s ease;
 			}
 		}
 

@@ -26,7 +26,7 @@ const Home = () => {
   const [darkMode, setDarkMode] = useState(false);  
   const [isSidebarVisible, setSidebarVisible] = useState(window.innerWidth >= 786);
   const activePage = useSelector(state => state.layout.activePage);
-  
+
   useEffect(() => {
     const handleResize = () => {
       setSidebarVisible(window.innerWidth >= 786);
@@ -56,7 +56,8 @@ const Home = () => {
           toggleDarkMode={toggleDarkMode} 
           toggleSidebar={toggleSidebar} 
           isSidebarVisible={isSidebarVisible} 
-          activePage={activePage} />
+          activePage={activePage} 
+          darkMode={darkMode}/>
 
         <main className="main-content">
             <Content />
