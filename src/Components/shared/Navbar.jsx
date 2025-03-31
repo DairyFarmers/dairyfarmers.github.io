@@ -1,18 +1,13 @@
 import React from 'react';
+import { FaBars } from "react-icons/fa";
 
-const Navbar = ({ toggleDarkMode, toggleSidebar }) => {
+const Navbar = ({ toggleDarkMode, toggleSidebar, activePage }) => {
   return (
     <nav>
-      <i className="bx bx-menu" onClick={toggleSidebar}></i>
-      <a href="#" className="nav-link">Categories</a>
-      <form action="#">
-        <div className="form-input">
-          <input type="search" placeholder="Search..." />
-          <button type="submit" className="search-btn">
-            <i className="bx bx-search"></i>
-          </button>
-        </div>
-      </form>
+      <button className="menu-btn" onClick={toggleSidebar}>
+        <FaBars size={24} />
+      </button>
+      <a href="#" className="page-title">{activePage.charAt(0).toUpperCase() + activePage.slice(1)}</a>
       <input type="checkbox" id="switch-mode" hidden onChange={toggleDarkMode} />
       <label htmlFor="switch-mode" className="switch-mode"></label>
       <a href="#" className="notification">

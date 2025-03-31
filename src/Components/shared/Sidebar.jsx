@@ -2,11 +2,11 @@ import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setActivePage } from '../../redux/slices/layoutSlice';
 
-const Sidebar = () => {
+const Sidebar = ({ isSidebarVisible }) => {
   const dispatch = useDispatch();
-  const { activePage, isSidebarVisible } = useSelector(state => state.layout);  
+  const { activePage } = useSelector(state => state.layout);  
   const role = useSelector((state) => state.user.role);
-  console.log(role)
+
   const menuItems = {
     admin: [
       { id: 'dashboard', icon: 'bx bxs-dashboard', label: 'Dashboard' },
@@ -31,26 +31,25 @@ const Sidebar = () => {
   };
 
   return (
-    <section id="sidebar" className={isSidebarVisible ? '' : 'hide'}>
-        <a href="#" className="brand">
-            <img src="./Images/logo.png"/>
-            <span className="text">DAIRY FARMER CO.</span>
-        </a>
-      <div className="side-menu top">
-      <div className="side-menu top">
-        {menuItems[role].map(item => (
-          <div
-            key={item.id}
-            className={`menu-item ${activePage === item.id ? 'active' : ''}`}
-            onClick={() => handleMenuClick(item.id)}
-          >
-            <i className={item.icon}></i>
-            <span>{item.label}</span>
+    <aside className={`sidebar ${isSidebarVisible ? "visible" : "hidden"}`}>
+          <a href="#" className="brand">
+              <img src="./Images/logo.png" className="brand-logo" alt="Logo" />
+              <span className="brand-text">DAIRY FARMERS</span>
+          </a>
+
+          <div className="side-menu">
+            {menuItems[role].map(item => (
+              <div
+                key={item.id}
+                className={`menu-item ${activePage === item.id ? 'active' : ''}`}
+                onClick={() => handleMenuClick(item.id)}
+              >
+                <i className={item.icon}></i>
+                <span className='nav-item-text'>{item.label}</span>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-      </div>
-    </section>
+    </aside>
   );
 };
 
