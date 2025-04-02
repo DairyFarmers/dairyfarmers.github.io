@@ -1,18 +1,13 @@
 import React from "react";
 import "./Table.scss";
 
-const activityData = [
-  { id: 1, user: "admin@dfi.com", action: "Logged in", timestamp: "2025-03-29 20:35:35", ip_address: "192.168.1.10" },
-  { id: 2, user: "manager@dfi.com", action: "Updated Inventory Item", timestamp: "2025-03-29 19:15:20", ip_address: "192.168.1.12" },
-  { id: 3, user: "shopowner@dfi.com", action: "Placed an Order", timestamp: "2025-03-29 18:45:00", ip_address: "192.168.1.15" },
-];
-
-const ActivityLogTable = () => {
+const ActivityLogTable = ({ data }) => {
   return (
     <div className="activity-log-container">
       <table>
         <thead>
           <tr>
+            <th>ID</th>
             <th>User</th>
             <th>Action</th>
             <th>Timestamp</th>
@@ -20,8 +15,9 @@ const ActivityLogTable = () => {
           </tr>
         </thead>
         <tbody>
-          {activityData.map((log) => (
+          {data.map((log) => (
             <tr key={log.id}>
+              <td>{log.id}</td>
               <td>{log.user}</td>
               <td>{log.action}</td>
               <td>{log.timestamp}</td>
