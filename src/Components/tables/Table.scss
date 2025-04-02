@@ -1,13 +1,25 @@
+@import "../../assets/styles/breakpoints";
+
 .activity-log-container {
   width: 100%;
   overflow-x: auto;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 
+  @include medium {
+    overflow-x: auto;
+  }
+
   table {
     width: 100%;
     border-collapse: collapse;
-    min-width: 600px; // Prevents table from squeezing on small screens
+    min-width: 600px;
+
+    @include medium {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
 
     thead {
       background-color: rgba(78, 76, 76, 0.7);
@@ -40,16 +52,6 @@
           white-space: nowrap; // Prevents text wrapping
         }
       }
-    }
-  }
-
-  @media (max-width: 768px) {
-    overflow-x: auto;
-
-    table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
     }
   }
 }
