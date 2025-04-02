@@ -3,7 +3,7 @@ import "./Table.scss";
 
 const ActivityLogTable = ({ data }) => {
   return (
-    <div className="activity-log-container">
+    <div className="table-container">
       <table>
         <thead>
           <tr>

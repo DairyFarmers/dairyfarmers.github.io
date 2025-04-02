@@ -1,6 +1,6 @@
 @import "../../assets/styles/breakpoints";
 
-.activity-log-container {
+.table-container {
   width: 100%;
   overflow-x: auto;
   border-radius: 8px;
@@ -54,4 +54,9 @@
       }
     }
   }
+}
+
+.title {
+  font-size: 17pt;
+  font-weight: 600;
 }

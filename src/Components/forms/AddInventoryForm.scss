@@ -1,0 +1,90 @@
+.inventory-form-container {
+    max-width: 100%;
+    margin: auto;
+    padding: 25px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  
+    .form-title {
+      text-align: left;
+      font-size: 22px;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: #333;
+    }
+  
+    .inventory-form {
+      display: grid;
+      gap: 15px;
+  
+      .form-group {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        align-items: center;
+        
+        label {
+          font-weight: bold;
+          color: #333;
+        }
+  
+        input,
+        textarea {
+          width: 100%;
+          padding: 8px;
+          border: 1px solid #ddd;
+          border-radius: 6px;
+          font-size: 16px;
+          transition: border-color 0.3s ease-in-out;
+  
+          &:focus {
+            border-color: #007bff;
+            outline: none;
+          }
+        }
+  
+        textarea {
+          resize: none;
+          height: 80px;
+        }
+      }
+  
+      .form-buttons {
+        display: flex;
+        width: 25%;
+        gap: 0.3rem;
+        grid-column: span 2;
+  
+        .submit-btn,
+        .clear-btn {
+          width: 48%;
+          padding: 10px;
+          font-size: 10pt;
+          border-radius: 6px;
+          font-weight: bold;
+          cursor: pointer;
+          text-align: center;
+          border: none;
+        }
+  
+        .submit-btn {
+          background: #007bff;
+          color: white;
+  
+          &:hover {
+            background: #0056b3;
+          }
+        }
+  
+        .clear-btn {
+          background: #dc3545;
+          color: white;
+  
+          &:hover {
+            background: #a71d2a;
+          }
+        }
+      }
+    }
+}
+  
