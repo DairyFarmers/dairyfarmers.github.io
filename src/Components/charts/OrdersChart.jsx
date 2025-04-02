@@ -4,12 +4,6 @@ import "./Chart.scss";
 
 const OrdersChart = ({ data }) => {
   const COLORS = ["#FFA500", "#28a745", "#dc3545"];
-
-  const orderData = [
-    { name: "Pending", value: 5 },
-    { name: "Completed", value: 10 },
-    { name: "Cancelled", value: 2 },
-  ];
   
   return (
     <div className="chart">
@@ -17,7 +11,7 @@ const OrdersChart = ({ data }) => {
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={orderData}
+            data={data}
             cx="50%"
             cy="50%"
             innerRadius={60}
@@ -26,7 +20,7 @@ const OrdersChart = ({ data }) => {
             dataKey="value"
             label
           >
-            {orderData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={COLORS[index]} />
             ))}
           </Pie>

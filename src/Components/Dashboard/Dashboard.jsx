@@ -1,8 +1,7 @@
 import React from "react";
 import SummaryCard from "./SummaryCard";
-import OrdersOverview from "./OrdersOverview";
+import OrdersOverview from "./Charts";
 import ExpiringStock from "./ExpiringStock";
-import SalesGraph from "./SalesGraph";
 import ActivityLogs from "./ActivityLogs";
 
 const Dashboard = () => {
