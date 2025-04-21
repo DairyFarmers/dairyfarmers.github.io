@@ -1,20 +1,20 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import AddInventoryForm from '../forms/AddInventoryForm';
+import AddOrderForm from '../forms/AddOrderForm';
 import { useNavigate } from 'react-router-dom';
 import { axiosPrivate } from '../../api/axios';
-import { inventory_add_path } from '../../api/config';
+import { order_add_path } from '../../api/config';
 import Toast from '../ui/Toast';
 
-const AddInventoryItem = () => {
+const AddOrderItem = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [operationStatus, setOperationStatus] = useState(false);
   const [operationStatusMsg, setOperationStatusMsg] = useState('');
 
-  const addInventoryItem = async (item) => {
+  const addOrderItem = async (item) => {
       try {
-        const response = await axiosPrivate.post(inventory_add_path, {
+        const response = await axiosPrivate.post(order_add_path, {
           name: item.name,
           description: item.description,
           quantity: item.quantity,
@@ -37,9 +37,9 @@ const AddInventoryItem = () => {
       {operationStatus && (
         <Toast message={operationStatusMsg} type="success" onClose={() => setOperationStatus(false)} />
       )}
-      <AddInventoryForm onAddItem={addInventoryItem} />
+      <AddOrderForm onAddItem={addOrderItem} />
     </div>
   );
 };
 
-export default AddInventoryItem;
+export default AddOrderItem;

@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./AddItemForm.scss";
 
-const AddInventoryForm = ({ onAddItem }) => {
+const AddOrderForm = ({ onAddItem }) => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -28,59 +28,34 @@ const AddInventoryForm = ({ onAddItem }) => {
       <h2 className="form-title">Add Item</h2>
       <form onSubmit={handleSubmit} className="form">
         <div className="form-group">
-          <label htmlFor="name">Name</label>
+          <label htmlFor="customer">Customer</label>
           <input
             type="text"
-            id="name"
-            name="name"
-            value={formData.name}
+            id="customer"
+            name="customer"
+            value={formData.customer}
             onChange={handleChange}
-            placeholder="Enter item name"
+            placeholder="Enter customer name"
             required
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="description">Description</label>
-          <input
-            id="description"
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            placeholder="Enter description"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="quantity">Quantity</label>
+          <label htmlFor="amount">Amount (LKR)</label>
           <input
             type="number"
-            id="quantity"
-            name="quantity"
-            value={formData.quantity}
+            id="amount"
+            name="amount"
+            value={formData.amount}
             onChange={handleChange}
-            placeholder="Enter quantity"
-            required
-          />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="price">Price (LKR)</label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="Enter price"
+            placeholder="Enter amount"
             required
           />
         </div>
 
         <div className="form-buttons mt-2">
           <button type="submit" className="submit-btn">
-            Add Item
+            Add Order
           </button>
           <button type="button" className="clear-btn" onClick={handleClear}>
             Clear
@@ -91,4 +66,4 @@ const AddInventoryForm = ({ onAddItem }) => {
   );
 };
 
-export default AddInventoryForm;
+export default AddOrderForm;

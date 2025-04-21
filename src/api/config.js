@@ -28,3 +28,13 @@ export const orders_overview_path = '/dashboard/orders-overview';
 export const sales_graph_path = '/dashboard/sales-graph';
 export const activity_log_path = '/users/activity-logs';
 
+export const inventory_add_path = 'inventory/add';
+export const inventory_list_path = 'inventory/list';
+export const inventory_update_path = 'inventory/update';
+export const inventory_delete_path = 'inventory/delete';
+
+export const order_add_path = 'orders/add';
+export const order_list_path = 'orders/list';
+export const order_update_path = 'orders/update';
+export const order_delete_path = 'orders/delete';
+

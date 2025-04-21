@@ -1,0 +1,32 @@
+@import "../../assets/styles/breakpoints";
+
+$error-bg: #f8f9fa;
+$error-text: #dc3545;
+$error-button: #007bff;
+
+.error-container {
+  height: 100vh;
+  background-color: $error-bg;
+  color: $error-text;
+  text-align: center;
+
+  .error-code {
+    font-weight: 700;
+  }
+
+  .error-message {
+    max-width: 500px;
+    margin-top: 1rem;
+  }
+
+  .btn-custom {
+    background-color: $error-button;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+
+    &:hover {
+      background-color: darken($error-button, 10%);
+    }
+  }
+}

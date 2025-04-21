@@ -8,7 +8,7 @@ import { PrivateRoute } from "./components/common/PrivateRoute";
 import { EmailVerification } from "./components/common/EmailVerification";
 import SignIn from "./pages/Signin/SignIn";
 import Home from "./pages/Home/Home";
-import Error from "./pages/Error";
+import Error from "./pages/Error/Error";
 import { login, logout, setAuth } from "./redux/slices/userSlice";
 import Password from "./pages/ForgotPassword/Password";
 import Verification from "./pages/Verification/Verification";
