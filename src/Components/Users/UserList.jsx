@@ -1,39 +1,32 @@
-import React from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { deleteUser } from "../../redux/slices/usersSlice";
+import React, { useState } from "react";
+import UsersListTable from "../tables/UsersListTable";
 
-const UserList = ({ onEdit }) => {
-  const users = useSelector((state) => state.users.users);
-  const dispatch = useDispatch();
+const UserList = () => {
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const handleEdit = (item) => {
+    setSelectedItem(item);
+    console.log("Editing Item:", item);
+  };
+
+  const UserData = [
+    {
+      "id": 1,
+      "email": "test1@dfi.com",
+      "role": "admin",
+    },
+    {
+      "id": 2,
+      "email": "test2@dfi.com",
+      "role": "user",
+    },
+  ];
+
 
   return (
-    <div className="bg-white p-4 mt-4 shadow-md rounded-lg">
-      <h2>User List</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.id}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                <button onClick={() => onEdit(user)}>Edit</button>
-                <button onClick={() => dispatch(deleteUser(user.id))}>Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div className="container mt-4 p-4">
+      <h2 className="font-bold mb-4 title">User Items</h2>
+      <UsersListTable data={UserData} />
     </div>
   );
 };
