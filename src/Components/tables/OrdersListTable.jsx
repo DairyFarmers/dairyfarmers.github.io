@@ -8,9 +8,10 @@ const OrdersListTable = ({ data }) => {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Customer</th>
+            <th>Customer Name</th>
+            <th>Email</th>
+            <th>Total (LKR)</th>
             <th>Status</th>
-            <th>Total ($)</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -18,9 +19,10 @@ const OrdersListTable = ({ data }) => {
           {data.map((log) => (
             <tr key={log.id}>
               <td>{log.id}</td>
-              <td>{log.customer}</td>
-              <td>{log.status}</td>
-              <td>{log.total}</td>
+              <td>{log.customer_name}</td>
+              <td>{log.customer_email}</td>
+              <td>{log.total_amount}</td>
+              <td>{log.order_status}</td>
               <td class="table-actions">
                 <button class="btn btn-edit">
                   <i class="bi bi-pencil-fill"></i> Edit

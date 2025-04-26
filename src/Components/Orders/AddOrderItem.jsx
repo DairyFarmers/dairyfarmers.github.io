@@ -15,10 +15,11 @@ const AddOrderItem = () => {
   const addOrderItem = async (item) => {
       try {
         const response = await axiosPrivate.post(order_add_path, {
-          name: item.name,
-          description: item.description,
-          quantity: item.quantity,
-          price: item.price
+          customer_name: item.customer,
+          delivery_date: item.deliveryDate,
+          total_amount: item.amount,
+          payment_status: item.paymentStatus,
+          notes: item.notes,
         });
   
         if (response.status === 201) {

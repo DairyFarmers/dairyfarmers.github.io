@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 
 const InventoryList = () => {
   const navigate = useNavigate();
-  const [selectedItem, setSelectedItem] = useState(null);
   const [inventoryItems, setInventoryItems] = useState([]);
 
   const getInventoryItems = async (item) => {
@@ -25,30 +24,6 @@ const InventoryList = () => {
   useEffect(() => {
     getInventoryItems();
   }, []);
-
-  const inventoryData = [
-    {
-      "id": 1,
-      "name": "Smartphone 2",
-      "description": "Android Phone",
-      "quantity": 15,
-      "price": "500.00",
-      "expiry_date": null,
-      "created_at": "2025-04-02T13:03:06.038018Z",
-      "updated_at": "2025-04-02T13:03:06.038018Z"
-    },
-    {
-      "id": 2,
-      "name": "Smartphone 2",
-      "description": "Android Phone",
-      "quantity": 15,
-      "price": "500.00",
-      "expiry_date": null,
-      "created_at": "2025-04-02T13:03:08.507965Z",
-      "updated_at": "2025-04-02T13:03:08.507965Z"
-    }
-  ];
-
 
   return (
     <div className="container mt-4 p-4">
