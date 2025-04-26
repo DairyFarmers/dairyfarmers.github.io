@@ -10,6 +10,7 @@ const UsersListTable = ({ data }) => {
             <th>ID</th>
             <th>Email</th>
             <th>Role</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -18,6 +19,14 @@ const UsersListTable = ({ data }) => {
               <td>{log.id}</td>
               <td>{log.email}</td>
               <td>{log.role}</td>
+              <td class="table-actions">
+                <button class="btn btn-edit">
+                  <i class="bi bi-pencil-fill"></i> Edit
+                </button>
+                <button class="btn btn-delete">
+                  <i class="bi bi-trash-fill"></i> Delete
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>

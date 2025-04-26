@@ -8,6 +8,7 @@ import Orders from '../../components/Orders/Orders';
 import Users from '../../components/Users/Users';
 import 'boxicons/css/boxicons.min.css';
 import './Home.scss';
+import ChatWidget from "../../components/Messaging/ChatWidget";
 
 const Content = () => {
   const activePage = useSelector(state => state.layout.activePage);
@@ -61,6 +62,7 @@ const Home = () => {
 
         <main>
             <Content />
+            <ChatWidget />
         </main>
       </div>
     </div>
