@@ -43,3 +43,8 @@ export const user_list_path = 'users/list';
 export const user_update_path = 'users/update';
 export const user_delete_path = 'users/delete';
 
+export const chat_send_path = '/chats/send';
+export const chat_get_path = '/chats/get';
+export const chat_delete_path = '/chats/delete';
+export const chat_update_path = '/chats/update';
+
