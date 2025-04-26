@@ -9,6 +9,8 @@ const UsersListTable = ({ data }) => {
           <tr>
             <th>ID</th>
             <th>Email</th>
+            <th>First Name</th>
+            <th>Last Name</th>
             <th>Role</th>
             <th>Actions</th>
           </tr>
@@ -18,6 +20,8 @@ const UsersListTable = ({ data }) => {
             <tr key={log.id}>
               <td>{log.id}</td>
               <td>{log.email}</td>
+              <td>{log.first_name}</td>
+              <td>{log.last_name}</td>
               <td>{log.role}</td>
               <td class="table-actions">
                 <button class="btn btn-edit">

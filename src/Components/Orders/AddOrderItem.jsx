@@ -24,9 +24,9 @@ const AddOrderItem = () => {
   
         if (response.status === 201) {
           setOperationStatus(true);
-          setOperationStatusMsg('Item added successfully');
+          setOperationStatusMsg('Order created successfully');
         } else {
-          setOperationStatusMsg('Failed to add item. Please try again');
+          setOperationStatusMsg('Failed to create order');
         }
       } catch (error) {
           navigate("/error", { replace: true });

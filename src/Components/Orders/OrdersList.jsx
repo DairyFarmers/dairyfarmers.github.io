@@ -17,7 +17,7 @@ const OrdersList = () => {
             }
           } catch (error) {
               navigate("/error", { replace: true });
-              console.error("Error fetching inventory items:", error);
+              console.error("Error fetching order list:", error);
           }
     };
   
