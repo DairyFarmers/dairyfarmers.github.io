@@ -1,23 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ActivityLogTable from '../tables/ActivityLogTable';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { axiosPrivate } from '../../api/axios';
-import { activity_log_path } from '../../api/config';
-
 
 const ActivityLogs = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [activityData, setActivityData] = React.useState([]);
+  const [page] = useState(1); // Start with page 1
+  const [size] = useState(5); // Default page size
 
-  const fetchActivityLogData = async () => {
+  const fetchActivityLogData = async (page, size) => {
     try {
-      const response = await axiosPrivate.get(activity_log_path);
+      const response = await axiosPrivate.get(`/users/activity-logs/?page=${page}&size=${size}`);
 
       if (response.status === 200) {
-        setActivityData(response.data);
+        setActivityData(response.data.results);
       } else {
           navigate("/error", { replace: true });
       }
@@ -27,8 +27,8 @@ const ActivityLogs = () => {
   };
     
   useEffect(() => {
-    fetchActivityLogData();
-  }, [dispatch]);
+    fetchActivityLogData(page, size);
+  }, [page, size]);
 
   return (
     <div className="container mt-4">
