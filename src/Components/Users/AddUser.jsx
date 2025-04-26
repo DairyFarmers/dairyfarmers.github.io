@@ -15,20 +15,26 @@ const AddUser = () => {
   const addUser = async (item) => {
       try {
         const response = await axiosPrivate.post(user_add_path, {
-          name: item.name,
-          description: item.description,
-          quantity: item.quantity,
-          price: item.price
+          email: item.email,
+          first_name: item.firstName,
+          last_name: item.lastName,
+          password: item.password,
+          role: item.role,
+        }, {
+          headers: {
+            'Content-Type': 'application/json',
+            //'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+          }
         });
   
         if (response.status === 201) {
           setOperationStatus(true);
-          setOperationStatusMsg('Item added successfully');
+          setOperationStatusMsg('User account created successfully');
         } else {
-          setOperationStatusMsg('Failed to add item. Please try again');
+          setOperationStatusMsg('Failed to create user account');
         }
       } catch (error) {
-          navigate("/error", { replace: true });
+          setOperationStatusMsg('Something went wrong. Please try again.');
       }
   };
 

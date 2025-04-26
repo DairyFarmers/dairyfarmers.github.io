@@ -38,7 +38,7 @@ export const order_list_path = 'orders/list';
 export const order_update_path = 'orders/update';
 export const order_delete_path = 'orders/delete';
 
-export const user_add_path = 'users/add';
+export const user_add_path = 'users/registration';
 export const user_list_path = 'users/list';
 export const user_update_path = 'users/update';
 export const user_delete_path = 'users/delete';

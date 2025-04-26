@@ -3,10 +3,11 @@ import "./AddItemForm.scss";
 
 const AddUserForm = ({ onAddItem }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-    quantity: "",
-    price: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    password: "",
+    role: "farmer",
   });
 
   const handleChange = (e) => {
@@ -30,12 +31,38 @@ const AddUserForm = ({ onAddItem }) => {
         <div className="form-group">
           <label htmlFor="email">Email</label>
           <input
-            type="text"
+            type="email"
             id="email"
             name="email"
             value={formData.email}
             onChange={handleChange}
             placeholder="Enter email"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="firstName">First Name</label>
+          <input
+            type="text"
+            id="firstName"
+            name="firstName"
+            value={formData.firstName}
+            onChange={handleChange}
+            placeholder="Enter First Name"
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="lastName">Last Name</label>
+          <input
+            type="text"
+            id="lastName"
+            name="lastName"
+            value={formData.lastName}
+            onChange={handleChange}
+            placeholder="Enter Last Name"
             required
           />
         </div>
@@ -54,15 +81,17 @@ const AddUserForm = ({ onAddItem }) => {
 
         <div className="form-group">
           <label htmlFor="role">Role</label>
-          <input
-            type="role"
+          <select
             id="role"
             name="role"
             value={formData.role}
             onChange={handleChange}
-            placeholder="Enter role"
-            required
-          />
+          >
+            <option value="admin">Unpaid</option>
+            <option value="inventory_manager">Inventory Manager</option>
+            <option value="shop_owner">Shop Owner</option>
+            <option value="farmer">Farmer</option>
+          </select>
         </div>
 
         <div className="form-buttons mt-2">
