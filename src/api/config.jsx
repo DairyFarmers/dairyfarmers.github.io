@@ -14,7 +14,7 @@ const config = {
 
 export const { APP_API_URL } = config[env] || config.dev;
 
-export const login_path = '/users/login';
+export const login_path = '/auth/login';
 export const verification_code_path = '/users/otp';
 export const email_verification_path = '/users/verification';
 export const token_verification_path = '/users/token/verification';
