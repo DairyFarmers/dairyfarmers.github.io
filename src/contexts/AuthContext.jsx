@@ -1,63 +1,48 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import api from '@/services/api';
 import { AUTH_ENDPOINTS } from '@/constants/endpoints';
 
-const AuthContext = createContext(null);
+// Export the context itself
+export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  // Check auth status when the app loads and when cookies might have changed
-  useEffect(() => {
-    checkAuthStatus();
-    // Listen for visibility changes to recheck auth when user returns to the tab
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-    };
-  }, []);
-
-  const handleVisibilityChange = () => {
-    if (document.visibilityState === 'visible') {
-      checkAuthStatus();
-    }
-  };
-
-  const checkAuthStatus = async () => {
-    try {
-      const response = await api.get(AUTH_ENDPOINTS.VERIFY_TOKEN);
-      if (response.data?.user) {
-        setIsAuthenticated(true);
-        setUser(response.data.user);
-      } else {
-        // If we get a 200 but no user data, treat as not authenticated
-        setIsAuthenticated(false);
-        setUser(null);
+  // Use React Query for auth status
+  const { data: authData, isLoading } = useQuery({
+    queryKey: ['auth'],
+    queryFn: async () => {
+      try {
+        const response = await api.get(AUTH_ENDPOINTS.VERIFY_TOKEN);
+        if (response.data?.data) {
+          return {
+            isAuthenticated: true,
+            user: response.data.data
+          };
+        }
+        return { isAuthenticated: false, user: null };
+      } catch (error) {
+        return { isAuthenticated: false, user: null };
       }
-    } catch (error) {
-      // Any error means we're not authenticated
-      setIsAuthenticated(false);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    // Refresh auth status when tab becomes visible
+    refetchOnWindowFocus: true,
+    // Don't refetch on mount if we have data
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   const login = async (credentials) => {
     try {
       const response = await api.post(AUTH_ENDPOINTS.LOGIN, credentials);
-      if (response.data?.user) {
-        setIsAuthenticated(true);
-        setUser(response.data.user);
+      if (response.data?.data) {
+        // Invalidate and refetch auth query
+        await queryClient.invalidateQueries(['auth']);
         return response.data;
       } else {
         throw new Error('Login response missing user data');
       }
     } catch (error) {
-      setIsAuthenticated(false);
-      setUser(null);
       throw error;
     }
   };
@@ -68,36 +53,40 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      setIsAuthenticated(false);
-      setUser(null);
+      // Clear auth data
+      queryClient.setQueryData(['auth'], { isAuthenticated: false, user: null });
     }
   };
 
   // Expose a method to force a re-verification
   const refreshAuth = () => {
-    return checkAuthStatus();
+    return queryClient.invalidateQueries(['auth']);
+  };
+
+  const value = {
+    isAuthenticated: authData?.isAuthenticated ?? false,
+    user: authData?.user ?? null,
+    loading: isLoading,
+    login,
+    logout,
+    refreshAuth
   };
 
   return (
-    <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        user,
-        loading,
-        login,
-        logout,
-        refreshAuth
-      }}
-    >
-      {!loading && children}
+    <AuthContext.Provider value={value}>
+      {!isLoading && children}
     </AuthContext.Provider>
   );
 };
 
+// Export both hooks for flexibility
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-}; 
+};
+
+// Alias for useAuth for those who prefer the more explicit name
+export const useAuthContext = useAuth; 

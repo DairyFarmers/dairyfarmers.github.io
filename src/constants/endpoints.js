@@ -1,12 +1,12 @@
 // Auth endpoints
 export const AUTH_ENDPOINTS = {
-  LOGIN: '/api/v1/users/login/',
-  LOGOUT: '/api/v1/users/logout/',
-  VERIFY_TOKEN: '/api/v1/users/token/verification/',
-  REFRESH_TOKEN: '/api/v1/users/token/refresh/',
-  FORGOT_PASSWORD: '/api/v1/users/forgot-password/',
-  RESET_PASSWORD: '/api/v1/users/reset-password/',
-  CHANGE_PASSWORD: '/api/v1/users/change-password/',
+  LOGIN: '/api/v1/users/login',
+  LOGOUT: '/api/v1/users/logout',
+  VERIFY_TOKEN: '/api/v1/users/token/verification',
+  REFRESH_TOKEN: '/api/v1/users/token/refresh',
+  FORGOT_PASSWORD: '/api/v1/users/forgot-password',
+  RESET_PASSWORD: '/api/v1/users/reset-password',
+  CHANGE_PASSWORD: '/api/v1/users/change-password',
 };
 
 // User management endpoints

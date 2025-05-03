@@ -8,34 +8,34 @@ export const PermissionProvider = ({ children }) => {
   const [permissions, setPermissions] = useState({});
   const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    const fetchPermissions = async () => {
-      if (!isAuthenticated) {
+    const updatePermissions = () => {
+      if (!isAuthenticated || !user) {
         setPermissions({});
         setRole(null);
         setLoading(false);
         return;
       }
 
-      try {
-        const response = await api.get('/users/permissions/');
-        setPermissions(response.data.permissions);
-        setRole(response.data.role_name);
-      } catch (error) {
-        console.error('Error fetching permissions:', error);
+      // Use the role data from the user object
+      if (user.role) {
+        setPermissions(user.role.permissions || {});
+        setRole(user.role.name);
+      } else {
         setPermissions({});
         setRole(null);
-      } finally {
-        setLoading(false);
       }
+      setLoading(false);
     };
 
-    fetchPermissions();
-  }, [isAuthenticated]);
+    updatePermissions();
+  }, [isAuthenticated, user]);
 
   const hasPermission = (permission) => {
+    if (!permissions) return false;
+    
     if (Array.isArray(permission)) {
       return permission.every(p => permissions[p] === true);
     }
@@ -44,7 +44,7 @@ export const PermissionProvider = ({ children }) => {
 
   const getRolePermissions = async () => {
     try {
-      const response = await api.get('/users/permissions/all/');
+      const response = await api.get('/api/v1/users/permissions/all/');
       return response.data;
     } catch (error) {
       console.error('Error fetching all permissions:', error);
