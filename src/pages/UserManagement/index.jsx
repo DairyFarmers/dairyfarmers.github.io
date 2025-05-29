@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PermissionGuard } from '../../components/common/PermissionGuard';
-import api from '../../services/api';
-import './UserManagement.scss';
+import { api } from '@/services/api';
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);

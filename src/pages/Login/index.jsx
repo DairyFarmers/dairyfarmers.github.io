@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { loginUser, clearError } from '@/redux/slices/userSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -22,7 +23,8 @@ const loginSchema = z.object({
 });
 
 const Login = () => {
-  const { login, isAuthenticated } = useAuth();
+  const dispatch = useDispatch();
+  const { isLoggedIn, loading, error } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -35,20 +37,32 @@ const Login = () => {
     },
   });
 
+  // Clear any existing errors when unmounting
+  useEffect(() => {
+    return () => {
+      dispatch(clearError());
+    };
+  }, [dispatch]);
+
   // If user is already authenticated, redirect them
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isLoggedIn) {
       const redirect = searchParams.get('redirect') || '/';
       navigate(redirect, { replace: true });
     }
-  }, [isAuthenticated, navigate, searchParams]);
+  }, [isLoggedIn, navigate, searchParams]);
 
   const onSubmit = async (data) => {
     try {
-      await login(data);
-    } catch (error) {
+      const resultAction = await dispatch(loginUser(data)).unwrap();
+      if (!resultAction) {
+        form.setError("root", {
+          message: "Login failed - please try again"
+        });
+      }
+    } catch (err) {
       form.setError("root", {
-        message: error.response?.data?.message || "Login failed"
+        message: err.message || "Login failed - please try again"
       });
     }
   };
@@ -109,9 +123,9 @@ const Login = () => {
             <CardContent>
               <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  {form.formState.errors.root && (
+                  {(form.formState.errors.root || error) && (
                     <div className="p-3 text-sm text-white bg-destructive rounded-md animate-shake">
-                      {form.formState.errors.root.message}
+                      {form.formState.errors.root?.message || error}
                     </div>
                   )}
                   <FormField
@@ -125,7 +139,7 @@ const Login = () => {
                             placeholder="Enter your email" 
                             type="email"
                             {...field} 
-                            disabled={form.formState.isSubmitting}
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -143,7 +157,7 @@ const Login = () => {
                             type="password" 
                             placeholder="Enter your password" 
                             {...field} 
-                            disabled={form.formState.isSubmitting}
+                            disabled={loading}
                           />
                         </FormControl>
                         <FormMessage />
@@ -153,9 +167,9 @@ const Login = () => {
                   <Button 
                     type="submit" 
                     className="w-full" 
-                    disabled={form.formState.isSubmitting}
+                    disabled={loading}
                   >
-                    {form.formState.isSubmitting && (
+                    {loading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
                     Sign In

@@ -13,27 +13,26 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       
-      <Route element={<PrivateRoute />}>
-        <Route path="/" element={<Dashboard />} />
-        <Route 
-          path="/users" 
-          element={<UserManagement />}
-          loader={({ request }) => {
-            const permissions = ['can_manage_users'];
-            // Permission check will be handled by PrivateRoute
-            return { permissions };
-          }}
-        />
-        <Route 
-          path="/inventory" 
-          element={<Inventory />}
-          loader={({ request }) => {
-            const permissions = ['can_manage_inventory', 'can_view_stock'];
-            // Permission check will be handled by PrivateRoute
-            return { permissions };
-          }}
-        />
-      </Route>
+      <Route path="/" element={
+        <PrivateRoute>
+          <Dashboard />
+        </PrivateRoute>
+      } />
+      
+      <Route path="/users" element={
+        <PrivateRoute requiredPermissions={['can_manage_users']}>
+          <UserManagement />
+        </PrivateRoute>
+      } />
+      
+      <Route path="/inventory" element={
+        <PrivateRoute 
+          requiredPermissions={['can_manage_inventory', 'can_view_stock']} 
+          requireAll={false}
+        >
+          <Inventory />
+        </PrivateRoute>
+      } />
     </Routes>
   );
 };

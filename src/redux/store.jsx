@@ -1,18 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
 import userReducer from './slices/userSlice';
-import layoutReducer from './slices/layoutSlice';
-import inventoryReducer from './slices/inventorySlice';
-import ordersReducer from './slices/orderSlice';
-import usersReducer from './slices/usersSlice';
+import dashboardReducer from './slices/dashboardSlice';
 
 const store = configureStore({
   reducer: {
     user: userReducer,
-    layout: layoutReducer,
-    inventory: inventoryReducer,
-    orders: ordersReducer,
-    users: usersReducer,
+    dashboard: dashboardReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 export default store;

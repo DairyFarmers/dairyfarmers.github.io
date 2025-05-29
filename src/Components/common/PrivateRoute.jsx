@@ -1,29 +1,28 @@
-import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { usePermissions } from '@/contexts/PermissionContext';
-import { useAuth } from '@/contexts/AuthContext';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import React, { useEffect } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { verifyToken } from '@/redux/slices/userSlice';
 
-export const PrivateRoute = () => {
-  const { hasPermission, loading } = usePermissions();
-  const { isAuthenticated } = useAuth();
+export const PrivateRoute = ({ children }) => {
+  const dispatch = useDispatch();
   const location = useLocation();
+  const { isLoggedIn, loading, permissions, tokenChecked } = useSelector((state) => state.user);
 
-  if (loading) {
-    return <LoadingSpinner />;
+  useEffect(() => {
+    if (!tokenChecked) {
+      dispatch(verifyToken());
+    }
+  }, [dispatch, tokenChecked]);
+
+  if (loading || !tokenChecked) {
+    return null;
   }
 
-  if (!isAuthenticated) {
+  if (!isLoggedIn) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Get the required permissions from the route loader data
-  const permissions = location.state?.permissions;
-  const hasRequiredPermissions = permissions ? hasPermission(permissions) : true;
-
-  if (!hasRequiredPermissions) {
-    return <Navigate to="/unauthorized" replace />;
-  }
-
-  return <Outlet />;
+  return children;
 };
+
+export default PrivateRoute;
