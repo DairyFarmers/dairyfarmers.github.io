@@ -5,10 +5,10 @@ export const PermissionGuard = ({
   permissions,
   children,
   fallback = null,
-  requireAll = true, // Optionally allow "all" or "any" logic
+  requireAll = true,
 }) => {
   const { permissions: userPermissions, loading } = useSelector((state) => state.user);
-
+  console.log('User Permissions:', userPermissions);
   if (loading) {
     return null;
   }
@@ -17,7 +17,6 @@ export const PermissionGuard = ({
     return children;
   }
 
-  // permissions can be a string or array
   const permsArray = Array.isArray(permissions) ? permissions : [permissions];
   const hasRequiredPermissions = requireAll
     ? permsArray.every((perm) => userPermissions[perm])
