@@ -2,38 +2,40 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaBox, FaShoppingCart, FaUsers, FaMoneyBillWave } from "react-icons/fa";
 
-export default function StatsCards({ data }) {
-  const { stock_summary, orders_overview, user_statistics, revenue_metrics } = data;
+export default function StatsCards({ metrics }) {
+  const { system, financial, inventory, orders } = metrics;
 
   const stats = [
     {
       title: "Total Stock",
-      value: stock_summary?.total_stock || 0,
-      description: `${stock_summary?.low_stock || 0} items low in stock`,
+      value: inventory?.total_items?.count || 0,
+      description: `${inventory?.low_stock_items?.length || 0} items low in stock`,
       icon: FaBox,
-      trend: stock_summary?.stock_trend || 0,
+      secondaryValue: `$${inventory?.stock_value?.toLocaleString() || 0}`,
     },
     {
       title: "Total Orders",
-      value: orders_overview?.total_orders || 0,
-      description: `${orders_overview?.pending_orders || 0} orders pending`,
+      value: orders?.total_orders || 0,
+      description: `${orders?.pending_orders || 0} orders pending`,
       icon: FaShoppingCart,
-      trend: orders_overview?.order_trend || 0,
+      secondaryValue: orders?.order_status_distribution?.[0]?.count || 0,
     },
     {
       title: "Total Users",
-      value: user_statistics?.total_users || 0,
-      description: `${user_statistics?.active_users || 0} active users`,
+      value: system?.total_users || 0,
+      description: `${system?.active_users || 0} active users`,
       icon: FaUsers,
-      trend: user_statistics?.user_trend || 0,
+      secondaryValue: system?.system_health?.system_status || 'N/A',
     },
     {
       title: "Revenue",
-      value: revenue_metrics?.total_revenue || 0,
-      description: `${revenue_metrics?.revenue_growth || 0}% growth`,
+      value: financial?.total_revenue || 0,
+      description: "Total revenue",
       icon: FaMoneyBillWave,
-      trend: revenue_metrics?.revenue_trend || 0,
       prefix: "$",
+      secondaryValue: financial?.revenue_trends?.length > 0 
+        ? `${financial.revenue_trends[0]?.value || 0}%`
+        : '0%',
     },
   ];
 
@@ -54,12 +56,22 @@ export default function StatsCards({ data }) {
             <p className="text-xs text-muted-foreground">
               {stat.description}
             </p>
-            <div className={`text-xs ${stat.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {stat.trend > 0 ? '↑' : '↓'} {Math.abs(stat.trend)}%
+            <div className="text-xs text-muted-foreground mt-1">
+              {stat.secondaryValue}
             </div>
           </CardContent>
         </Card>
       ))}
     </div>
   );
-} 
+}
+
+// Add prop validation
+StatsCards.defaultProps = {
+  metrics: {
+    system_metrics: {},
+    financial_metrics: {},
+    inventory_metrics: {},
+    order_metrics: {}
+  }
+};

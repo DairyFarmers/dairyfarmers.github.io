@@ -1,22 +1,38 @@
 import React from 'react';
+import { Skeleton } from "@/components/ui/skeleton";
 import StatsCards from './StatsCards';
 import ChartSection from './ChartSection';
+import ActivitySection from './ActivitySection';
 
-export default function DashboardContent({ data, timeRange, user }) {
+export default function DashboardContent({ data, timeRange, user, isLoading }) {
+  console.log('Rendering DashboardContent with timeRange:', timeRange);
+  console.log('User role:', user?.role?.name);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          {[...Array(4)].map((_, i) => (
+            <Skeleton key={i} className="h-32" />
+          ))}
+        </div>
+        <Skeleton className="h-[400px]" />
+      </div>
+    );
+  }
+
   if (!data) return null;
 
-  // Destructure metrics from API response
   const {
-    system_metrics,
-    financial_metrics,
-    inventory_metrics,
-    order_metrics,
+    system_metrics = {},
+    financial_metrics = {},
+    inventory_metrics = {},
+    order_metrics = {},
     last_login,
-    notifications,
-    recent_activities
+    notifications = [],
+    recent_activities = []
   } = data;
 
-  // Organize metrics for components
   const metrics = {
     system: system_metrics,
     financial: financial_metrics,
@@ -24,20 +40,34 @@ export default function DashboardContent({ data, timeRange, user }) {
     orders: order_metrics
   };
 
-  const commonData = {
-    lastLogin: last_login,
-    notifications,
-    recentActivities: recent_activities
-  };
-
   return (
     <div className="space-y-6">
-      <StatsCards metrics={metrics} commonData={commonData} />
-      <ChartSection 
-        metrics={metrics} 
-        timeRange={timeRange}
-        role={user?.role?.name}
-      />
+      <StatsCards metrics={metrics} />
+      
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ChartSection 
+            metrics={metrics} 
+            timeRange={timeRange}
+            role={user?.role?.name}
+          />
+        </div>
+        
+        <div className="lg:col-span-1">
+          <ActivitySection 
+            lastLogin={last_login}
+            notifications={notifications}
+            activities={recent_activities}
+          />
+        </div>
+      </div>
     </div>
   );
 }
+
+DashboardContent.defaultProps = {
+  isLoading: false,
+  data: null,
+  timeRange: 'week',
+  user: null
+};

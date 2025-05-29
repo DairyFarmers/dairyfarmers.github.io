@@ -5,21 +5,17 @@ import { PieChart, Pie, Cell } from 'recharts';
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
-export default function ChartSection({ data, timeRange }) {
-  const { orders_overview, revenue_metrics } = data;
+export default function ChartSection({ metrics, timeRange, role }) {
+  const { orders, financial } = metrics;
+  
+  const orderStatusData = orders?.order_status_distribution?.map(status => ({
+    name: status.status.charAt(0).toUpperCase() + status.status.slice(1),
+    value: status.count
+  })) || [];
 
-  // Transform data for order status chart
-  const orderStatusData = [
-    { name: 'Pending', value: orders_overview?.pending_orders || 0 },
-    { name: 'Processing', value: orders_overview?.processing_orders || 0 },
-    { name: 'Completed', value: orders_overview?.completed_orders || 0 },
-    { name: 'Cancelled', value: orders_overview?.cancelled_orders || 0 },
-  ];
-
-  // Transform data for revenue chart
-  const revenueData = revenue_metrics?.timeline?.map(item => ({
-    name: item.date,
-    revenue: item.amount,
+  const revenueData = financial?.revenue_trends?.map(trend => ({
+    name: new Date(trend.date).toLocaleDateString(),
+    revenue: trend.value
   })) || [];
 
   return (
@@ -41,10 +37,15 @@ export default function ChartSection({ data, timeRange }) {
                   outerRadius={80}
                   fill="#8884d8"
                   dataKey="value"
-                  label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                  label={({ name, percent }) => 
+                    `${name} ${(percent * 100).toFixed(0)}%`
+                  }
                 >
                   {orderStatusData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    <Cell 
+                      key={`cell-${index}`} 
+                      fill={COLORS[index % COLORS.length]} 
+                    />
                   ))}
                 </Pie>
                 <Tooltip />
@@ -54,22 +55,33 @@ export default function ChartSection({ data, timeRange }) {
         </CardContent>
       </Card>
 
-      {/* Revenue Timeline */}
+      {/* Revenue Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Revenue Timeline</CardTitle>
+          <CardTitle>Revenue ({timeRange})</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="h-[300px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={revenueData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
+                <XAxis 
+                  dataKey="name" 
+                  fontSize={12}
+                  tickFormatter={(value) => value.split(',')[0]}
+                />
+                <YAxis 
+                  fontSize={12}
+                  tickFormatter={(value) => `$${value}`}
+                />
                 <Tooltip 
                   formatter={(value) => [`$${value}`, 'Revenue']}
                 />
-                <Bar dataKey="revenue" fill="#8884d8" />
+                <Bar 
+                  dataKey="revenue" 
+                  fill="#8884d8"
+                  radius={[4, 4, 0, 0]}
+                />
               </BarChart>
             </ResponsiveContainer>
           </div>
@@ -77,4 +89,13 @@ export default function ChartSection({ data, timeRange }) {
       </Card>
     </div>
   );
-} 
+}
+
+ChartSection.defaultProps = {
+  metrics: {
+    order_metrics: {},
+    financial_metrics: {}
+  },
+  timeRange: 'week',
+  role: 'user'
+};
