@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardContent from '@/components/dashboard/DashboardContent';
-import { fetchDashboardData, selectDashboardData, selectDashboardLoading, selectDashboardError } from '@/redux/slices/dashboardSlice';
+import { useDashboard } from '@/hooks/useDashboard';
 
 const TIME_RANGES = [
   { value: 'week', label: 'Last 7 days' },
@@ -16,20 +16,9 @@ const TIME_RANGES = [
 ];
 
 export default function Dashboard() {
-  const dispatch = useDispatch();
   const [timeRange, setTimeRange] = useState('week');
   const { user } = useSelector((state) => state.user);
-  const data = useSelector(selectDashboardData);
-  const isLoading = useSelector(selectDashboardLoading);
-  const error = useSelector(selectDashboardError);
-
-  const handleRefresh = () => {
-    dispatch(fetchDashboardData(timeRange));
-  };
-
-  useEffect(() => {
-    handleRefresh();
-  }, [timeRange]); // Remove dispatch from dependencies as it's now in handleRefresh
+  const { data, isLoading, error, refetch } = useDashboard(timeRange);
 
   if (isLoading) {
     return (
@@ -56,11 +45,11 @@ export default function Dashboard() {
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Error loading dashboard</AlertTitle>
               <AlertDescription className="flex items-center justify-between">
-                <span>{error}</span>
+                <span>{error.message}</span>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={handleRefresh}
+                  onClick={() => refetch()}
                   className="ml-4"
                 >
                   <RefreshCcw className="h-4 w-4 mr-2" />
@@ -102,7 +91,7 @@ export default function Dashboard() {
                 <Button 
                   variant="outline" 
                   size="icon"
-                  onClick={handleRefresh}
+                  onClick={() => refetch()}
                   className="shrink-0"
                 >
                   <RefreshCcw className="h-4 w-4" />
@@ -114,6 +103,7 @@ export default function Dashboard() {
               data={data}
               timeRange={timeRange}
               user={user}
+              isLoading={isLoading}
             />
           </div>
         </main>
