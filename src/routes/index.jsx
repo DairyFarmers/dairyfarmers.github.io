@@ -6,6 +6,8 @@ import Dashboard from '@/pages/Dashboard';
 import UserManagement from '@/pages/UserManagement';
 import Inventory from '@/pages/Inventory';
 import Unauthorized from '@/pages/Unauthorized';
+import Suppliers from '@/pages/Suppliers';
+import Orders from '@/pages/Orders';
 
 const AppRoutes = () => {
   return (
@@ -33,6 +35,24 @@ const AppRoutes = () => {
           <Inventory />
         </PrivateRoute>
       } />
+
+      <Route path="/suppliers" element={
+        <PrivateRoute 
+          requiredPermissions={['can_manage_suppliers']}
+          requireAll={false}  
+        >
+          <Suppliers />
+        </PrivateRoute>
+      } />
+
+      <Route path="/orders" element={
+        <PrivateRoute 
+          requiredPermissions={['can_manage_orders', 'can_view_orders']} 
+          requireAll={false}
+        >
+          <Orders />
+        </PrivateRoute>
+      } /> 
     </Routes>
   );
 };

@@ -5,7 +5,7 @@ import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw } from "lucide-react";
+import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Star } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -16,28 +16,29 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { useInventory } from '@/hooks/useInventory';
-import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
+import { useSupplier } from '@/hooks/useSupplier';
+import { AddSupplierForm } from '@/components/suppliers/AddSupplierForm.jsx';
 
-export default function Inventory() {
+export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const { 
-    inventory, 
+    suppliers, 
     isLoading, 
     error, 
     refetch,
     stats,
-    addItem,
-    updateItem,
-    deleteItem 
-  } = useInventory();
+    addSupplier,
+    updateSupplier,
+    deleteSupplier 
+  } = useSupplier();
 
-  const handleAddItem = async (formData) => {
+  const handleAddSupplier = async (formData) => {
     try {
-      await addItem.mutateAsync(formData);
+      await addSupplier.mutateAsync(formData);
+      setIsAddDialogOpen(false);
     } catch (error) {
-      console.error('Failed to add item:', error);
+      console.error('Failed to add supplier:', error);
     }
   };
 
@@ -64,7 +65,7 @@ export default function Inventory() {
           <div className="p-6">
             <Alert variant="destructive">
               <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error loading inventory</AlertTitle>
+              <AlertTitle>Error loading suppliers</AlertTitle>
               <AlertDescription className="flex items-center justify-between">
                 <span>{error.message}</span>
                 <Button 
@@ -93,29 +94,29 @@ export default function Inventory() {
           <div className="max-w-7xl mx-auto space-y-6">
             <div className="flex justify-between items-center">
               <div>
-                <h1 className="text-3xl font-bold text-foreground">Inventory Management</h1>
+                <h1 className="text-3xl font-bold text-foreground">Supplier Management</h1>
                 <p className="text-muted-foreground mt-1">
-                  Manage your inventory items and stock levels
+                  Manage your suppliers and their information
                 </p>
               </div>
-              <PermissionGuard permissions="can_manage_inventory">
+              <PermissionGuard permissions="can_manage_suppliers">
                 <Button onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add New Item
+                  Add New Supplier
                 </Button>
               </PermissionGuard>
 
-              <AddItemForm 
-                isOpen={isAddDialogOpen}
-                onClose={() => setIsAddDialogOpen(false)}
-                onSubmit={handleAddItem}
-              />
+              <AddSupplierForm 
+                  isOpen={isAddDialogOpen}
+                  onClose={() => setIsAddDialogOpen(false)}
+                  onSubmit={handleAddSupplier}
+                />
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Total Items</CardTitle>
+                  <CardTitle className="text-sm font-medium">Total Suppliers</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.total}</div>
@@ -123,21 +124,21 @@ export default function Inventory() {
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Low Stock Items</CardTitle>
+                  <CardTitle className="text-sm font-medium">Average Rating</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-yellow-600">
-                    {stats.lowStock}
+                    {stats.averageRating} <Star className="h-4 w-4 inline" />
                   </div>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Out of Stock</CardTitle>
+                  <CardTitle className="text-sm font-medium">Top Rated Suppliers</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold text-red-600">
-                    {stats.outOfStock}
+                  <div className="text-2xl font-bold text-green-600">
+                    {stats.topRated}
                   </div>
                 </CardContent>
               </Card>
@@ -145,64 +146,53 @@ export default function Inventory() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Inventory Items</CardTitle>
+                <CardTitle>Suppliers List</CardTitle>
               </CardHeader>
               <CardContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Item Name</TableHead>
-                      <TableHead>Description</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Quantity</TableHead>
-                      <TableHead>Unit</TableHead>
-                      <TableHead>Price</TableHead>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Contact Person</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Rating</TableHead>
                       <TableHead>Status</TableHead>
-                      <TableHead>Expiry</TableHead>
                       <TableHead className="text-right">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {inventory.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell>{item.dairy_type}</TableCell>
+                    {suppliers.map((supplier) => (
+                      <TableRow key={supplier.id}>
+                        <TableCell>{supplier.name}</TableCell>
+                        <TableCell>{supplier.contact_person}</TableCell>
+                        <TableCell>{supplier.email}</TableCell>
+                        <TableCell>{supplier.phone}</TableCell>
                         <TableCell>
-                          <span className={
-                            item.quantity === 0 ? 'text-red-600 font-bold' 
-                            : item.quantity <= 10 ? 'text-yellow-600 font-medium' 
-                            : ''
-                          }>
-                            {item.quantity}
+                          <span className="flex items-center">
+                            {supplier.rating || 'N/A'} 
+                            {supplier.rating && <Star className="h-4 w-4 ml-1 text-yellow-500" />}
                           </span>
                         </TableCell>
-                        <TableCell>{item.unit}</TableCell>
-                        <TableCell>${item.price}</TableCell>
                         <TableCell>
-                          <Badge variant={item.is_active ? "default" : "secondary"}>
-                            {item.is_active ? 'Active' : 'Inactive'}
+                          <Badge variant={supplier.is_active ? "default" : "secondary"}>
+                            {supplier.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </TableCell>
-                        <TableCell>
-                          {item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A'}
-                        </TableCell>
                         <TableCell className="text-right">
-                          <PermissionGuard permissions="can_manage_inventory">
+                          <PermissionGuard permissions="can_manage_suppliers">
                             <Button 
                               variant="ghost" 
                               size="icon" 
                               className="mr-2"
-                              onClick={() => updateItem.mutate({ id: item.id, data: {} })}
+                              onClick={() => updateSupplier.mutate({ id: supplier.id, data: {} })}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
                             <Button 
                               variant="ghost" 
                               size="icon"
-                              onClick={() => deleteItem.mutate(item.id)}
+                              onClick={() => deleteSupplier.mutate(supplier.id)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

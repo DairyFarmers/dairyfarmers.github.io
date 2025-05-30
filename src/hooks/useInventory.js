@@ -26,7 +26,7 @@ export function useInventory() {
 
   const addItem = useMutation({
     mutationFn: async (newItem) => {
-      const response = await api.post('/api/v1/inventories/items/', newItem);
+      const response = await api.post('/api/v1/inventory/items/', newItem);
       return response.data;
     },
     onSuccess: () => {
@@ -54,6 +54,19 @@ export function useInventory() {
     }
   });
 
+  const { data: suppliers = [] } = useQuery({
+    queryKey: ['suppliers'],
+    queryFn: async () => {
+      try {
+        const response = await api.get('/api/v1/suppliers/');
+        return response || [];
+      } catch (error) {
+        console.error('Suppliers Error:', error);
+        return [];
+      }
+    }
+  });
+
   const inventory = data || [];
   const lowStockItems = inventory.filter(item => item.quantity <= 10 && item.quantity > 0);
   const outOfStockItems = inventory.filter(item => item.quantity === 0);
@@ -70,6 +83,7 @@ export function useInventory() {
       total: inventory.length,
       lowStock: lowStockItems.length,
       outOfStock: outOfStockItems.length
-    }
+    },
+    suppliers,
   };
 }
