@@ -13,7 +13,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
     queryKey: ['orders', { page, pageSize }],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/v1/orders/orders/');
+        const response = await api.get('/api/v1/orders/');
         return response; // Return response.data instead of response
       } catch (error) {
         console.error('Orders Error:', {
@@ -33,7 +33,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
   const addOrder = useMutation({
     mutationFn: async (newOrder) => {
       try {
-        const response = await api.post('/api/v1/orders/orders/', newOrder);
+        const response = await api.post('/api/v1/orders/', newOrder);
         return response.data;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to create order');
@@ -48,7 +48,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
   const updateOrder = useMutation({
     mutationFn: async ({ id, data: updateData }) => {
       try {
-        const response = await api.patch(`/api/v1/orders/orders/${id}/`, updateData);
+        const response = await api.patch(`/api/v1/orders/${id}/`, updateData);
         return response.data;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to update order');
@@ -63,7 +63,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
   const deleteOrder = useMutation({
     mutationFn: async (id) => {
       try {
-        await api.delete(`/api/v1/orders/orders/${id}/`);
+        await api.delete(`/api/v1/orders/${id}/`);
         return id;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to delete order');

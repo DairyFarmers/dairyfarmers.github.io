@@ -14,17 +14,72 @@ import {
   Truck,
   BarChart3
 } from "lucide-react";
+import { PermissionGuard } from "@/components/common/PermissionGuard";
 
 const navigation = [
-  { name: "Dashboard", href: "/", icon: LayoutDashboard, current: true },
-  { name: "Inventory", href: "/inventory", icon: Package, current: false },
-  { name: "Sales", href: "/sales", icon: TrendingUp, current: false },
-  { name: "Orders", href: "/orders", icon: ShoppingCart, current: false },
-  { name: "Suppliers", href: "/suppliers", icon: Truck, current: false },
-  { name: "Production", href: "/production", icon: BarChart3, current: false },
-  { name: "Users", href: "/users", icon: Users, current: false },
-  { name: "Reports", href: "/reports", icon: FileText, current: false },
-  { name: "Settings", href: "/settings", icon: Settings, current: false },
+  { 
+    name: "Dashboard", 
+    href: "/", 
+    icon: LayoutDashboard, 
+    current: true,
+    permission: "can_view_analytics" 
+  },
+  { 
+    name: "Inventory", 
+    href: "/inventory", 
+    icon: Package, 
+    current: false,
+    permission: "can_view_inventory"
+  },
+  { 
+    name: "Sales", 
+    href: "/sales", 
+    icon: TrendingUp, 
+    current: false,
+    permission: "can_view_sales"
+  },
+  { 
+    name: "Orders", 
+    href: "/orders", 
+    icon: ShoppingCart, 
+    current: false,
+    permission: "can_view_orders"
+  },
+  { 
+    name: "Suppliers", 
+    href: "/suppliers", 
+    icon: Truck, 
+    current: false,
+    permission: "can_view_suppliers"
+  },
+  { 
+    name: "Production", 
+    href: "/production", 
+    icon: BarChart3, 
+    current: false,
+    permission: "can_view_production"
+  },
+  { 
+    name: "Users", 
+    href: "/users", 
+    icon: Users, 
+    current: false,
+    permission: "can_manage_users"
+  },
+  { 
+    name: "Reports", 
+    href: "/reports", 
+    icon: FileText, 
+    current: false,
+    permission: "can_view_reports"
+  },
+  { 
+    name: "Settings", 
+    href: "/settings", 
+    icon: Settings, 
+    current: false,
+    permission: "can_manage_settings"
+  },
 ];
 
 export default function Sidebar() {
@@ -68,8 +123,8 @@ export default function Sidebar() {
           </div>
           {(!collapsed || mobileOpen) && (
             <div>
-              <h1 className="text-lg font-bold text-sidebar-foreground">DairyManager</h1>
-              <p className="text-sm text-sidebar-foreground/60">Pro</p>
+              <h1 className="text-lg font-bold text-sidebar-foreground">Dairy Manager</h1>
+              <p className="text-sm text-sidebar-foreground/60">Inventory Service</p>
             </div>
           )}
         </div>
@@ -79,22 +134,27 @@ export default function Sidebar() {
           {navigation.map((item) => {
             const Icon = item.icon;
             return (
-              <Button
+              <PermissionGuard 
                 key={item.name}
-                variant="ghost"
-                className={cn(
-                  "w-full justify-start gap-3 h-10 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
-                  item.current && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
-                  collapsed && !mobileOpen && "justify-center px-2"
-                )}
-                asChild
-                onClick={() => setMobileOpen(false)}
+                permissions={item.permission}
+                fallback={null}
               >
-                <a href={item.href}>
-                  <Icon className="h-5 w-5 flex-shrink-0" />
-                  {(!collapsed || mobileOpen) && <span>{item.name}</span>}
-                </a>
-              </Button>
+                <Button
+                  variant="ghost"
+                  className={cn(
+                    "w-full justify-start gap-3 h-10 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                    item.current && "bg-sidebar-primary text-sidebar-primary-foreground hover:bg-sidebar-primary hover:text-sidebar-primary-foreground",
+                    collapsed && !mobileOpen && "justify-center px-2"
+                  )}
+                  asChild
+                  onClick={() => setMobileOpen(false)}
+                >
+                  <a href={item.href}>
+                    <Icon className="h-5 w-5 flex-shrink-0" />
+                    {(!collapsed || mobileOpen) && <span>{item.name}</span>}
+                  </a>
+                </Button>
+              </PermissionGuard>
             );
           })}
         </nav>
