@@ -18,19 +18,33 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useInventory } from '@/hooks/useInventory';
 import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
+import { EditItemForm } from '@/Components/inventory/EditItemForm';
 
 export default function Inventory() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const { 
-    inventory, 
-    isLoading, 
-    error, 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const handleUpdateItem = async (formData) => {
+    try {
+      await updateItem.mutateAsync({ id: selectedItem.id, data: formData });
+      setEditDialogOpen(false);
+      setSelectedItem(null);
+    } catch (error) {
+      console.error("Failed to update item:", error);
+    }
+  };
+
+  const {
+    inventory,
+    isLoading,
+    error,
     refetch,
     stats,
     addItem,
     updateItem,
-    deleteItem 
+    deleteItem
   } = useInventory();
 
   const handleAddItem = async (formData) => {
@@ -41,10 +55,12 @@ export default function Inventory() {
     }
   };
 
+  console.log('Inventory data:', updateItem);
+
   if (isLoading) {
     return (
       <div className="flex h-screen bg-background">
-          <Sidebar />
+        <Sidebar />
         <div className="flex-1 flex flex-col overflow-hidden">
           <TopNavbar />
           <div className="flex items-center justify-center flex-1">
@@ -67,9 +83,9 @@ export default function Inventory() {
               <AlertTitle>Error loading inventory</AlertTitle>
               <AlertDescription className="flex items-center justify-between">
                 <span>{error.message}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => refetch()}
                   className="ml-4"
                 >
@@ -105,7 +121,7 @@ export default function Inventory() {
                 </Button>
               </PermissionGuard>
 
-              <AddItemForm 
+              <AddItemForm
                 isOpen={isAddDialogOpen}
                 onClose={() => setIsAddDialogOpen(false)}
                 onSubmit={handleAddItem}
@@ -172,9 +188,9 @@ export default function Inventory() {
                         <TableCell>{item.dairy_type}</TableCell>
                         <TableCell>
                           <span className={
-                            item.quantity === 0 ? 'text-red-600 font-bold' 
-                            : item.quantity <= 10 ? 'text-yellow-600 font-medium' 
-                            : ''
+                            item.quantity === 0 ? 'text-red-600 font-bold'
+                              : item.quantity <= 10 ? 'text-yellow-600 font-medium'
+                                : ''
                           }>
                             {item.quantity}
                           </span>
@@ -191,22 +207,38 @@ export default function Inventory() {
                         </TableCell>
                         <TableCell className="text-right">
                           <PermissionGuard permissions="can_manage_inventory">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="mr-2"
-                              onClick={() => updateItem.mutate({ id: item.id, data: {} })}
+                              onClick={() => {
+                                setSelectedItem(item);
+                                setEditDialogOpen(true);
+                              }}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
-                              onClick={() => deleteItem.mutate(item.id)}
+                              onClick={() => {
+                                if (window.confirm(`Are you sure you want to delete "${item.name}"?`)) {
+                                  deleteItem.mutate(item.id);
+                                }
+                              }}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </PermissionGuard>
+                          <EditItemForm
+                            isOpen={editDialogOpen}
+                            onClose={() => {
+                              setEditDialogOpen(false);
+                              setSelectedItem(null);
+                            }}
+                            onSubmit={handleUpdateItem}
+                            defaultValues={selectedItem}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
