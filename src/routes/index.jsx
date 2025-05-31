@@ -9,6 +9,7 @@ import Unauthorized from '@/pages/Unauthorized';
 import Suppliers from '@/pages/Suppliers';
 import Orders from '@/pages/Orders';
 import Sales from '@/pages/Sales';
+import Reports from '@/pages/reports';
 
 const AppRoutes = () => {
   return (
@@ -61,6 +62,15 @@ const AppRoutes = () => {
           requireAll={false}
         >
           <Sales />
+        </PrivateRoute>
+      } />
+
+      <Route path="/reports" element={
+        <PrivateRoute 
+          requiredPermissions={['can_view_reports', 'can_generate_reports']} 
+          requireAll={false}
+        >
+          <Reports />
         </PrivateRoute>
       } />
     </Routes>

@@ -12,7 +12,7 @@ export const PermissionGuard = ({
     return null;
   }
 
-  if (!permissions) {
+  if (permissions) {
     return children;
   }
 
