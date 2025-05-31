@@ -8,6 +8,7 @@ import Inventory from '@/pages/Inventory';
 import Unauthorized from '@/pages/Unauthorized';
 import Suppliers from '@/pages/Suppliers';
 import Orders from '@/pages/Orders';
+import Sales from '@/pages/Sales';
 
 const AppRoutes = () => {
   return (
@@ -52,7 +53,16 @@ const AppRoutes = () => {
         >
           <Orders />
         </PrivateRoute>
-      } /> 
+      } />
+
+      <Route path="/sales" element={
+        <PrivateRoute 
+          requiredPermissions={['can_manage_sales', 'can_view_sales']} 
+          requireAll={false}
+        >
+          <Sales />
+        </PrivateRoute>
+      } />
     </Routes>
   );
 };

@@ -2,34 +2,36 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function useSales() {
-  // Fetch sales data
+export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
+  // Fetch sales with pagination
   const {
-    data = [],
+    data,
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['sales'],
+    queryKey: ['sales', { page, pageSize, ...filters }],
     queryFn: async () => {
       try {
-        const response = await api.get('/sales/');
-        return response.data.data || [];
+        const response = await api.get('/api/v1/sales/');
+        return {
+          results: response.results || [],
+          count: response.count,
+          next: response.next,
+          previous: response.previous
+        };
       } catch (error) {
-        console.error('Sales Error:', {
-          message: error?.response?.data?.message || error.message,
-          status: error?.response?.status
-        });
-        throw error;
+        throw new Error(error?.response?.data?.message || 'Failed to fetch sales');
       }
-    }
+    },
+    keepPreviousData: true
   });
 
-  // Add new sale
+  // Create sale from order
   const addSale = useMutation({
-    mutationFn: async (newSale) => {
-      const response = await api.post('/sales/', newSale);
-      return response.data;
+    mutationFn: async (saleData) => {
+      const response = await api.post('/api/v1/sales/', {saleData});
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);
@@ -38,8 +40,8 @@ export function useSales() {
 
   // Update sale
   const updateSale = useMutation({
-    mutationFn: async ({ id, data }) => {
-      const response = await api.patch(`/sales/${id}/`, data);
+    mutationFn: async ({ id, data: updateData }) => {
+      const response = await api.patch(`/api/v1/sales/${id}/`, updateData);
       return response.data;
     },
     onSuccess: () => {
@@ -50,22 +52,29 @@ export function useSales() {
   // Delete sale
   const deleteSale = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/sales/${id}/`);
-      return response.data;
+      await api.delete(`/api/v1/sales/${id}/`);
+      return id;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);
     }
   });
 
-  // Computed stats
-  const sales = data || [];
-  const totalSales = sales.reduce((sum, sale) => sum + sale.total_amount, 0);
-  const pendingPayments = sales.filter(sale => sale.status === 'pending');
-  const completedSales = sales.filter(sale => sale.status === 'completed');
+  // Calculate stats
+  const sales = data?.results || [];
+  const totalSales = data?.count || 0;
+  const pendingPayments = sales.filter(sale => 
+    ['pending', 'partial'].includes(sale.payment_status)
+  ).length;
+  const completedSales = sales.filter(sale => 
+    sale.payment_status === 'paid'
+  ).length;
+  const totalRevenue = sales.reduce((sum, sale) => 
+    sum + Number(sale.total_amount), 0
+  );
 
   return {
-    sales,
+    sales: data || { results: [], count: 0 },
     isLoading,
     error,
     refetch,
@@ -73,10 +82,10 @@ export function useSales() {
     updateSale,
     deleteSale,
     stats: {
-      total: sales.length,
-      totalAmount: totalSales,
-      pending: pendingPayments.length,
-      completed: completedSales.length
+      total: totalSales,
+      totalAmount: totalRevenue,
+      pending: pendingPayments,
+      completed: completedSales
     }
   };
 }
