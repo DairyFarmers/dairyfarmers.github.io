@@ -8,7 +8,6 @@ export const PermissionGuard = ({
   requireAll = true,
 }) => {
   const { permissions: userPermissions, loading } = useSelector((state) => state.user);
-  console.log('User Permissions:', userPermissions);
   if (loading) {
     return null;
   }

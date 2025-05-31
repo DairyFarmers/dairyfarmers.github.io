@@ -48,6 +48,8 @@ export default function Sales() {
     isLoading, 
     error 
   } = useSales({ page: 1, pageSize: 10 });
+  console.log('Sales Data:', sales);
+  console.log('Sales Stats:', stats);
 
   const handleAddSale = async (formData) => {
     try {

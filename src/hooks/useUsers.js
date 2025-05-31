@@ -1,79 +1,89 @@
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { api } from '@/services/api';
-import { queryClient } from '@/lib/queryClient';
+import { toast } from 'sonner';
 
-export function useUsers({ page = 1, pageSize = 10, filters = {} } = {}) {
-  // Fetch users with pagination
-  const {
-    data,
-    isLoading,
+export function useUsers() {
+  const queryClient = useQueryClient();
+
+  // Fetch users
+  const { 
+    data: users = [], 
+    isLoading, 
     error,
-    refetch
+    refetch 
   } = useQuery({
-    queryKey: ['users', { page, pageSize, ...filters }],
+    queryKey: ['users'],
     queryFn: async () => {
-      const response = await api.get('/api/v1/users/', {
-        params: {
-          page,
-          page_size: pageSize,
-          ...filters
-        }
-      });
-      return response.data;
+      const response = await api.get('/api/v1/users/list');
+      console.log('Fetched users:', response);
+      return response;
+    }
+  });
+
+  // Fetch roles
+  const { data: roles = [] } = useQuery({
+    queryKey: ['user-roles'],
+    queryFn: async () => {
+      const response = await api.get('/api/v1/users/roles/');
+      console.log('Fetched roles:', response);
+      return response;
     }
   });
 
   // Add user mutation
   const addUser = useMutation({
     mutationFn: async (userData) => {
-      const response = await api.post('/api/v1/users/', userData);
-      return response.data;
+      const response = await api.post('/api/v1/users/registration', userData);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
+      toast.success('User added successfully');
+    },
+    onError: (error) => {
+      toast.error(error.response?.data?.message || 'Failed to add user');
     }
   });
 
   // Update user mutation
   const updateUser = useMutation({
-    mutationFn: async ({ id, data }) => {
-      const response = await api.patch(`/api/v1/users/${id}/`, data);
-      return response.data;
+    mutationFn: async ({ userId, data }) => {
+      const response = await api.patch(`/api/v1/users/detail/${userId}`, data);
+      return response;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
+      toast.success('User updated successfully');
     }
   });
 
   // Delete user mutation
   const deleteUser = useMutation({
-    mutationFn: async (id) => {
-      await api.delete(`/api/v1/users/${id}/`);
-      return id;
+    mutationFn: async (userId) => {
+      await api.delete(`/api/v1/users/detail/${userId}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
+      toast.success('User deleted successfully');
     }
   });
 
   // Calculate stats
-  const users = data?.results || [];
-  const totalUsers = data?.count || 0;
-  const activeUsers = users.filter(user => user.is_active).length;
-  const inactiveUsers = totalUsers - activeUsers;
+  const stats = {
+    total: users.length || 0,
+    active: users.filter(user => user.is_active).length || 0,
+    inactive: users.filter(user => !user.is_active).length || 0
+  };
 
   return {
-    users: data || { results: [], count: 0 },
+    users,
+    roles,
     isLoading,
     error,
     refetch,
+    stats,
     addUser,
     updateUser,
-    deleteUser,
-    stats: {
-      total: totalUsers,
-      active: activeUsers,
-      inactive: inactiveUsers
-    }
+    deleteUser
   };
 }

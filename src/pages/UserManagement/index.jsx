@@ -1,121 +1,226 @@
-import React, { useState, useEffect } from 'react';
-import { PermissionGuard } from '../../components/common/PermissionGuard';
-import { api } from '@/services/api';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+import Sidebar from '@/components/layout/sidebar';
+import TopNavbar from '@/components/layout/top-navbar';
+import { PermissionGuard } from '@/components/common/PermissionGuard';
+import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Shield } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { useUsers } from '@/hooks/useUsers';
+import { AddUserForm } from '@/components/users/AddUserForm';
 
-const UserManagement = () => {
-  const [users, setUsers] = useState([]);
-  const [roles, setRoles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+export default function Users() {
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const { user } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    fetchUsers();
-    fetchRoles();
-  }, []);
+  const { 
+    users, 
+    roles,
+    isLoading, 
+    error, 
+    refetch,
+    stats,
+    addUser,
+    updateUser,
+    deleteUser 
+  } = useUsers();
 
-  const fetchUsers = async () => {
+  const handleAddUser = async (formData) => {
     try {
-      const response = await api.get('/users/list');
-      setUsers(response.data.data || []);
-    } catch (err) {
-      setError('Failed to fetch users');
-      console.error('Error fetching users:', err);
+      await addUser.mutateAsync(formData);
+      setIsAddDialogOpen(false);
+    } catch (error) {
+      console.error('Failed to add user:', error);
     }
   };
 
-  const fetchRoles = async () => {
-    try {
-      const response = await api.get('/users/roles/');
-      setRoles(response.data || []);
-    } catch (err) {
-      console.error('Error fetching roles:', err);
-    } finally {
-      setLoading(false);
-    }
+  const toggleUserStatus = (userId, isActive) => {
+    updateUser.mutate({
+      userId,
+      data: { is_active: !isActive }
+    });
   };
 
-  const handleRoleChange = async (userId, roleId) => {
-    try {
-      await api.patch(`/users/detail/${userId}`, { role: roleId });
-      await fetchUsers(); // Refresh user list
-    } catch (err) {
-      setError('Failed to update user role');
-      console.error('Error updating user role:', err);
+   if (isLoading) {
+      return (
+        <div className="flex h-screen bg-background">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNavbar />
+            <div className="flex items-center justify-center flex-1">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </div>
+      );
     }
-  };
-
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div className="alert alert-danger">{error}</div>;
+  
+    if (error) {
+      return (
+        <div className="flex h-screen bg-background">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNavbar />
+            <div className="p-6">
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error loading suppliers</AlertTitle>
+                <AlertDescription className="flex items-center justify-between">
+                  <span>{error.message}</span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetch()}
+                    className="ml-4"
+                  >
+                    <RefreshCcw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </div>
+          </div>
+        </div>
+      );
+  }
 
   return (
-    <div className="user-management">
-      <h1>User Management</h1>
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopNavbar />
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-7xl mx-auto space-y-6">
+            <div className="flex justify-between items-center">
+              <div>
+                <h1 className="text-3xl font-bold text-foreground">User Management</h1>
+                <p className="text-muted-foreground mt-1">
+                  Manage user accounts and permissions
+                </p>
+              </div>
+              <PermissionGuard permissions="can_manage_users">
+                <Button onClick={() => setIsAddDialogOpen(true)}>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New User
+                </Button>
+              </PermissionGuard>
 
-      <PermissionGuard permissions="can_create_users">
-        <div className="actions mb-4">
-          <button className="btn btn-primary">Add New User</button>
-        </div>
-      </PermissionGuard>
+              <AddUserForm 
+                isOpen={isAddDialogOpen}
+                onClose={() => setIsAddDialogOpen(false)}
+                onSubmit={handleAddUser}
+                roles={roles}
+              />
+            </div>
 
-      <div className="table-responsive">
-        <table className="table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {users.map((user) => (
-              <tr key={user.id}>
-                <td>{`${user.first_name} ${user.last_name}`}</td>
-                <td>{user.email}</td>
-                <td>
-                  <PermissionGuard permissions="can_manage_roles">
-                    <select
-                      className="form-select"
-                      value={user.role}
-                      onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                    >
-                      {roles.map((role) => (
-                        <option key={role.id} value={role.id}>
-                          {role.name}
-                        </option>
-                      ))}
-                    </select>
-                  </PermissionGuard>
-                  <PermissionGuard
-                    permissions="can_manage_roles"
-                    fallback={<span>{user.role_name}</span>}
-                  />
-                </td>
-                <td>
-                  <span className={`badge ${user.is_active ? 'bg-success' : 'bg-danger'}`}>
-                    {user.is_active ? 'Active' : 'Inactive'}
-                  </span>
-                </td>
-                <td>
-                  <PermissionGuard permissions="can_edit_users">
-                    <button className="btn btn-sm btn-outline-primary me-2">
-                      Edit
-                    </button>
-                  </PermissionGuard>
-                  <PermissionGuard permissions="can_delete_users">
-                    <button className="btn btn-sm btn-outline-danger">
-                      Delete
-                    </button>
-                  </PermissionGuard>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">{stats.total}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Inactive Users</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-yellow-600">{stats.inactive}</div>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Users List</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>Name</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Status</TableHead>
+                      <TableHead>Last Login</TableHead>
+                      <TableHead className="text-right">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>{`${user.first_name} ${user.last_name}`}</TableCell>
+                        <TableCell>{user.email}</TableCell>
+                        <TableCell>
+                          <Badge variant="secondary">
+                            <Shield className="h-3 w-3 mr-1" />
+                            {roles.find(
+                              role => role.id === user.role
+                            )?.name.split(' ').map(
+                              word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') 
+                              || 'Unknown'
+                            }
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant={user.is_active ? "success" : "warning"}>
+                            {user.is_active ? 'Active' : 'Inactive'}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          {new Date(user.last_login).toLocaleDateString()}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <PermissionGuard permissions="can_manage_users">
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="mr-2"
+                              onClick={() => toggleUserStatus(user.id, user.is_active)}
+                            >
+                              <Badge variant={user.is_active ? "destructive" : "default"}>
+                                {user.is_active ? 'Disable' : 'Enable'}
+                              </Badge>
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon"
+                              className="hover:bg-destructive/10"
+                              onClick={() => deleteUser.mutate(user.id)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </PermissionGuard>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
       </div>
     </div>
   );
-};
-
-export default UserManagement; 
+}
