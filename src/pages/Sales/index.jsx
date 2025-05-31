@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Eye } from "lucide-react";
 import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -28,15 +30,28 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
+import { toast } from 'sonner';
 import { useSales } from '@/hooks/useSales';
+import { SaleDetailDialog } from '@/components/sales/SaleDetailDialog';
+import { AddSaleForm } from '@/components/sales/AddSaleForm';
 import { SaleDetailDialog } from '@/components/sales/SaleDetailDialog';
 import { AddSaleForm } from '@/components/sales/AddSaleForm';
 
 export default function Sales() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [selectedSale, setSelectedSale] = useState(null);
   const { user } = useSelector((state) => state.user);
   const { 
+    sales = { results: [], count: 0 }, 
+    stats = {
+      total: 0,
+      totalAmount: 0,
+      pending: 0,
+      completed: 0
+    }, 
+    addSale,
     sales = { results: [], count: 0 }, 
     stats = {
       total: 0,
@@ -121,6 +136,7 @@ export default function Sales() {
               </div>
               <PermissionGuard permissions="can_manage_sales">
                 <Button onClick={() => setIsAddDialogOpen(true)}>
+                <Button onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Sale
                 </Button>
@@ -188,23 +204,30 @@ export default function Sales() {
                   </TableHeader>
                   <TableBody>
                     {sales.results.map((sale) => (
+                    {sales.results.map((sale) => (
                       <TableRow key={sale.id}>
                         <TableCell>{sale.id}</TableCell>
                         <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
                         <TableCell>{sale.seller.email || '-'}</TableCell>
                         <TableCell>{(sale.order.items.length || []).length} items</TableCell>
                         <TableCell>${stats.totalAmount || 0}</TableCell>
+                        <TableCell>{sale.seller.email || '-'}</TableCell>
+                        <TableCell>{(sale.order.items.length || []).length} items</TableCell>
+                        <TableCell>${stats.totalAmount || 0}</TableCell>
                         <TableCell>
                           <Badge variant={
+                            sale.order.status === 'completed' ? 'default' :
                             sale.order.status === 'completed' ? 'default' :
                             sale.status === 'pending' ? 'warning' :
                             'secondary'
                           }>
                             {(sale.order.status || 'pending').charAt(0).toUpperCase() + (sale.order.status || 'pending').slice(1)}
+                            {(sale.order.status || 'pending').charAt(0).toUpperCase() + (sale.order.status || 'pending').slice(1)}
                           </Badge>
                         </TableCell>
                         <TableCell>
                           <Badge variant={sale.payment_status === 'paid' ? 'success' : 'warning'}>
+                            {sale.payment_status || 'pending'}
                             {sale.payment_status || 'pending'}
                           </Badge>
                         </TableCell>
@@ -215,7 +238,9 @@ export default function Sales() {
                               size="icon" 
                               className="mr-2"
                               onClick={() => setSelectedSale(sale)}
+                              onClick={() => setSelectedSale(sale)}
                             >
+                              <Eye className="h-4 w-4 text-blue-500" />
                               <Eye className="h-4 w-4 text-blue-500" />
                             </Button>
                             <AlertDialog>
@@ -264,7 +289,21 @@ export default function Sales() {
           onSubmit={handleAddSale}
           isLoading={addSale.isLoading}
         />
+
+        <AddSaleForm 
+          isOpen={isAddDialogOpen}
+          onClose={() => setIsAddDialogOpen(false)}
+          onSubmit={handleAddSale}
+          isLoading={addSale.isLoading}
+        />
       </div>
+
+      <SaleDetailDialog 
+        open={!!selectedSale} 
+        onClose={() => setSelectedSale(null)}
+        sale={selectedSale}
+        stats={stats}
+      />
 
       <SaleDetailDialog 
         open={!!selectedSale} 
