@@ -47,7 +47,8 @@ export default function Sales() {
     }, 
     addSale,
     isLoading, 
-    error 
+    error,
+    deleteSale 
   } = useSales({ page: 1, pageSize: 10 });
   console.log('Sales Data:', sales);
   console.log('Sales Stats:', stats);

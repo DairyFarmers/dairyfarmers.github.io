@@ -55,8 +55,6 @@ export default function Inventory() {
     }
   };
 
-  console.log('Inventory data:', updateItem);
-
   if (isLoading) {
     return (
       <div className="flex h-screen bg-background">

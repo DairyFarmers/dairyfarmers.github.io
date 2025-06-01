@@ -19,11 +19,15 @@ import { Badge } from "@/components/ui/badge";
 import { useOrder } from '@/hooks/useOrder';
 import { toast } from 'sonner';
 import { AddOrderForm } from '@/components/orders/AddOrderForm.jsx';
+import { EditOrderForm } from '@/Components/orders/EditOrderForm';
 
 export default function Orders() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 10;
+
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState(null);
 
   const { 
     orders: { results: orders = [], count = 0 }, 
@@ -81,6 +85,32 @@ export default function Orders() {
       toast.error(error?.response?.data?.message || 'Failed to create order');
     }
   };
+
+const handleUpdateOrder = async (formData) => {
+  try {
+    const sanitizedData = {
+      customer_name: formData.customer_name,
+      items: formData.items,
+      shipping_cost: Number(formData.shipping_cost),
+      status: formData.status,
+      payment_status: formData.payment_status,
+      priority: formData.priority,
+      // Recalculate totals if needed
+      subtotal: formData.items.reduce((sum, item) =>
+        sum + ((item.quantity * item.unit_price) - item.discount), 0),
+    };
+    sanitizedData.total_amount = sanitizedData.subtotal + (sanitizedData.shipping_cost || 0);
+ console.log("Sanitized update data:", sanitizedData);
+    await updateOrder.mutateAsync({ id: selectedOrder.id, data: sanitizedData });
+    toast.success('Order updated successfully');
+    setEditDialogOpen(false);
+    setSelectedOrder(null);
+  } catch (error) {
+    console.error("Failed to update order:", error.response?.data || error.message);
+  }
+};
+
+  console.log('Orders:', updateOrder);
 
   if (isLoading) {
     return (
@@ -248,7 +278,10 @@ export default function Orders() {
                               variant="ghost" 
                               size="icon" 
                               className="mr-2"
-                              onClick={() => updateOrder.mutate({ id: order.id, data: {} })}
+                               onClick={() => {
+                                setSelectedOrder(order);
+                                setEditDialogOpen(true);
+                              }}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
@@ -256,11 +289,24 @@ export default function Orders() {
                               variant="ghost" 
                               size="icon"
                               className="hover:bg-destructive/10"
-                              onClick={() => deleteOrder.mutate(order.id)}
+                              onClick={() => {
+                                if (window.confirm(`Are you sure you want to delete "${order.customer_name}"?`)) {
+                                  deleteOrder.mutate(order.id);
+                                }
+                              }}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </PermissionGuard>
+                          <EditOrderForm
+                                                      isOpen={editDialogOpen}
+                                                      onClose={() => {
+                                                        setEditDialogOpen(false);
+                                                        setSelectedOrder(null);
+                                                      }}
+                                                      onSubmit={handleUpdateOrder}
+                                                      defaultValues={selectedOrder}
+                                                    />
                         </TableCell>
                       </TableRow>
                     ))}
