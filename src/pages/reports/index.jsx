@@ -201,6 +201,9 @@ export default function Reports() {
                               className="mr-2 hover:bg-primary/10"
                               onClick={() => handleDownload(report)}
                               disabled={report.status !== 'completed'}
+                              title={report.status !== 'completed' 
+                                ? 'Report is being generated' 
+                                : 'Download report'}
                             >
                               <Download className="h-4 w-4" />
                             </Button>
