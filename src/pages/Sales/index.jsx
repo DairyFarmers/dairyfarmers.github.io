@@ -35,6 +35,7 @@ import { AddSaleForm } from '@/components/sales/AddSaleForm';
 export default function Sales() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+
   const { user } = useSelector((state) => state.user);
   const { 
     sales = { results: [], count: 0 }, 
@@ -46,7 +47,8 @@ export default function Sales() {
     }, 
     addSale,
     isLoading, 
-    error 
+    error,
+    deleteSale 
   } = useSales({ page: 1, pageSize: 10 });
 
   const handleAddSale = async (formData) => {

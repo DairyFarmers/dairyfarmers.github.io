@@ -48,7 +48,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
   const updateOrder = useMutation({
     mutationFn: async ({ id, data: updateData }) => {
       try {
-        const response = await api.patch(`/api/v1/orders/${id}/`, updateData);
+        const response = await api.put(`/api/v1/orders/${id}/`, updateData);
         return response.data;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to update order');

@@ -36,7 +36,7 @@ export function useInventory() {
 
   const updateItem = useMutation({
     mutationFn: async ({ id, data }) => {
-      const response = await api.patch(`/inventories/items/${id}/`, data);
+      const response = await api.put(`/api/v1/inventory/items/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -46,7 +46,7 @@ export function useInventory() {
 
   const deleteItem = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/inventories/items/${id}/`);
+      const response = await api.delete(`/api/v1/inventory/items/${id}`);
       return response.data;
     },
     onSuccess: () => {

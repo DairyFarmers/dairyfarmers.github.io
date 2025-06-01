@@ -30,7 +30,7 @@ export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
   // Create sale from order
   const addSale = useMutation({
     mutationFn: async (saleData) => {
-      const response = await api.post('/api/v1/sales/', {saleData});
+      const response = await api.post('/api/v1/sales/', saleData);
       return response;
     },
     onSuccess: () => {
