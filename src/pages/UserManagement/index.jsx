@@ -44,6 +44,21 @@ export default function Users() {
     }
   };
 
+  const handleDeleteUser = (user) => {
+    if (window.confirm(`Are you sure you want to delete "${user.first_name}"?`)) {
+      deleteUser.mutate(user.id, {
+        onSuccess: () => {
+          toast.error(`"${user.first_name}" deleted successfully`);
+        },
+        onError: (error) => {
+          console.error(error);
+          toast.error(`Failed to delete "${user.first_name}"`);
+        }
+      });
+    }
+  };
+
+  console.log('User:', deleteUser);
   const toggleUserStatus = (userId, isActive) => {
     updateUser.mutate({
       userId,
@@ -206,7 +221,7 @@ export default function Users() {
                               variant="ghost" 
                               size="icon"
                               className="hover:bg-destructive/10"
-                              onClick={() => deleteUser.mutate(user.id)}
+                              onClick={() => handleDeleteUser(user)}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>

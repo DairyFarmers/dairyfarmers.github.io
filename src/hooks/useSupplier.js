@@ -36,7 +36,7 @@ export function useSupplier() {
 
   const updateSupplier = useMutation({
     mutationFn: async ({ id, data }) => {
-      const response = await api.patch(`/api/v1/suppliers/${id}/`, data);
+      const response = await api.put(`/api/v1/suppliers/${id}`, data);
       return response.data;
     },
     onSuccess: () => {
@@ -46,7 +46,7 @@ export function useSupplier() {
 
   const deleteSupplier = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/api/v1/suppliers/${id}/`);
+      const response = await api.delete(`/api/v1/suppliers/${id}`);
       return response.data;
     },
     onSuccess: () => {

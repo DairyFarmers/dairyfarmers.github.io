@@ -59,8 +59,8 @@ export function useUsers() {
 
   // Delete user mutation
   const deleteUser = useMutation({
-    mutationFn: async (userId) => {
-      await api.delete(`/api/v1/users/detail/${userId}`);
+    mutationFn: async (id) => {
+      await api.delete(`/api/v1/users/detail/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);

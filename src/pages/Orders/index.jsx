@@ -27,17 +27,17 @@ export default function Orders() {
   const pageSize = 10;
 
   const [editDialogOpen, setEditDialogOpen] = useState(false);
-    const [selectedOrder, setSelectedOrder] = useState(null);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const { 
-    orders: { results: orders = [], count = 0 }, 
-    isLoading, 
-    error, 
+  const {
+    orders: { results: orders = [], count = 0 },
+    isLoading,
+    error,
     refetch,
     stats,
     addOrder,
     updateOrder,
-    deleteOrder 
+    deleteOrder
   } = useOrder({ page: currentPage, pageSize });
 
   const getStatusColor = (status) => {
@@ -63,7 +63,7 @@ export default function Orders() {
   const handleAddOrder = async (formData) => {
     try {
       const orderNumber = `ORD-${Date.now().toString().slice(-6)}`;
-      
+
       const orderData = {
         ...formData,
         order_number: orderNumber,
@@ -71,7 +71,7 @@ export default function Orders() {
         status: 'draft',
         payment_status: 'pending',
         // Calculate totals
-        subtotal: formData.items.reduce((sum, item) => 
+        subtotal: formData.items.reduce((sum, item) =>
           sum + ((item.quantity * item.unit_price) - item.discount), 0
         ),
       };
@@ -86,29 +86,29 @@ export default function Orders() {
     }
   };
 
-const handleUpdateOrder = async (formData) => {
-  try {
-    const sanitizedData = {
-      customer_name: formData.customer_name,
-      items: formData.items,
-      shipping_cost: Number(formData.shipping_cost),
-      status: formData.status,
-      payment_status: formData.payment_status,
-      priority: formData.priority,
-      // Recalculate totals if needed
-      subtotal: formData.items.reduce((sum, item) =>
-        sum + ((item.quantity * item.unit_price) - item.discount), 0),
-    };
-    sanitizedData.total_amount = sanitizedData.subtotal + (sanitizedData.shipping_cost || 0);
- console.log("Sanitized update data:", sanitizedData);
-    await updateOrder.mutateAsync({ id: selectedOrder.id, data: sanitizedData });
-    toast.success('Order updated successfully');
-    setEditDialogOpen(false);
-    setSelectedOrder(null);
-  } catch (error) {
-    console.error("Failed to update order:", error.response?.data || error.message);
-  }
-};
+  const handleUpdateOrder = async (formData) => {
+    try {
+      const sanitizedData = {
+        customer_name: formData.customer_name,
+        items: formData.items,
+        shipping_cost: Number(formData.shipping_cost),
+        status: formData.status,
+        payment_status: formData.payment_status,
+        priority: formData.priority,
+        // Recalculate totals if needed
+        subtotal: formData.items.reduce((sum, item) =>
+          sum + ((item.quantity * item.unit_price) - item.discount), 0),
+      };
+      sanitizedData.total_amount = sanitizedData.subtotal + (sanitizedData.shipping_cost || 0);
+      console.log("Sanitized update data:", sanitizedData);
+      await updateOrder.mutateAsync({ id: selectedOrder.id, data: sanitizedData });
+      toast.success('Order updated successfully');
+      setEditDialogOpen(false);
+      setSelectedOrder(null);
+    } catch (error) {
+      console.error("Failed to update order:", error.response?.data || error.message);
+    }
+  };
 
   console.log('Orders:', updateOrder);
 
@@ -138,9 +138,9 @@ const handleUpdateOrder = async (formData) => {
               <AlertTitle>Error loading orders</AlertTitle>
               <AlertDescription className="flex items-center justify-between">
                 <span>{error.message}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => refetch()}
                   className="ml-4"
                 >
@@ -176,7 +176,7 @@ const handleUpdateOrder = async (formData) => {
                 </Button>
               </PermissionGuard>
 
-              <AddOrderForm 
+              <AddOrderForm
                 isOpen={isAddDialogOpen}
                 onClose={() => setIsAddDialogOpen(false)}
                 onSubmit={handleAddOrder}
@@ -265,28 +265,28 @@ const handleUpdateOrder = async (formData) => {
                         <TableCell>
                           <Badge variant={
                             order.priority === 'urgent' ? 'destructive' :
-                            order.priority === 'high' ? 'warning' :
-                            order.priority === 'medium' ? 'default' :
-                            'secondary'
+                              order.priority === 'high' ? 'warning' :
+                                order.priority === 'medium' ? 'default' :
+                                  'secondary'
                           }>
                             {order.priority}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
                           <PermissionGuard permissions="can_manage_orders">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="mr-2"
-                               onClick={() => {
+                              onClick={() => {
                                 setSelectedOrder(order);
                                 setEditDialogOpen(true);
                               }}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
                               className="hover:bg-destructive/10"
                               onClick={() => {
@@ -299,14 +299,14 @@ const handleUpdateOrder = async (formData) => {
                             </Button>
                           </PermissionGuard>
                           <EditOrderForm
-                                                      isOpen={editDialogOpen}
-                                                      onClose={() => {
-                                                        setEditDialogOpen(false);
-                                                        setSelectedOrder(null);
-                                                      }}
-                                                      onSubmit={handleUpdateOrder}
-                                                      defaultValues={selectedOrder}
-                                                    />
+                            isOpen={editDialogOpen}
+                            onClose={() => {
+                              setEditDialogOpen(false);
+                              setSelectedOrder(null);
+                            }}
+                            onSubmit={handleUpdateOrder}
+                            defaultValues={selectedOrder}
+                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -318,12 +318,12 @@ const handleUpdateOrder = async (formData) => {
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
-                          <PaginationPrevious 
+                          <PaginationPrevious
                             onClick={() => handlePageChange(currentPage - 1)}
                             disabled={currentPage === 1}
                           />
                         </PaginationItem>
-                        
+
                         {[...Array(totalPages)].map((_, index) => (
                           <PaginationItem key={index + 1}>
                             <Button
