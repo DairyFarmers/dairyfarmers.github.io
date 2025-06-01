@@ -59,7 +59,7 @@ const orderFormSchema = z.object({
 });
 
 export function AddOrderForm({ isOpen, onClose, onSubmit }) {
-  const { inventory } = useInventory();
+  const { inventory } = useInventory({ fetchAll: true });
   const [items, setItems] = useState([{ id: 0 }]);
 
   const form = useForm({
@@ -260,7 +260,7 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {inventory?.map((item) => (
+                            {inventory?.results?.map((item) => (
                               <SelectItem 
                                 key={item.id} 
                                 value={item.id.toString()}

@@ -2,7 +2,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function useOrder({ page = 1, pageSize = 10 } = {}) {
+export function useOrder({ currentPage = 1, pageSize = 10 } = {}) {
   // Fetch orders with pagination
   const {
     data,
@@ -10,22 +10,28 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['orders', { page, pageSize }],
+    queryKey: ['orders', { currentPage, pageSize }],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/v1/orders/');
-        return response; // Return response.data instead of response
-      } catch (error) {
-        console.error('Orders Error:', {
-          message: error?.response?.data?.message || error.message,
-          status: error?.response?.status
+        const response = await api.get('/api/v1/orders/', {
+          params: {
+            page: currentPage,
+            size: pageSize
+          }
         });
-        throw new Error(error?.response?.data?.message || 'Failed to fetch orders');
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to fetch orders');
       }
     },
     refetchOnMount: true,
     refetchOnWindowFocus: false,
-    staleTime: 30000, // Consider data stale after 30 seconds
+    staleTime: 30000,
     keepPreviousData: true,
   });
 
@@ -34,9 +40,14 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
     mutationFn: async (newOrder) => {
       try {
         const response = await api.post('/api/v1/orders/', newOrder);
+        
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
         return response.data;
       } catch (error) {
-        throw new Error(error?.response?.data?.message || 'Failed to create order');
+        throw new Error('Failed to create order');
       }
     },
     onSuccess: () => {
@@ -49,9 +60,14 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
     mutationFn: async ({ id, data: updateData }) => {
       try {
         const response = await api.put(`/api/v1/orders/${id}/`, updateData);
+        
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+        
         return response.data;
       } catch (error) {
-        throw new Error(error?.response?.data?.message || 'Failed to update order');
+        throw new Error('Failed to update order');
       }
     },
     onSuccess: () => {
@@ -66,7 +82,7 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
         await api.delete(`/api/v1/orders/${id}/`);
         return id;
       } catch (error) {
-        throw new Error(error?.response?.data?.message || 'Failed to delete order');
+        throw new Error('Failed to delete order');
       }
     },
     onSuccess: () => {
@@ -74,7 +90,6 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
     }
   });
 
-  // Calculate stats from the current page results
   const orders = data?.results || [];
   const totalOrders = data?.count || 0;
   const pendingOrders = orders.filter(order => 
@@ -88,23 +103,23 @@ export function useOrder({ page = 1, pageSize = 10 } = {}) {
   );
 
   return {
-    orders: {
-      results: orders,
-      count: totalOrders,
-      next: data?.next,
-      previous: data?.previous
+    orders: data?.orders || {
+      results: [],
+      count: 0,
+      num_pages: 1,
+      next: null,
+      previous: null
+    },
+    stats: data?.stats || {
+      pending: 0,
+      completed: 0,
+      totalRevenue: 0
     },
     isLoading,
     error,
     refetch,
     addOrder,
     updateOrder,
-    deleteOrder,
-    stats: {
-      total: totalOrders,
-      pending: pendingOrders.length,
-      completed: completedOrders.length,
-      totalRevenue
-    }
+    deleteOrder
   };
 }

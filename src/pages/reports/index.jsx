@@ -22,15 +22,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { useReports } from '@/hooks/useReports';
 import { GenerateReportForm } from '@/components/reports/GenerateReportForm';
 
 export default function Reports() {
   const [isGenerateDialogOpen, setIsGenerateDialogOpen] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const { 
-    reports, 
+    reports: { 
+      results: reports = [], 
+      count = 0,
+      next,
+      previous,
+      num_pages = 1
+    }, 
     isLoading, 
     error, 
     refetch,
@@ -38,7 +53,25 @@ export default function Reports() {
     generateReport,
     downloadReport,
     deleteReport 
-  } = useReports();
+  } = useReports({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleGenerateReport = async (formData) => {
     try {
@@ -162,6 +195,9 @@ export default function Reports() {
             <Card>
               <CardHeader>
                 <CardTitle>Report History</CardTitle>
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -176,7 +212,7 @@ export default function Reports() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {reports.map((report) => (
+                    {reports?.map((report) => (
                       <TableRow key={report.id}>
                         <TableCell className="capitalize">{report.report_type}</TableCell>
                         <TableCell>
@@ -223,6 +259,61 @@ export default function Reports() {
                     ))}
                   </TableBody>
                 </Table>
+
+                {num_pages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
+                          />
+                        </PaginationItem>
+
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}                
               </CardContent>
             </Card>
           </div>

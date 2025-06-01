@@ -15,6 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { useInventory } from '@/hooks/useInventory';
 import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
@@ -23,9 +30,45 @@ import { toast } from 'sonner';
 
 export default function Inventory() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
+
+  const {
+    inventory: {
+      results: inventory = [],
+      count = 0,
+      num_pages = 1,
+      next,
+      previous
+    },
+    isLoading,
+    error,
+    refetch,
+    stats,
+    addItem,
+    updateItem,
+    deleteItem
+  } = useInventory({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleUpdateItem = async (formData) => {
     try {
@@ -37,17 +80,6 @@ export default function Inventory() {
       console.error("Failed to update item:", error);
     }
   };
-
-  const {
-    inventory,
-    isLoading,
-    error,
-    refetch,
-    stats,
-    addItem,
-    updateItem,
-    deleteItem
-  } = useInventory();
 
   const handleAddItem = async (formData) => {
     try {
@@ -163,6 +195,9 @@ export default function Inventory() {
             <Card>
               <CardHeader>
                 <CardTitle>Inventory Items</CardTitle>
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -181,7 +216,7 @@ export default function Inventory() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {inventory.map((item) => (
+                    {inventory?.map((item) => (
                       <TableRow key={item.id}>
                         <TableCell>{item.id}</TableCell>
                         <TableCell>{item.name}</TableCell>
@@ -246,6 +281,61 @@ export default function Inventory() {
                     ))}
                   </TableBody>
                 </Table>
+
+                {num_pages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
+                          />
+                        </PaginationItem>
+
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

@@ -15,6 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { useSupplier } from '@/hooks/useSupplier';
 import { AddSupplierForm } from '@/components/suppliers/AddSupplierForm.jsx';
@@ -23,12 +30,19 @@ import { EditSupplierForm } from '@/Components/suppliers/EditSupplierForm';
 
 export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const {
-    suppliers,
+    suppliers: { 
+      results: suppliers = [], 
+      count = 0,
+      next,
+      previous,
+      num_pages = 1
+    },
     isLoading,
     error,
     refetch,
@@ -36,7 +50,25 @@ export default function Suppliers() {
     addSupplier,
     updateSupplier,
     deleteSupplier
-  } = useSupplier();
+  } = useSupplier({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleAddSupplier = async (formData) => {
     try {
@@ -72,8 +104,6 @@ export default function Suppliers() {
       });
     }
   };
-
-  console.log('Selected Supplier:', updateSupplier);
 
   if (isLoading) {
     return (
@@ -180,6 +210,9 @@ export default function Suppliers() {
             <Card>
               <CardHeader>
                 <CardTitle>Suppliers List</CardTitle>
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -195,7 +228,7 @@ export default function Suppliers() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {suppliers.map((supplier) => (
+                    {suppliers?.map((supplier) => (
                       <TableRow key={supplier.id}>
                         <TableCell>{supplier.name}</TableCell>
                         <TableCell>{supplier.contact_person}</TableCell>
@@ -248,6 +281,61 @@ export default function Suppliers() {
                     />
                   </TableBody>
                 </Table>
+
+                {num_pages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
+                          />
+                        </PaginationItem>
+
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}                
               </CardContent>
             </Card>
           </div>

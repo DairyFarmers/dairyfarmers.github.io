@@ -28,7 +28,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useInventory } from '@/hooks/useInventory';
+import { useSupplier } from '@/hooks/useSupplier';
 
 const createFormSchema = (suppliers = []) => {
   return z.object({
@@ -71,7 +71,7 @@ const createFormSchema = (suppliers = []) => {
 };
 
 export function AddItemForm({ isOpen, onClose, onSubmit }) {
-  const { suppliers } = useInventory();
+  const { suppliers: { results: suppliers = []} } = useSupplier({ fetchAll: true })
    const formSchema = createFormSchema(suppliers);
 
   const form = useForm({

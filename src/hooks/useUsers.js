@@ -1,10 +1,13 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
+import { queryClient } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-export function useUsers() {
-  const queryClient = useQueryClient();
-
+export function useUsers({
+  currentPage = 1,
+  pageSize = 10,
+  fetchAll = false
+}) {
   // Fetch users
   const { 
     data: users = [], 
@@ -12,11 +15,17 @@ export function useUsers() {
     error,
     refetch 
   } = useQuery({
-    queryKey: ['users'],
+    queryKey: ['users', fetchAll ? 'all' : { currentPage, pageSize }],
     queryFn: async () => {
-      const response = await api.get('/api/v1/users/list');
-      console.log('Fetched users:', response);
-      return response;
+      const response = await api.get('/api/v1/users/list', {
+        ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
+      });
+      
+      if (!response?.status) {
+        throw new Error('Failed to fetch users');
+      }
+      
+      return response.data;
     }
   });
 
@@ -25,8 +34,12 @@ export function useUsers() {
     queryKey: ['user-roles'],
     queryFn: async () => {
       const response = await api.get('/api/v1/users/roles/');
-      console.log('Fetched roles:', response);
-      return response;
+
+      if (!response?.status) {
+        throw new Error('Failed to fetch user roles');
+      }
+
+      return response.data;
     }
   });
 
@@ -68,16 +81,30 @@ export function useUsers() {
     }
   });
 
-  // Calculate stats
+  console.log('user roles', roles);
+  console.log('users data', users);
+
   const stats = {
-    total: users.length || 0,
-    active: users.filter(user => user.is_active).length || 0,
-    inactive: users.filter(user => !user.is_active).length || 0
+    total: users.results?.length || 0,
+    active: users.results?.filter(user => user.is_active).length || 0,
+    inactive: users.results?.filter(user => !user.is_active).length || 0
   };
 
   return {
-    users,
-    roles,
+    users: fetchAll ? {
+      results: users?.results || [],
+      count: users.count || 0,
+    } : {
+      results: users?.results || [],
+      count: users?.count || 0,
+      num_pages: users?.num_pages || 1,
+      next: users?.next,
+      previous: users?.previous
+    },
+    roles: {
+      results: roles?.results || [],
+      count: roles?.count || 0
+    },
     isLoading,
     error,
     refetch,

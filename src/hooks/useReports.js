@@ -1,10 +1,9 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
+import { queryClient } from '@/lib/queryClient';
 import { toast } from 'sonner';
 
-export function useReports() {
-  const queryClient = useQueryClient();
-
+export function useReports({ currentPage = 1, pageSize = 10 } = {}) {
   // Fetch reports
   const { 
     data: reports = [], 
@@ -12,10 +11,21 @@ export function useReports() {
     error,
     refetch 
   } = useQuery({
-    queryKey: ['reports'],
+    queryKey: ['reports', { currentPage, pageSize }],
     queryFn: async () => {
-      const response = await api.get('/api/v1/reports/list');
-      return response;
+      try {
+        const response = await api.get('/api/v1/reports/list', {
+          params: { page: currentPage, size: pageSize }
+        });
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error(`Failed to fetch reports`);
+      }
     }
   });
 
@@ -55,19 +65,24 @@ export function useReports() {
     }
   });
 
-  // Calculate stats
   const stats = {
-    total: reports.length || 0,
-    today: reports.filter(report => 
+    total: reports?.results?.length || 0,
+    today: reports?.results?.filter(report => 
       new Date(report.generated_at).toDateString() === new Date().toDateString()
     ).length || 0,
-    thisMonth: reports.filter(report => 
+    thisMonth: reports?.results?.filter(report => 
       new Date(report.generated_at).getMonth() === new Date().getMonth()
     ).length || 0
   };
 
   return {
-    reports,
+    reports: {
+      results: reports?.results || [],
+      count: reports?.count || 0,
+      num_pages: reports?.num_pages || 1,
+      next: reports?.next,
+      previous: reports?.previous
+    },
     isLoading,
     error,
     refetch,
