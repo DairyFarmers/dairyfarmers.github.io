@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -29,7 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from 'lucide-react';
+import { Plus, Minus, Trash2 } from 'lucide-react';
 
 const orderFormSchema = z.object({
   // Customer Information
@@ -58,12 +58,13 @@ const orderFormSchema = z.object({
   shipping_cost: z.number().min(0, 'Shipping cost cannot be negative'),
 });
 
-export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
+export function EditOrderForm({ isOpen, onClose, onSubmit, orderI }) {
   const { inventory } = useInventory();
+  const [items, setItems] = useState([{ id: 0 }]);
 
   const form = useForm({
     resolver: zodResolver(orderFormSchema),
-    defaultValues: defaultValues || {
+    defaultValues: {
       customer_name: '',
       customer_email: '',
       customer_phone: '',
@@ -77,31 +78,14 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
     },
   });
 
-  // When defaultValues changes (like when opening the modal to edit), reset the form
-  useEffect(() => {
-    if (defaultValues) {
-      // Defensive fallback for items in case they are missing or empty
-      const safeDefaults = {
-        ...defaultValues,
-        items: defaultValues.items && defaultValues.items.length > 0
-          ? defaultValues.items.map(item => ({
-              inventory_item: item.inventory_item || '',
-              quantity: item.quantity || 1,
-              unit_price: item.unit_price || 0,
-              discount: item.discount || 0,
-            }))
-          : [{ inventory_item: '', quantity: 1, unit_price: 0, discount: 0 }],
-      };
-      form.reset(safeDefaults);
-    }
-  }, [defaultValues, form]);
-
   const addItem = () => {
     const values = form.getValues();
-    form.setValue('items', [
-      ...values.items,
-      { inventory_item: '', quantity: 1, unit_price: 0, discount: 0 }
-    ]);
+    form.setValue('items', [...values.items, { 
+      inventory_item: '', 
+      quantity: 1, 
+      unit_price: 0, 
+      discount: 0 
+    }]);
   };
 
   const removeItem = (index) => {
@@ -198,10 +182,7 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Priority *</FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select priority" />
@@ -262,17 +243,14 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
               </div>
 
               {form.watch('items').map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-4 gap-4 items-end border p-4 rounded-lg"
-                >
+                <div key={index} className="grid grid-cols-4 gap-4 items-end border p-4 rounded-lg">
                   <FormField
                     control={form.control}
                     name={`items.${index}.inventory_item`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Item *</FormLabel>
-                        <Select
+                        <Select 
                           onValueChange={(value) => field.onChange(Number(value))}
                           defaultValue={field.value?.toString()}
                         >
@@ -283,7 +261,10 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
                           </FormControl>
                           <SelectContent>
                             {inventory?.map((item) => (
-                              <SelectItem key={item.id} value={item.id.toString()}>
+                              <SelectItem 
+                                key={item.id} 
+                                value={item.id.toString()}
+                              >
                                 {item.name} (LKR {item.price})
                               </SelectItem>
                             ))}
@@ -301,11 +282,11 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
                       <FormItem>
                         <FormLabel>Quantity *</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
+                          <Input 
+                            type="number" 
                             min="1"
                             {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={e => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
                         <FormMessage />
@@ -320,11 +301,11 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
                       <FormItem>
                         <FormLabel>Unit Price *</FormLabel>
                         <FormControl>
-                          <Input
-                            type="number"
+                          <Input 
+                            type="number" 
                             step="0.01"
                             {...field}
-                            onChange={(e) => field.onChange(Number(e.target.value))}
+                            onChange={e => field.onChange(Number(e.target.value))}
                           />
                         </FormControl>
                         <FormMessage />
@@ -340,84 +321,98 @@ export function EditOrderForm({ isOpen, onClose, onSubmit, defaultValues }) {
                         <FormItem className="flex-1">
                           <FormLabel>Discount</FormLabel>
                           <FormControl>
-                            <Input
-                              type="number"
+                            <Input 
+                              type="number" 
+                              step="0.01"
+                              min="0"
+                              {...field}
+                              onChange={e => field.onChange(Number(e.target.value))}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {index > 0 && (
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        className="mb-2"
+                        onClick={() => removeItem(index)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Additional Information */}
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium">Additional Information</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="expected_delivery_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Expected Delivery Date *</FormLabel>
+                      <FormControl>
+                        <Input type="date" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="shipping_cost"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Shipping Cost</FormLabel>
+                      <FormControl>
+                        <Input 
+                          type="number" 
                           step="0.01"
+                          min="0"
                           {...field}
-                          onChange={(e) => field.onChange(Number(e.target.value))}
+                          onChange={e => field.onChange(Number(e.target.value))}
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="icon"
-                  onClick={() => removeItem(index)}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
               </div>
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
-          ))}
-        </div>
 
-        {/* Additional Info */}
-        <FormField
-          control={form.control}
-          name="expected_delivery_date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Expected Delivery Date *</FormLabel>
-              <FormControl>
-                <Input type="date" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="shipping_cost"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Shipping Cost *</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  step="0.01"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="notes"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Additional Notes</FormLabel>
-              <FormControl>
-                <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <DialogFooter>
-          <Button type="submit">Update Order</Button>
-        </DialogFooter>
-      </form>
-    </Form>
-  </DialogContent>
-</Dialog>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={onClose}>
+                Cancel
+              </Button>
+              <Button type="submit">Edit Order</Button>
+            </DialogFooter>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }

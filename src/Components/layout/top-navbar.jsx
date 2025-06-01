@@ -13,14 +13,17 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, Bell, User, Settings, LogOut, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 export default function TopNavbar() {
   const { user, logoutMutation } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  logoutMutation.mutate(); // let it handle everything
+};
 
   // Format role name for display
   const formatRole = (role) => {
@@ -32,6 +35,16 @@ export default function TopNavbar() {
     }
     return 'user'; // default fallback
   };
+
+  
+
+  const handleNotify = () => {
+    navigate("/notifications"); 
+  };
+
+  const handleSettings = () => {
+    navigate("/settings");
+  }
 
   return (
     <header className="h-16 bg-background border-b border-border flex items-center justify-between px-4 lg:px-6">
@@ -57,8 +70,8 @@ export default function TopNavbar() {
       {/* Right side */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative">
-          <Bell className="h-5 w-5" />
+        <Button variant="ghost" size="sm" className="relative" onClick={handleNotify}>
+          <Bell className="h-5 w-5"/>
           <Badge 
             variant="destructive" 
             className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
@@ -96,11 +109,11 @@ export default function TopNavbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
               Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </DropdownMenuItem> */}
+            <DropdownMenuItem onClick={handleSettings}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
@@ -108,7 +121,7 @@ export default function TopNavbar() {
             <DropdownMenuItem 
               onClick={handleLogout}
               className="text-destructive focus:text-destructive"
-              disabled={logoutMutation.isPending}
+              //disabled={logoutMutation.isPending}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
