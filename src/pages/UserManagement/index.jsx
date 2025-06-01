@@ -15,6 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { useUsers } from '@/hooks/useUsers';
 import { AddUserForm } from '@/components/users/AddUserForm';
@@ -22,10 +29,21 @@ import { AddUserForm } from '@/components/users/AddUserForm';
 export default function Users() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const { user } = useSelector((state) => state.user);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const { 
-    users, 
-    roles,
+    users: {
+      results: users = [],
+      count = 0,
+      num_pages = 1,
+      next,
+      previous
+    }, 
+    roles: {
+      results: roles = [],
+      count: rolesCount = 0
+    },
     isLoading, 
     error, 
     refetch,
@@ -33,7 +51,25 @@ export default function Users() {
     addUser,
     updateUser,
     deleteUser 
-  } = useUsers();
+  } = useUsers({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleAddUser = async (formData) => {
     try {
@@ -168,6 +204,9 @@ export default function Users() {
             <Card>
               <CardHeader>
                 <CardTitle>Users List</CardTitle>
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -231,6 +270,61 @@ export default function Users() {
                     ))}
                   </TableBody>
                 </Table>
+
+                {num_pages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
+                          />
+                        </PaginationItem>
+
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>

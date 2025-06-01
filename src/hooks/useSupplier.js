@@ -2,24 +2,33 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function useSupplier() {
+export function useSupplier({
+  currentPage = 1,
+  pageSize = 10,
+  fetchAll = false
+}) {
   const {
     data = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['suppliers'],
+    queryKey: ['suppliers', fetchAll ? 'all' : { currentPage, pageSize }],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/v1/suppliers/');
-        return response || [];
-      } catch (error) {
-        console.error('Suppliers Error:', {
-          message: error?.response?.data?.message || error.message,
-          status: error?.response?.status
+        const response = await api.get('/api/v1/suppliers/', {
+          params: {
+            ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
+          }
         });
-        throw error;
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+        
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to fetch suppliers');
       }
     }
   });
@@ -54,15 +63,27 @@ export function useSupplier() {
     }
   });
 
-  // Calculate stats
-  const suppliers = data || [];
+  const suppliers = data?.results || [];
   const totalSuppliers = suppliers.length;
-  const averageRating = suppliers.reduce((sum, supplier) => 
-    sum + (supplier.rating || 0), 0) / (totalSuppliers || 1);
+  const averageRating = suppliers.length > 0 
+    ? (suppliers
+        .filter(supplier => supplier.rating != null)
+        .reduce((sum, supplier) => sum + supplier.rating, 0) / 
+        suppliers.filter(supplier => supplier.rating != null).length) || 0
+    : 0;
   const topRatedSuppliers = suppliers.filter(s => (s.rating || 0) >= 4.0);
 
   return {
-    suppliers,
+    suppliers: fetchAll ? {
+      results: suppliers,
+      count: totalSuppliers
+    } : {
+      results: suppliers,
+      count: data?.count || 0,
+      num_pages: data?.num_pages || 1,
+      next: data?.next,
+      previous: data?.previous
+    },
     isLoading,
     error,
     refetch,

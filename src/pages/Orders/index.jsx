@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw } from "lucide-react";
+import { AlertCircle, Plus, Trash2, RefreshCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -15,22 +14,33 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import { useOrder } from '@/hooks/useOrder';
 import { toast } from 'sonner';
 import { AddOrderForm } from '@/components/orders/AddOrderForm.jsx';
-import { EditOrderForm } from '@/Components/orders/EditOrderForm';
 
 export default function Orders() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const {
-    orders: { results: orders = [], count = 0 },
+    orders: { 
+      results: orders = [], 
+      count = 0,
+      next,
+      previous,
+      num_pages = 1
+    },
     isLoading,
     error,
     refetch,
@@ -38,7 +48,25 @@ export default function Orders() {
     addOrder,
     updateOrder,
     deleteOrder
-  } = useOrder({ page: currentPage, pageSize });
+  } = useOrder({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const getStatusColor = (status) => {
     const colors = {
@@ -52,12 +80,6 @@ export default function Orders() {
       returned: 'destructive'
     };
     return colors[status] || 'default';
-  };
-
-  const totalPages = Math.ceil(count / pageSize);
-
-  const handlePageChange = (page) => {
-    setCurrentPage(page);
   };
 
   const handleAddOrder = async (formData) => {
@@ -109,8 +131,6 @@ export default function Orders() {
       console.error("Failed to update order:", error.response?.data || error.message);
     }
   };
-
-  console.log('Orders:', updateOrder);
 
   if (isLoading) {
     return (
@@ -277,17 +297,6 @@ export default function Orders() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="mr-2"
-                              onClick={() => {
-                                setSelectedOrder(order);
-                                setEditDialogOpen(true);
-                              }}
-                            >
-                              <Pencil className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              variant="ghost"
-                              size="icon"
                               className="hover:bg-destructive/10"
                               onClick={() => {
                                 if (window.confirm(`Are you sure you want to delete "${order.customer_name}"?`)) {
@@ -298,48 +307,60 @@ export default function Orders() {
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
                           </PermissionGuard>
-                          <EditOrderForm
-                            isOpen={editDialogOpen}
-                            onClose={() => {
-                              setEditDialogOpen(false);
-                              setSelectedOrder(null);
-                            }}
-                            onSubmit={handleUpdateOrder}
-                            defaultValues={selectedOrder}
-                          />
                         </TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
                 </Table>
 
-                {totalPages > 1 && (
+                {num_pages > 1 && (
                   <div className="mt-4 flex justify-center">
                     <Pagination>
                       <PaginationContent>
                         <PaginationItem>
                           <PaginationPrevious
-                            onClick={() => handlePageChange(currentPage - 1)}
-                            disabled={currentPage === 1}
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
                           />
                         </PaginationItem>
 
-                        {[...Array(totalPages)].map((_, index) => (
-                          <PaginationItem key={index + 1}>
-                            <Button
-                              variant={currentPage === index + 1 ? "default" : "outline"}
-                              size="icon"
-                              onClick={() => handlePageChange(index + 1)}
-                            >
-                              {index + 1}
-                            </Button>
-                          </PaginationItem>
-                        ))}
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
 
                         <PaginationItem>
-                          <PaginationNext
-                            onClick={() => handlePageChange(currentPage + 1)}
-                            disabled={currentPage === totalPages}
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
                           />
                         </PaginationItem>
                       </PaginationContent>

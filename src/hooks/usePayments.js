@@ -2,7 +2,13 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function usePayments(saleId) {
+export function usePayments(
+  saleId,
+  {
+    currentPage = 1,
+    pageSize = 10,
+  } = {}
+) {
   // Fetch payments for a sale
   const {
     data: payments = [],
@@ -10,13 +16,22 @@ export function usePayments(saleId) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['payments', saleId],
+    queryKey: ['payments', saleId, { currentPage, pageSize }],
     queryFn: async () => {
       try {
         const response = await api.get('/api/v1/payments/', {
-          params: { sale_id: saleId }
+          params: { 
+            sale_id: saleId,
+            page: currentPage,
+            size: pageSize
+          }
         });
-        return response.data.results || [];
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to fetch payments');
       }
@@ -56,13 +71,19 @@ export function usePayments(saleId) {
     }
   });
 
-  // Calculate payment stats
-  const totalPaid = payments.reduce((sum, payment) => 
+  const totalPaid = payments?.results?.reduce((sum, payment) => 
     sum + Number(payment.amount), 0
   );
 
   return {
-    payments,
+    payments: {
+      results: payments?.results || [],
+      count: payments?.count || 0,
+      num_pages: payments?.num_pages || 1,
+      next: payments?.next,
+      previous: payments?.previous
+
+    },
     isLoading,
     error,
     refetch,

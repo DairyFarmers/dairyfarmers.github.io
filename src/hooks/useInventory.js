@@ -1,25 +1,39 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
+import { current } from '@reduxjs/toolkit';
 
-export function useInventory() {
+export function useInventory({ 
+  currentPage = 1, 
+  pageSize = 10, 
+  fetchAll = false } = {}
+) {
   const {
     data = [],
     isLoading,
     error,
     refetch
   } = useQuery({
-    queryKey: ['inventory', 'items'],
+    queryKey: [
+      'inventory', 
+      'items', 
+      fetchAll ? 'all': {currentPage, pageSize}
+    ],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/v1/inventory/items/');
-        return response || [];
-      } catch (error) {
-        console.error('Inventory Error:', {
-          message: error?.response?.data?.message || error.message,
-          status: error?.response?.status
+        const response = await api.get('/api/v1/inventory/items/', {
+          params: {
+            ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
+          }
         });
-        throw error;
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response?.data;
+      } catch (error) {
+        throw new Error(`Failed to fetch inventory items`);
       }
     }
   });
@@ -54,25 +68,21 @@ export function useInventory() {
     }
   });
 
-  const { data: suppliers = [] } = useQuery({
-    queryKey: ['suppliers'],
-    queryFn: async () => {
-      try {
-        const response = await api.get('/api/v1/suppliers/');
-        return response || [];
-      } catch (error) {
-        console.error('Suppliers Error:', error);
-        return [];
-      }
-    }
-  });
-
-  const inventory = data || [];
-  const lowStockItems = inventory.filter(item => item.quantity <= 10 && item.quantity > 0);
-  const outOfStockItems = inventory.filter(item => item.quantity === 0);
+  const items = data?.results || [];
+  const lowStockItems = items.filter(item => item.quantity <= 10 && item.quantity > 0);
+  const outOfStockItems = items.filter(item => item.quantity === 0);
 
   return {
-    inventory,
+    inventory: fetchAll ? {
+      results: items,
+      count: items.length
+    } : {
+      results: items,
+      count: data?.count || 0,
+      num_pages: data?.num_pages || 1,
+      next: data?.next,
+      previous: data?.previous
+    },
     isLoading,
     error,
     refetch,
@@ -80,10 +90,9 @@ export function useInventory() {
     updateItem,
     deleteItem,
     stats: {
-      total: inventory.length,
+      total: fetchAll ? items.length : data?.count || 0,
       lowStock: lowStockItems.length,
       outOfStock: outOfStockItems.length
-    },
-    suppliers,
+    }
   };
 }

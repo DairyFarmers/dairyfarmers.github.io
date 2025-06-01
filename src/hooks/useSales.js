@@ -2,7 +2,12 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
+export function useSales({ 
+  currentPage = 1, 
+  pageSize = 10, 
+  filters = {}, 
+  fetchAll = false } = {}
+) {
   // Fetch sales with pagination
   const {
     data,
@@ -10,16 +15,20 @@ export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
     error,
     refetch
   } = useQuery({
-    queryKey: ['sales', { page, pageSize, ...filters }],
+    queryKey: ['sales',  fetchAll ? 'all': {currentPage, pageSize, ...filters}],
     queryFn: async () => {
       try {
-        const response = await api.get('/api/v1/sales/');
-        return {
-          results: response.results || [],
-          count: response.count,
-          next: response.next,
-          previous: response.previous
-        };
+        const response = await api.get('/api/v1/sales/', {
+          params: {
+            ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
+          }
+        });
+        
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
       } catch (error) {
         throw new Error(error?.response?.data?.message || 'Failed to fetch sales');
       }
@@ -74,7 +83,16 @@ export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
   );
 
   return {
-    sales: data || { results: [], count: 0 },
+    sales: fetchAll ? {
+      results: sales,
+      count: totalSales
+    } : {
+      results: sales,
+      count: data?.count || 0,
+      num_pages: data?.num_pages || 1,
+      next: data?.next,
+      previous: data?.previous
+    },
     isLoading,
     error,
     refetch,

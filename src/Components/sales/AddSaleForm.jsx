@@ -44,7 +44,6 @@ const saleFormSchema = z.object({
 
 export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
   const { orders } = useOrder();
-  console.log('Orders:', orders);
 
   const form = useForm({
     resolver: zodResolver(saleFormSchema),

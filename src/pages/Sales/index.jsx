@@ -15,6 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
@@ -35,21 +42,48 @@ import { AddSaleForm } from '@/components/sales/AddSaleForm';
 export default function Sales() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(5);
 
   const { user } = useSelector((state) => state.user);
   const { 
-    sales = { results: [], count: 0 }, 
+    sales: {
+      results: sales = [],
+      count = 0,
+      num_pages = 1,
+      next,
+      previous
+    },
     stats = {
       total: 0,
       totalAmount: 0,
       pending: 0,
       completed: 0
-    }, 
+    },
+    refetch, 
     addSale,
     isLoading, 
     error,
     deleteSale 
-  } = useSales({ page: 1, pageSize: 10 });
+  } = useSales({ currentPage, pageSize });
+
+  const handleNextPage = () => {
+    if (next) {
+      setCurrentPage(prev => prev + 1);
+    }
+  };
+
+  const handlePreviousPage = () => {
+    if (previous) {
+      setCurrentPage(prev => prev - 1);
+    }
+  };
+
+  const handlePageChange = (page) => {
+    if (page >= 1 && page <= num_pages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleAddSale = async (formData) => {
     try {
@@ -61,8 +95,6 @@ export default function Sales() {
       toast.error(error?.response?.data?.message || 'Failed to add sale');
     }
   };
-  
-  console.log('User Permissions:', addSale);
   
   if (isLoading) {
     return (
@@ -173,6 +205,9 @@ export default function Sales() {
             <Card>
               <CardHeader>
                 <CardTitle>Sales History</CardTitle>
+                <div className="text-sm text-muted-foreground">
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                </div>
               </CardHeader>
               <CardContent>
                 <Table>
@@ -189,7 +224,7 @@ export default function Sales() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {sales.results.map((sale) => (
+                    {sales?.map((sale) => (
                       <TableRow key={sale.id}>
                         <TableCell>{sale.id}</TableCell>
                         <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
@@ -255,6 +290,61 @@ export default function Sales() {
                     ))}
                   </TableBody>
                 </Table>
+
+                {num_pages > 1 && (
+                  <div className="mt-4 flex justify-center">
+                    <Pagination>
+                      <PaginationContent>
+                        <PaginationItem>
+                          <PaginationPrevious
+                            onClick={handlePreviousPage}
+                            disabled={!previous}
+                          />
+                        </PaginationItem>
+
+                        {[...Array(num_pages)].map((_, index) => {
+                          const pageNumber = index + 1;
+                          if (
+                            pageNumber === 1 ||
+                            pageNumber === num_pages ||
+                            (pageNumber >= currentPage - 1 && pageNumber <= currentPage + 1)
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button
+                                  variant={currentPage === pageNumber ? "default" : "outline"}
+                                  size="icon"
+                                  onClick={() => handlePageChange(pageNumber)}
+                                >
+                                  {pageNumber}
+                                </Button>
+                              </PaginationItem>
+                            );
+                          } else if (
+                            pageNumber === currentPage - 2 ||
+                            pageNumber === currentPage + 2
+                          ) {
+                            return (
+                              <PaginationItem key={pageNumber}>
+                                <Button variant="outline" size="icon" disabled>
+                                  ...
+                                </Button>
+                              </PaginationItem>
+                            );
+                          }
+                          return null;
+                        })}
+
+                        <PaginationItem>
+                          <PaginationNext 
+                            onClick={handleNextPage}
+                            disabled={!next}
+                          />
+                        </PaginationItem>
+                      </PaginationContent>
+                    </Pagination>
+                  </div>
+                )}
               </CardContent>
             </Card>
           </div>
