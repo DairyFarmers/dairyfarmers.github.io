@@ -1,25 +1,17 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+import { useAuth } from '@/hooks/useAuth';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
+} from '@/components/ui/form';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const profileSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -35,30 +27,48 @@ const USER_ROLES = [
   { value: 'staff', label: 'Staff' },
 ];
 
-export default function ProfileSettings({ user, onSave, isLoading }) {
+export default function ProfileSettings({ onSave, isLoading }) {
+  const { user } = useAuth();
+
   const form = useForm({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      email: user?.email || '',
-      first_name: user?.first_name || '',
-      last_name: user?.last_name || '',
-      role: user?.role || 'staff',
-      is_active: user?.is_active ?? true,
+      email: '',
+      first_name: '',
+      last_name: '',
+      role: 'staff',
+      is_active: true,
     },
   });
 
+  useEffect(() => {
+    if (user) {
+      form.reset({
+        email: user.email || '',
+        first_name: user.first_name || '',
+        last_name: user.last_name || '',
+        role: user.role || 'staff',
+        is_active: user.is_active ?? true,
+      });
+    }
+  }, [user, form]);
+
   const handleSubmit = async (data) => {
     try {
-      await onSave(data);
+      await onSave?.(data); // if onSave is passed
     } catch (error) {
       console.error('Profile update failed:', error);
     }
   };
 
+  if (!user) return null; // or a loading spinner
+
   return (
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md mt-10">
       <h2 className="text-2xl font-semibold mb-2 text-center">Profile Settings</h2>
-      <p className="text-gray-600 mb-6 text-center">Update your personal information and account status.</p>
+      <p className="text-gray-600 mb-6 text-center">
+        Update your personal information and account status.
+      </p>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -69,9 +79,7 @@ export default function ProfileSettings({ user, onSave, isLoading }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>First Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -82,9 +90,7 @@ export default function ProfileSettings({ user, onSave, isLoading }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Last Name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
+                  <FormControl><Input {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -97,9 +103,7 @@ export default function ProfileSettings({ user, onSave, isLoading }) {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email Address</FormLabel>
-                <FormControl>
-                  <Input type="email" {...field} />
-                </FormControl>
+                <FormControl><Input type="email" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -112,7 +116,7 @@ export default function ProfileSettings({ user, onSave, isLoading }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Role</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select role" />
@@ -130,6 +134,7 @@ export default function ProfileSettings({ user, onSave, isLoading }) {
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="is_active"

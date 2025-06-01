@@ -1,5 +1,7 @@
 import React from "react";
 import { Bell, AlertCircle, CheckCircle, Info } from "lucide-react";
+import Sidebar from "@/components/layout/sidebar";
+import TopNavbar from "@/components/layout/top-navbar";
 
 const notifications = [
   {
@@ -46,31 +48,39 @@ const typeIcons = {
   info: <Info className="h-5 w-5" />,
 };
 
-export default function Notification () {
+export default function Notification() {
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-semibold flex items-center gap-2 mb-6">
-          <Bell className="w-6 h-6 text-primary" />
-          Notifications
-        </h2>
+    <div className="flex h-screen bg-background">
+      <Sidebar />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <TopNavbar />
+        <main className="flex-1 overflow-y-auto p-6">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="text-3xl font-semibold flex items-center gap-2 mb-6">
+              <Bell className="w-6 h-6 text-primary" />
+              Notifications
+            </h2>
 
-        <div className="space-y-4">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`flex items-start p-4 rounded-xl shadow-sm ${typeStyles[notification.type]}`}
-            >
-              <div className="mr-4 mt-1">{typeIcons[notification.type]}</div>
-              <div className="flex-1">
-                <h3 className="font-semibold">{notification.title}</h3>
-                <p className="text-sm">{notification.message}</p>
-                <span className="text-xs text-muted-foreground">{notification.time}</span>
-              </div>
+            <div className="space-y-4">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`flex items-start p-4 rounded-xl shadow-sm ${typeStyles[notification.type]}`}
+                >
+                  <div className="mr-4 mt-1">{typeIcons[notification.type]}</div>
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{notification.title}</h3>
+                    <p className="text-sm">{notification.message}</p>
+                    <span className="text-xs text-muted-foreground">
+                      {notification.time}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </div>
+        </main>
       </div>
     </div>
   );
-};
+}

@@ -67,12 +67,12 @@ const AppRoutes = () => {
       } />
 
       <Route path='/notifications' element={
-        <privateRoute
+        <PrivateRoute
           requiredPermissions={['can_view_notifications']}
           requireAll={false}
         >
           <Notification />
-        </privateRoute>
+        </PrivateRoute>
       } />
 
       <Route path="/settings"

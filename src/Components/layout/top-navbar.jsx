@@ -19,9 +19,11 @@ export default function TopNavbar() {
   const { user, logoutMutation } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const handleLogout = () => {
-    logoutMutation.mutate();
-  };
+  const navigate = useNavigate();
+
+const handleLogout = () => {
+  logoutMutation.mutate(); // let it handle everything
+};
 
   // Format role name for display
   const formatRole = (role) => {
@@ -34,7 +36,7 @@ export default function TopNavbar() {
     return 'user'; // default fallback
   };
 
-  const navigate = useNavigate();
+  
 
   const handleNotify = () => {
     navigate("/notifications"); 
@@ -119,7 +121,7 @@ export default function TopNavbar() {
             <DropdownMenuItem 
               onClick={handleLogout}
               className="text-destructive focus:text-destructive"
-              disabled={logoutMutation.isPending}
+              //disabled={logoutMutation.isPending}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
