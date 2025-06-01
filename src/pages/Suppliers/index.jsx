@@ -18,29 +18,62 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useSupplier } from '@/hooks/useSupplier';
 import { AddSupplierForm } from '@/components/suppliers/AddSupplierForm.jsx';
+import { toast } from 'sonner';
+import { EditSupplierForm } from '@/Components/suppliers/EditSupplierForm';
 
 export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
-  const { 
-    suppliers, 
-    isLoading, 
-    error, 
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedSupplier, setSelectedSupplier] = useState(null);
+
+  const {
+    suppliers,
+    isLoading,
+    error,
     refetch,
     stats,
     addSupplier,
     updateSupplier,
-    deleteSupplier 
+    deleteSupplier
   } = useSupplier();
 
   const handleAddSupplier = async (formData) => {
     try {
       await addSupplier.mutateAsync(formData);
       setIsAddDialogOpen(false);
+      toast.success('Supplier Add successfully');
     } catch (error) {
       console.error('Failed to add supplier:', error);
     }
   };
+
+  const handleUpdateSupplier = async (formData) => {
+    try {
+      await updateSupplier.mutateAsync({ id: selectedSupplier.id, data: formData });
+      setEditDialogOpen(false);
+      setSelectedSupplier(null);
+      toast.success('Supplier updated successfully');
+    } catch (error) {
+      console.error("Failed to update item:", error);
+    }
+  };
+
+  const handleDeleteSupplier = (supplier) => {
+    if (window.confirm(`Are you sure you want to delete "${supplier.name}"?`)) {
+      deleteSupplier.mutate(supplier.id, {
+        onSuccess: () => {
+          toast.error(`"${supplier.name}" deleted successfully`);
+        },
+        onError: (error) => {
+          console.error(error);
+          toast.error(`Failed to delete "${supplier.name}"`);
+        }
+      });
+    }
+  };
+
+  console.log('Selected Supplier:', updateSupplier);
 
   if (isLoading) {
     return (
@@ -68,9 +101,9 @@ export default function Suppliers() {
               <AlertTitle>Error loading suppliers</AlertTitle>
               <AlertDescription className="flex items-center justify-between">
                 <span>{error.message}</span>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   onClick={() => refetch()}
                   className="ml-4"
                 >
@@ -106,11 +139,11 @@ export default function Suppliers() {
                 </Button>
               </PermissionGuard>
 
-              <AddSupplierForm 
-                  isOpen={isAddDialogOpen}
-                  onClose={() => setIsAddDialogOpen(false)}
-                  onSubmit={handleAddSupplier}
-                />
+              <AddSupplierForm
+                isOpen={isAddDialogOpen}
+                onClose={() => setIsAddDialogOpen(false)}
+                onSubmit={handleAddSupplier}
+              />
             </div>
 
             <div className="grid gap-4 md:grid-cols-3">
@@ -170,7 +203,7 @@ export default function Suppliers() {
                         <TableCell>{supplier.phone}</TableCell>
                         <TableCell>
                           <span className="flex items-center">
-                            {supplier.rating || 'N/A'} 
+                            {supplier.rating || 'N/A'}
                             {supplier.rating && <Star className="h-4 w-4 ml-1 text-yellow-500" />}
                           </span>
                         </TableCell>
@@ -181,25 +214,38 @@ export default function Suppliers() {
                         </TableCell>
                         <TableCell className="text-right">
                           <PermissionGuard permissions="can_manage_suppliers">
-                            <Button 
-                              variant="ghost" 
-                              size="icon" 
+                            <Button
+                              variant="ghost"
+                              size="icon"
                               className="mr-2"
-                              onClick={() => updateSupplier.mutate({ id: supplier.id, data: {} })}
+                              onClick={() => {
+                                setSelectedSupplier(supplier);
+                                setEditDialogOpen(true);
+                              }}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
-                              onClick={() => deleteSupplier.mutate(supplier.id)}
+                              onClick={() => handleDeleteSupplier(supplier)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </PermissionGuard>
+
                         </TableCell>
                       </TableRow>
                     ))}
+                    <EditSupplierForm
+                      isOpen={editDialogOpen}
+                      onClose={() => {
+                        setEditDialogOpen(false);
+                        setSelectedSupplier(null);
+                      }}
+                      onSubmit={handleUpdateSupplier}
+                      defaultValues={selectedSupplier}
+                    />
                   </TableBody>
                 </Table>
               </CardContent>
