@@ -1,12 +1,10 @@
 import React, { useState } from 'react';
-import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Eye } from "lucide-react";
 import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Eye } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -30,28 +28,16 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { toast } from 'sonner';
-import { toast } from 'sonner';
 import { useSales } from '@/hooks/useSales';
-import { SaleDetailDialog } from '@/components/sales/SaleDetailDialog';
-import { AddSaleForm } from '@/components/sales/AddSaleForm';
 import { SaleDetailDialog } from '@/components/sales/SaleDetailDialog';
 import { AddSaleForm } from '@/components/sales/AddSaleForm';
 
 export default function Sales() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [selectedSale, setSelectedSale] = useState(null);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [selectedSale, setSelectedSale] = useState(null);
+
   const { user } = useSelector((state) => state.user);
   const { 
-    sales = { results: [], count: 0 }, 
-    stats = {
-      total: 0,
-      totalAmount: 0,
-      pending: 0,
-      completed: 0
-    }, 
-    addSale,
     sales = { results: [], count: 0 }, 
     stats = {
       total: 0,
@@ -136,7 +122,6 @@ export default function Sales() {
               </div>
               <PermissionGuard permissions="can_manage_sales">
                 <Button onClick={() => setIsAddDialogOpen(true)}>
-                <Button onClick={() => setIsAddDialogOpen(true)}>
                   <Plus className="h-4 w-4 mr-2" />
                   New Sale
                 </Button>
@@ -204,7 +189,6 @@ export default function Sales() {
                   </TableHeader>
                   <TableBody>
                     {sales.results.map((sale) => (
-                    {sales.results.map((sale) => (
                       <TableRow key={sale.id}>
                         <TableCell>{sale.id}</TableCell>
                         <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
@@ -237,7 +221,6 @@ export default function Sales() {
                               variant="ghost" 
                               size="icon" 
                               className="mr-2"
-                              onClick={() => setSelectedSale(sale)}
                               onClick={() => setSelectedSale(sale)}
                             >
                               <Eye className="h-4 w-4 text-blue-500" />
