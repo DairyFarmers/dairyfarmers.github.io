@@ -10,28 +10,29 @@ import Suppliers from '@/pages/Suppliers';
 import Orders from '@/pages/Orders';
 import Sales from '@/pages/Sales';
 import Notification from '@/pages/Notification';
+import Settings from '@/pages/Settings';
 
 const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
-      
+
       <Route path="/" element={
         <PrivateRoute>
           <Dashboard />
         </PrivateRoute>
       } />
-      
+
       <Route path="/users" element={
         <PrivateRoute requiredPermissions={['can_manage_users']}>
           <UserManagement />
         </PrivateRoute>
       } />
-      
+
       <Route path="/inventory" element={
-        <PrivateRoute 
-          requiredPermissions={['can_manage_inventory', 'can_view_stock']} 
+        <PrivateRoute
+          requiredPermissions={['can_manage_inventory', 'can_view_stock']}
           requireAll={false}
         >
           <Inventory />
@@ -39,17 +40,17 @@ const AppRoutes = () => {
       } />
 
       <Route path="/suppliers" element={
-        <PrivateRoute 
+        <PrivateRoute
           requiredPermissions={['can_manage_suppliers']}
-          requireAll={false}  
+          requireAll={false}
         >
           <Suppliers />
         </PrivateRoute>
       } />
 
       <Route path="/orders" element={
-        <PrivateRoute 
-          requiredPermissions={['can_manage_orders', 'can_view_orders']} 
+        <PrivateRoute
+          requiredPermissions={['can_manage_orders', 'can_view_orders']}
           requireAll={false}
         >
           <Orders />
@@ -57,8 +58,8 @@ const AppRoutes = () => {
       } />
 
       <Route path="/sales" element={
-        <PrivateRoute 
-          requiredPermissions={['can_manage_sales', 'can_view_sales']} 
+        <PrivateRoute
+          requiredPermissions={['can_manage_sales', 'can_view_sales']}
           requireAll={false}
         >
           <Sales />
@@ -68,11 +69,22 @@ const AppRoutes = () => {
       <Route path='/notifications' element={
         <privateRoute
           requiredPermissions={['can_view_notifications']}
-          requireAll={false}  
+          requireAll={false}
         >
           <Notification />
         </privateRoute>
-      }/>
+      } />
+
+      <Route path="/settings"
+        element={
+          <PrivateRoute
+            requiredPermissions={['can_manage_settings']}
+            requireAll={false}
+          >
+            <Settings />
+          </PrivateRoute>
+        }
+      />
     </Routes>
   );
 };

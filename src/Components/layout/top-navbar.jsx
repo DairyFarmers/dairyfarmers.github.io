@@ -40,6 +40,10 @@ export default function TopNavbar() {
     navigate("/notifications"); 
   };
 
+  const handleSettings = () => {
+    navigate("/settings");
+  }
+
   return (
     <header className="h-16 bg-background border-b border-border flex items-center justify-between px-4 lg:px-6">
       {/* Search - hidden on mobile to make room for hamburger menu */}
@@ -103,11 +107,11 @@ export default function TopNavbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            {/* <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
               Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem>
+            </DropdownMenuItem> */}
+            <DropdownMenuItem onClick={handleSettings}>
               <Settings className="mr-2 h-4 w-4" />
               Settings
             </DropdownMenuItem>
