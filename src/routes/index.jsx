@@ -9,6 +9,7 @@ import Unauthorized from '@/pages/Unauthorized';
 import Suppliers from '@/pages/Suppliers';
 import Orders from '@/pages/Orders';
 import Sales from '@/pages/Sales';
+import Notification from '@/pages/Notification';
 
 const AppRoutes = () => {
   return (
@@ -63,6 +64,15 @@ const AppRoutes = () => {
           <Sales />
         </PrivateRoute>
       } />
+
+      <Route path='/notifications' element={
+        <privateRoute
+          requiredPermissions={['can_view_notifications']}
+          requireAll={false}  
+        >
+          <Notification />
+        </privateRoute>
+      }/>
     </Routes>
   );
 };

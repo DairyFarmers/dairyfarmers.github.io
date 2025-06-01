@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, Bell, User, Settings, LogOut, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useNavigate } from "react-router-dom";
 
 export default function TopNavbar() {
   const { user, logoutMutation } = useAuth();
@@ -31,6 +32,12 @@ export default function TopNavbar() {
       return role.name.replace(/_/g, ' ').toLowerCase();
     }
     return 'user'; // default fallback
+  };
+
+  const navigate = useNavigate();
+
+  const handleNotify = () => {
+    navigate("/notifications"); 
   };
 
   return (
@@ -57,8 +64,8 @@ export default function TopNavbar() {
       {/* Right side */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative">
-          <Bell className="h-5 w-5" />
+        <Button variant="ghost" size="sm" className="relative" onClick={handleNotify}>
+          <Bell className="h-5 w-5"/>
           <Badge 
             variant="destructive" 
             className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"

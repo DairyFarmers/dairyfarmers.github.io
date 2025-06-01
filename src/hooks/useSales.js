@@ -31,7 +31,7 @@ export function useSales({ page = 1, pageSize = 10, filters = {} } = {}) {
   const addSale = useMutation({
     mutationFn: async (saleData) => {
       const response = await api.post('/api/v1/sales/', saleData);
-      return response;
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);

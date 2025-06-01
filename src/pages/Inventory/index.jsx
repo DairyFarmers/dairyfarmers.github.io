@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { useInventory } from '@/hooks/useInventory';
 import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
 import { EditItemForm } from '@/Components/inventory/EditItemForm';
+import { toast } from 'sonner';
 
 export default function Inventory() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -31,6 +32,7 @@ export default function Inventory() {
       await updateItem.mutateAsync({ id: selectedItem.id, data: formData });
       setEditDialogOpen(false);
       setSelectedItem(null);
+      toast.success('Item updated successfully');
     } catch (error) {
       console.error("Failed to update item:", error);
     }
@@ -50,6 +52,7 @@ export default function Inventory() {
   const handleAddItem = async (formData) => {
     try {
       await addItem.mutateAsync(formData);
+      toast.success('Item added successfully');
     } catch (error) {
       console.error('Failed to add item:', error);
     }
@@ -222,6 +225,7 @@ export default function Inventory() {
                               onClick={() => {
                                 if (window.confirm(`Are you sure you want to delete "${item.name}"?`)) {
                                   deleteItem.mutate(item.id);
+                                  toast.error(`${item.name} deleted successfully`);
                                 }
                               }}
                             >

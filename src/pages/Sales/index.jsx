@@ -64,6 +64,8 @@ export default function Sales() {
     }
   };
   
+  console.log('User Permissions:', addSale);
+  
   if (isLoading) {
     return (
       <div className="flex h-screen bg-background">
