@@ -10,7 +10,7 @@ import Suppliers from '@/pages/Suppliers';
 import Orders from '@/pages/Orders';
 import Sales from '@/pages/Sales';
 import Reports from '@/pages/reports';
-import Notification from '@/pages/Notification';
+import Notifications from '@/pages/Notifications';
 import Settings from '@/pages/Settings';
 
 const AppRoutes = () => {
@@ -80,7 +80,7 @@ const AppRoutes = () => {
           requiredPermissions={['can_view_notifications']}
           requireAll={false}
         >
-          <Notification />
+          <Notifications />
         </PrivateRoute>
       } />
 
