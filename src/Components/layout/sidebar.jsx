@@ -53,13 +53,6 @@ const navigation = [
     permission: "can_view_suppliers"
   },
   { 
-    name: "Production", 
-    href: "/production", 
-    icon: BarChart3, 
-    current: false,
-    permission: "can_view_production"
-  },
-  { 
     name: "Users", 
     href: "/users", 
     icon: Users, 
@@ -72,13 +65,6 @@ const navigation = [
     icon: FileText, 
     current: false,
     permission: "can_view_reports"
-  },
-  { 
-    name: "Settings", 
-    href: "/settings", 
-    icon: Settings, 
-    current: false,
-    permission: "can_manage_settings"
   },
 ];
 
