@@ -25,7 +25,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useInventory } from '@/hooks/useInventory';
 import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
-import { EditItemForm } from '@/Components/inventory/EditItemForm';
+import { EditItemForm } from '@/components/inventory/EditItemForm';
 import { toast } from 'sonner';
 
 export default function Inventory() {
@@ -203,7 +203,7 @@ export default function Inventory() {
                 <Table>
                   <TableHeader>
                     <TableRow>
-                      <TableHead>ID</TableHead>
+                      <TableHead>Batch Number</TableHead>
                       <TableHead>Item Name</TableHead>
                       <TableHead>Description</TableHead>
                       <TableHead>Category</TableHead>
@@ -218,7 +218,7 @@ export default function Inventory() {
                   <TableBody>
                     {inventory?.map((item) => (
                       <TableRow key={item.id}>
-                        <TableCell>{item.id}</TableCell>
+                        <TableCell>{item.batch_number}</TableCell>
                         <TableCell>{item.name}</TableCell>
                         <TableCell>{item.description}</TableCell>
                         <TableCell>{item.dairy_type}</TableCell>

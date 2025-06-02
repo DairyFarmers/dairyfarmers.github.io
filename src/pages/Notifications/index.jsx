@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
@@ -15,6 +16,7 @@ import { toast } from 'sonner';
 import { cn } from "@/lib/utils";
 
 export default function Notifications() {
+  const navigate = useNavigate();
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
@@ -38,7 +40,8 @@ export default function Notifications() {
     refetch,
     markAsRead,
     deleteNotification,
-    markAllAsRead
+    markAllAsRead,
+    handleNotificationClick
   } = useNotifications({ currentPage, pageSize });
 
   const handleNextPage = () => {
@@ -65,6 +68,17 @@ export default function Notifications() {
     }
   };
 
+  const handleNotificationSelected = async (id) => {
+    try {
+      const redirectUrl = await handleNotificationClick(id);
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      }
+    } catch (error) {
+      toast.error('Failed to process notification');
+    }
+  };
+
   const handleMarkAllRead = async () => {
     try {
       await markAllAsRead.mutateAsync();
@@ -80,6 +94,18 @@ export default function Notifications() {
       toast.success('Notification marked as read');
     } catch (error) {
       toast.error('Failed to mark notification as read');
+    }
+  };
+
+  const handleClick = async () => {
+    try {
+      const redirectUrl = await onNotificationClick(notifications);
+      
+      if (redirectUrl) {
+        navigate(redirectUrl);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -179,16 +205,18 @@ export default function Notifications() {
                       "transition-colors hover:bg-muted/50",
                       !notification.read && "bg-muted/20"
                     )}
+                    onClick={() => handleNotificationSelected(notification.id)}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
                             <Badge variant={notification.priority === 'urgent' ? 'destructive' : 'outline'}>
-                              {notification.type}
+                              {notification.notification_type}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {new Date(notification.created_at).toLocaleDateString()} • 
+                              {new Date(notification.created_at).toLocaleDateString()}
+                              {'  •  '} 
                               {new Date(notification.created_at).toLocaleTimeString()}
                             </span>
                           </div>
@@ -196,20 +224,13 @@ export default function Notifications() {
                           <p className="text-muted-foreground">{notification.message}</p>
                         </div>
                         <div className="flex items-center space-x-2">
-                          {!notification.read && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              onClick={() => handleMarkAsRead(notification.id)}
-                              className="hover:bg-success/10 hover:text-success"
-                            >
-                              <CheckCircle2 className="h-4 w-4" />
-                            </Button>
-                          )}
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => deleteNotification.mutate(notification.id)}
+                            onClick={(e) => {
+                              e.stopPropagation(); 
+                              deleteNotification.mutate(notification.id);
+                            }}
                             className="hover:bg-destructive/10 hover:text-destructive"
                           >
                             <XCircle className="h-4 w-4" />

@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
+import { toast } from 'sonner';
 
 export function useNotifications({ 
   currentPage = 1, 
@@ -19,19 +20,17 @@ export function useNotifications({
       try {
         const response = await api.get('/api/v1/notifications/', {
           params: {
-            ...(fetchAll ? { all: true } : { page: currentPage, page_size: pageSize })
+            ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
           }
         });
 
-        console.log('Notifications response:', response);
-
         if (!response?.status) {
-          throw new Error(response?.data?.message || 'Invalid response from server');
+          throw new Error('Invalid response from server');
         }
 
         return response.data;
       } catch (error) {
-        throw new Error(error?.response?.data?.message || 'Failed to fetch notifications');
+        throw new Error('Failed to fetch notifications');
       }
     },
     refetchOnMount: true,
@@ -44,15 +43,39 @@ export function useNotifications({
   const markAsRead = useMutation({
     mutationFn: async (id) => {
       try {
-        const response = await api.patch(`/api/v1/notifications/${id}/read/`);
+        const response = await api.get(`/api/v1/notifications/${id}`);
         
         if (!response?.status) {
           throw new Error('Failed to mark as read');
         }
 
-        return response.data;
+        const { redirect_url } = response.data;
+        queryClient.invalidateQueries(['notifications']);
+        return redirect_url;
       } catch (error) {
         throw new Error('Failed to mark as read');
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries(['notifications']);
+    }
+  });
+
+  // Mark multiple notifications as read
+  const markAllAsRead = useMutation({
+    mutationFn: async (notificationIds) => {
+      try {
+        const response = await api.post('/api/v1/notifications/mark-all', {
+          notification_ids: notificationIds
+        });
+
+        if (!response?.status) {
+          throw new Error('Failed to mark notifications as read');
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to mark notifications as read');
       }
     },
     onSuccess: () => {
@@ -64,10 +87,14 @@ export function useNotifications({
   const deleteNotification = useMutation({
     mutationFn: async (id) => {
       try {
-        const response = await api.delete(`/api/v1/notifications/${id}/`);
-        if (!response?.data?.status) {
+        const response = await api.delete(`/api/v1/notifications/${id}/delete`);
+        
+        if (!response?.status) {
           throw new Error('Failed to delete notification');
         }
+
+        queryClient.invalidateQueries(['notifications']);
+        toast.success('Notification deleted successfully');
         return id;
       } catch (error) {
         throw new Error('Failed to delete notification');
@@ -78,27 +105,25 @@ export function useNotifications({
     }
   });
 
-  // Mark all as read mutation
-  const markAllAsRead = useMutation({
-    mutationFn: async () => {
-      try {
-        const response = await api.post('/api/v1/notifications/mark-all/');
-        
-        if (!response?.data?.status) {
-          throw new Error('Failed to mark all as read');
-        }
-
-        return response.data;
-      } catch (error) {
-        throw new Error('Failed to mark all as read');
+  const handleNotificationClick = async (id) => {
+    try {
+      const response = await api.get(`/api/v1/notifications/${id}`);
+      
+      if (!response?.status) {
+        throw new Error('Failed to process notification');
       }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['notifications']);
-    }
-  });
 
-  const notifications = data?.results || [];
+      console.log('Notification response:', response.data);
+
+      const { redirect_url } = response.data;
+      queryClient.invalidateQueries(['notifications']);
+      return redirect_url;
+    } catch (error) {
+      throw new Error('Failed to process notification');
+    }
+  };
+
+  const notifications = data?.notifications?.results || [];
   const stats = {
     total: fetchAll ? notifications.length : data?.count || 0,
     unread: notifications.filter(n => !n.read).length,
@@ -109,13 +134,13 @@ export function useNotifications({
   return {
     notifications: fetchAll ? {
       results: notifications,
-      count: notifications.length
+      count: data?.notifications?.count || 0,
     } : {
       results: notifications,
-      count: data?.count || 0,
-      num_pages: data?.num_pages || 1,
-      next: data?.next,
-      previous: data?.previous
+      count: data?.notifications?.count || 0,
+      num_pages: data?.notifications?.num_pages || 1,
+      next: data?.notifications?.next,
+      previous: data?.notifications?.previous
     },
     stats: {
         total: stats.total,
@@ -128,6 +153,7 @@ export function useNotifications({
     refetch,
     markAsRead,
     deleteNotification,
-    markAllAsRead
+    markAllAsRead,
+    handleNotificationClick
   };
 }
