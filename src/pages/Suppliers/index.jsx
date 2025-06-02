@@ -26,7 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { useSupplier } from '@/hooks/useSupplier';
 import { AddSupplierForm } from '@/components/suppliers/AddSupplierForm.jsx';
 import { toast } from 'sonner';
-import { EditSupplierForm } from '@/Components/suppliers/EditSupplierForm';
+import { EditSupplierForm } from '@/components/suppliers/EditSupplierForm';
 
 export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);

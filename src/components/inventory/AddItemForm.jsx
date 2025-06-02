@@ -54,10 +54,9 @@ const createFormSchema = (suppliers = []) => {
       .max(30, 'Maximum temperature cannot exceed 30°C'),
     manufacturing_date: z.string().min(1, 'Manufacturing date is required'),
     expiry_date: z.string().min(1, 'Expiry date is required'),
-    supplier: z.coerce
-      .number()
-      .positive('Supplier is required')
-      .refine((val) => suppliers.some(s => s.id === val), {
+    supplier: z.string()
+      .min(1, 'Supplier is required')
+      .refine((val) => suppliers.some(s => s.id.toString() === val), {
         message: 'Please select a valid supplier'
       }),
     reorder_point: z.number().min(0, 'Reorder point must be non-negative'),
@@ -363,8 +362,8 @@ export function AddItemForm({ isOpen, onClose, onSubmit }) {
                   <FormItem>
                     <FormLabel>Supplier *</FormLabel>
                     <Select 
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      defaultValue={field.value?.toString()}
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>

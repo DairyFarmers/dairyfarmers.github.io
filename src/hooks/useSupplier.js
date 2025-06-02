@@ -25,7 +25,7 @@ export function useSupplier({
         if (!response?.status) {
           throw new Error('Invalid response from server');
         }
-        
+
         return response.data;
       } catch (error) {
         throw new Error('Failed to fetch suppliers');

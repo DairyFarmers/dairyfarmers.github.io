@@ -68,9 +68,9 @@ export default function Notifications() {
     }
   };
 
-  const handleNotificationSelected = async (notification) => {
+  const handleNotificationSelected = async (id) => {
     try {
-      const redirectUrl = await handleNotificationClick(notification);
+      const redirectUrl = await handleNotificationClick(id);
       if (redirectUrl) {
         navigate(redirectUrl);
       }
@@ -205,17 +205,18 @@ export default function Notifications() {
                       "transition-colors hover:bg-muted/50",
                       !notification.read && "bg-muted/20"
                     )}
-                    onClick={() => handleNotificationSelected(notification)}
+                    onClick={() => handleNotificationSelected(notification.id)}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between">
                         <div className="space-y-2">
                           <div className="flex items-center space-x-2">
                             <Badge variant={notification.priority === 'urgent' ? 'destructive' : 'outline'}>
-                              {notification.type}
+                              {notification.notification_type}
                             </Badge>
                             <span className="text-sm text-muted-foreground">
-                              {new Date(notification.created_at).toLocaleDateString()} • 
+                              {new Date(notification.created_at).toLocaleDateString()}
+                              {'  •  '} 
                               {new Date(notification.created_at).toLocaleTimeString()}
                             </span>
                           </div>

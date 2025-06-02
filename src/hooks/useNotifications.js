@@ -1,6 +1,7 @@
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
+import { toast } from 'sonner';
 
 export function useNotifications({ 
   currentPage = 1, 
@@ -22,8 +23,6 @@ export function useNotifications({
             ...(fetchAll ? { all: true } : { page: currentPage, size: pageSize })
           }
         });
-
-        console.log('Notifications response:', response);
 
         if (!response?.status) {
           throw new Error('Invalid response from server');
@@ -88,12 +87,14 @@ export function useNotifications({
   const deleteNotification = useMutation({
     mutationFn: async (id) => {
       try {
-        const response = await api.delete(`/api/v1/notifications/${id}`);
+        const response = await api.delete(`/api/v1/notifications/${id}/delete`);
         
         if (!response?.status) {
           throw new Error('Failed to delete notification');
         }
 
+        queryClient.invalidateQueries(['notifications']);
+        toast.success('Notification deleted successfully');
         return id;
       } catch (error) {
         throw new Error('Failed to delete notification');
@@ -104,13 +105,15 @@ export function useNotifications({
     }
   });
 
-  const handleNotificationClick = async (notification) => {
+  const handleNotificationClick = async (id) => {
     try {
-      const response = await api.get(`/api/v1/notifications/${notification.id}`);
+      const response = await api.get(`/api/v1/notifications/${id}`);
       
       if (!response?.status) {
         throw new Error('Failed to process notification');
       }
+
+      console.log('Notification response:', response.data);
 
       const { redirect_url } = response.data;
       queryClient.invalidateQueries(['notifications']);
@@ -120,7 +123,7 @@ export function useNotifications({
     }
   };
 
-  const notifications = data?.results || [];
+  const notifications = data?.notifications?.results || [];
   const stats = {
     total: fetchAll ? notifications.length : data?.count || 0,
     unread: notifications.filter(n => !n.read).length,
@@ -131,13 +134,13 @@ export function useNotifications({
   return {
     notifications: fetchAll ? {
       results: notifications,
-      count: data?.count || 0,
+      count: data?.notifications?.count || 0,
     } : {
       results: notifications,
-      count: data?.count || 0,
-      num_pages: data?.num_pages || 1,
-      next: data?.next,
-      previous: data?.previous
+      count: data?.notifications?.count || 0,
+      num_pages: data?.notifications?.num_pages || 1,
+      next: data?.notifications?.next,
+      previous: data?.notifications?.previous
     },
     stats: {
         total: stats.total,
