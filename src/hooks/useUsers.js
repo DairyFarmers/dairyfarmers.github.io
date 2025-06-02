@@ -7,7 +7,7 @@ export function useUsers({
   currentPage = 1,
   pageSize = 10,
   fetchAll = false
-}) {
+}={}) {
   // Fetch users
   const { 
     data: users = [], 
@@ -59,16 +59,16 @@ export function useUsers({
   });
 
   // Update user mutation
-  const updateUser = useMutation({
-    mutationFn: async ({ userId, data }) => {
-      const response = await api.patch(`/api/v1/users/detail/${userId}`, data);
-      return response;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['users']);
-      toast.success('User updated successfully');
-    }
-  });
+const updateUser = useMutation({
+  mutationFn: async ({ userId, data }) => {
+    const response = await api.patch(`/api/v1/users/detail/${userId}/`, data); // <-- Add trailing slash
+    return response;
+  },
+  onSuccess: () => {
+    queryClient.invalidateQueries(['users']);
+    toast.success('User updated successfully');
+  }
+});
 
   // Delete user mutation
   const deleteUser = useMutation({
@@ -80,9 +80,6 @@ export function useUsers({
       toast.success('User deleted successfully');
     }
   });
-
-  console.log('user roles', roles);
-  console.log('users data', users);
 
   const stats = {
     total: users.results?.length || 0,

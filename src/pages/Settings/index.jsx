@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -12,9 +12,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-
+import { CheckCircle2, Circle } from 'lucide-react';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
+import { useUsers } from '@/hooks/useUsers';
 
 const profileSchema = z.object({
   email: z.string().email('Invalid email address'),
@@ -30,8 +33,11 @@ const USER_ROLES = [
   { value: 'staff', label: 'Staff' },
 ];
 
-export default function ProfileSettings({ onSave, isLoading }) {
+export default function ProfileSettings() {
   const { user } = useAuth();
+ const { updateUser } = useUsers();
+  const [isEditMode, setIsEditMode] = useState(false);
+
 
   const form = useForm({
     resolver: zodResolver(profileSchema),
@@ -46,7 +52,6 @@ export default function ProfileSettings({ onSave, isLoading }) {
 
   useEffect(() => {
     if (user) {
-      // Split full_name into first and last names
       const nameParts = user.full_name?.trim().split(' ') ?? [];
       const first_name = nameParts[0] || '';
       const last_name = nameParts.slice(1).join(' ') || '';
@@ -61,14 +66,24 @@ export default function ProfileSettings({ onSave, isLoading }) {
     }
   }, [user, form]);
 
-  const handleSubmit = async (data) => {
-    try {
-      await onSave?.(data);
-    } catch (error) {
-      console.error('Profile update failed:', error);
-    }
-  };
+const handleSubmit = async (data) => {
+  try {
+    await updateUser.mutateAsync({
+      userId: user.user_id,
+      data,
+    });
+    // success logic
+  } catch (error) {
+    console.error('Profile update failed:', error);
 
+    if (error.response?.data) {
+      console.error('Backend error details:', error.response.data);
+    }
+  }
+};
+
+console.log('User data:', updateUser);
+console.log('Form data:', form.getValues());
   if (!user) return null;
 
   return (
@@ -78,10 +93,19 @@ export default function ProfileSettings({ onSave, isLoading }) {
         <TopNavbar />
         <main className="flex-1 overflow-y-auto p-6">
           <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
-            <h2 className="text-2xl font-semibold mb-2 text-center">Profile Settings</h2>
-            <p className="text-gray-600 mb-6 text-center">
-              Update your personal information and account status.
-            </p>
+            <div className="flex justify-between items-center mb-4">
+              <div>
+                <h2 className="text-2xl font-semibold">Profile Settings</h2>
+                <p className="text-gray-600 mt-2">
+                  Update your personal information and account status.
+                </p>
+              </div>
+              {!isEditMode && (
+                <Button size="sm" onClick={() => setIsEditMode(true)}>
+                  Edit Profile
+                </Button>
+              )}
+            </div>
 
             <Form {...form}>
               <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
@@ -92,7 +116,11 @@ export default function ProfileSettings({ onSave, isLoading }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        {isEditMode ? (
+                          <FormControl><Input {...field} /></FormControl>
+                        ) : (
+                          <p className="mt-1">{field.value}</p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -103,7 +131,11 @@ export default function ProfileSettings({ onSave, isLoading }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
+                        {isEditMode ? (
+                          <FormControl><Input {...field} /></FormControl>
+                        ) : (
+                          <p className="mt-1">{field.value}</p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -116,7 +148,11 @@ export default function ProfileSettings({ onSave, isLoading }) {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
-                      <FormControl><Input type="email" {...field} /></FormControl>
+                      {isEditMode ? (
+                        <FormControl><Input type="email" {...field} /></FormControl>
+                      ) : (
+                        <p className="mt-1">{field.value}</p>
+                      )}
                       <FormMessage />
                     </FormItem>
                   )}
@@ -129,20 +165,9 @@ export default function ProfileSettings({ onSave, isLoading }) {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {USER_ROLES.map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                          <p className="mt-1">
+                            {USER_ROLES.find(r => r.value === field.value)?.label}
+                          </p>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -152,22 +177,37 @@ export default function ProfileSettings({ onSave, isLoading }) {
                     control={form.control}
                     name="is_active"
                     render={({ field }) => (
-                      <FormItem className="flex flex-row items-end space-x-3 space-y-0 mt-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel>Active Account</FormLabel>
+                      <FormItem className="flex items-center space-x-2 mt-5">                       
+                          <div className="flex items-center space-x-2">
+                            {field.value ? (
+                              <CheckCircle2 className="w-4 h-4 text-green-500" />
+                            ) : (
+                              <Circle className="w-4 h-4 text-gray-400" />
+                            )}
+                            <span>{field.value ? 'Active' : 'Inactive'}</span>
+                          </div>
                       </FormItem>
                     )}
                   />
                 </div>
 
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
-                </Button>
+                {isEditMode && (
+                  <div className="flex gap-4">
+                    <Button type="submit" disabled={updateUser.isLoading}>
+                      {updateUser.isLoading ? 'Saving...' : 'Save Changes'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        form.reset();
+                        setIsEditMode(false);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                  </div>
+                )}
               </form>
             </Form>
           </div>

@@ -32,38 +32,29 @@ import { useInventory } from '@/hooks/useInventory';
 
 const createFormSchema = (suppliers = []) => {
   return z.object({
-    name: z.string().min(2, 'Name must be at least 2 characters'),
+    name: z.string().optional(),
     description: z.string().optional(),
-    dairy_type: z.enum(['milk', 'cheese', 'butter', 'yogurt', 'cream', 'other'], {
-      required_error: 'Category is required',
-    }),
-    batch_number: z.string().min(1, 'Batch number is required'),
-    quantity: z.number().positive('Quantity must be positive'),
-    unit: z.enum(['kg', 'l', 'pcs'], {
-      required_error: 'Unit is required',
-    }),
-    price: z.number().positive('Price must be positive'),
-    storage_condition: z.enum(['refrigerated', 'frozen', 'room_temp'], {
-      required_error: 'Storage condition is required',
-    }),
-    optimal_temperature_min: z.number()
-      .min(-30, 'Minimum temperature cannot be below -30°C')
-      .max(30, 'Maximum temperature cannot exceed 30°C'),
-    optimal_temperature_max: z.number()
-      .min(-30, 'Minimum temperature cannot be below -30°C')
-      .max(30, 'Maximum temperature cannot exceed 30°C'),
-    manufacturing_date: z.string().min(1, 'Manufacturing date is required'),
-    expiry_date: z.string().min(1, 'Expiry date is required'),
-    supplier: z.coerce
-      .number()
-      .positive('Supplier is required')
-      .refine((val) => suppliers.some(s => s.id === val), {
-        message: 'Please select a valid supplier'
+    dairy_type: z.enum(['milk', 'cheese', 'butter', 'yogurt', 'cream', 'other']).optional(),
+    batch_number: z.string().optional(),
+    quantity: z.coerce.number().optional(),
+    unit: z.enum(['kg', 'l', 'pcs']).optional(),
+    price: z.coerce.number().optional(),
+    storage_condition: z.enum(['refrigerated', 'frozen', 'room_temp']).default('refrigerated'),
+    optimal_temperature_min: z.coerce.number().min(-30).max(30).optional(),
+    optimal_temperature_max: z.coerce.number().min(-30).max(30).optional(),
+    manufacturing_date: z.string().optional(),
+    expiry_date: z.string().optional(),
+    supplier: z.coerce.number().optional()
+      .refine(val => !val || suppliers.some(s => s.id === val), {
+        message: "Please select a valid supplier"
       }),
-    reorder_point: z.number().min(0, 'Reorder point must be non-negative'),
-    minimum_order_quantity: z.number().positive('Minimum order quantity must be positive'),
+    reorder_point: z.coerce.number().optional(),
+    minimum_order_quantity: z.coerce.number().optional(),
   }).refine(data => {
-    return new Date(data.manufacturing_date) <= new Date(data.expiry_date);
+    if (data.manufacturing_date && data.expiry_date) {
+      return new Date(data.manufacturing_date) <= new Date(data.expiry_date);
+    }
+    return true;
   }, {
     message: "Manufacturing date must be before expiry date",
     path: ["manufacturing_date"],
@@ -72,7 +63,7 @@ const createFormSchema = (suppliers = []) => {
 
 export function EditItemForm({ isOpen, onClose, onSubmit, defaultValues }) {
   const { suppliers } = useInventory();
-   const formSchema = createFormSchema(suppliers);
+  const formSchema = createFormSchema(suppliers || []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -81,62 +72,135 @@ export function EditItemForm({ isOpen, onClose, onSubmit, defaultValues }) {
       description: '',
       dairy_type: '',
       batch_number: '',
-      quantity: 0,
+      quantity: '',
       unit: '',
-      price: 0,
+      price: '',
       storage_condition: '',
-      optimal_temperature_min: 2,
-      optimal_temperature_max: 8,
-      manufacturing_date: new Date().toISOString().split('T')[0], // Today's date
+      optimal_temperature_min: '',
+      optimal_temperature_max: '',
+      manufacturing_date: '',
       expiry_date: '',
       supplier: '',
-      reorder_point: 0,
-      minimum_order_quantity: 1,
-      is_active: true,
+      reorder_point: '',
+      minimum_order_quantity: '',
     },
   });
 
-  // Reset form when dialog opens
-useEffect(() => {
-  if (isOpen && defaultValues) {
-    form.reset({
-      ...defaultValues,
-      supplier: defaultValues.supplier?.toString(), // ensure supplier is a string for Select
-      manufacturing_date: defaultValues.manufacturing_date?.split('T')[0],
-      expiry_date: defaultValues.expiry_date?.split('T')[0],
-    });
-  }
-}, [isOpen, defaultValues, form]);
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return '';
+    try {
+      const date = new Date(dateString);
+      return date.toISOString().split('T')[0];
+    } catch (error) {
+      console.error('Date formatting error:', error);
+      return '';
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      if (defaultValues) {
+        const supplierId = defaultValues.supplier_details
+          ? String(defaultValues.supplier_details.id)
+          : String(defaultValues.supplier || defaultValues.supplier_id || '');
+
+        const formData = {
+          name: defaultValues.name || '',
+          description: defaultValues.description || '',
+          dairy_type: defaultValues.dairy_type || '',
+          batch_number: defaultValues.batch_number || '',
+          quantity: defaultValues.quantity !== undefined ? String(defaultValues.quantity) : '',
+          unit: defaultValues.unit || '',
+          price: defaultValues.price !== undefined ? String(defaultValues.price) : '',
+          storage_condition: defaultValues.storage_condition || 'refrigerated',
+          optimal_temperature_min: defaultValues.optimal_temperature_min !== undefined
+            ? String(defaultValues.optimal_temperature_min)
+            : '',
+          optimal_temperature_max: defaultValues.optimal_temperature_max !== undefined
+            ? String(defaultValues.optimal_temperature_max)
+            : '',
+          manufacturing_date: formatDateForInput(defaultValues.manufacturing_date),
+          expiry_date: formatDateForInput(defaultValues.expiry_date),
+          supplier: supplierId,
+          reorder_point: defaultValues.reorder_point !== undefined
+            ? String(defaultValues.reorder_point)
+            : '',
+          minimum_order_quantity: defaultValues.minimum_order_quantity !== undefined
+            ? String(defaultValues.minimum_order_quantity)
+            : '',
+        };
+        form.reset(formData);
+      } else {
+        form.reset({
+          name: '',
+          description: '',
+          dairy_type: '',
+          batch_number: '',
+          quantity: '',
+          unit: '',
+          price: '',
+          storage_condition: 'refrigerated',
+          optimal_temperature_min: '',
+          optimal_temperature_max: '',
+          manufacturing_date: '',
+          expiry_date: '',
+          supplier: '',
+          reorder_point: '',
+          minimum_order_quantity: '',
+        });
+      }
+    }
+  }, [isOpen, defaultValues, form]);
 
   const handleSubmit = async (data) => {
     try {
-      await onSubmit(data);
-      form.reset();
+      const processedData = {
+        ...data,
+        quantity: data.quantity ? Number(data.quantity) : undefined,
+        price: data.price ? Number(data.price) : undefined,
+        supplier: data.supplier ? Number(data.supplier) : undefined,
+        reorder_point: data.reorder_point ? Number(data.reorder_point) : undefined,
+        minimum_order_quantity: data.minimum_order_quantity ? Number(data.minimum_order_quantity) : undefined,
+        optimal_temperature_min: data.optimal_temperature_min ? Number(data.optimal_temperature_min) : undefined,
+        optimal_temperature_max: data.optimal_temperature_max ? Number(data.optimal_temperature_max) : undefined,
+        ...(defaultValues?.id && { id: defaultValues.id })
+      };
+
+      await onSubmit(processedData);
       onClose();
     } catch (error) {
       console.error('Form submission error:', error);
     }
   };
 
+  const handleCancel = () => {
+    form.reset();
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Edit Inventory Item</DialogTitle>
+          <DialogTitle>
+            {defaultValues ? 'Edit Inventory Item' : 'Add New Inventory Item'}
+          </DialogTitle>
           <DialogDescription>
-            Fill in the details for the edit item. All fields marked with * are required.
+            Update the inventory item details below.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
-              {/* Basic Information */}
               <FormField
                 control={form.control}
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Name *</FormLabel>
+                    <FormLabel>Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Item name" {...field} />
                     </FormControl>
@@ -150,8 +214,8 @@ useEffect(() => {
                 name="dairy_type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Category *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Category</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
@@ -185,18 +249,19 @@ useEffect(() => {
                 )}
               />
 
-              {/* Quantity and Price */}
               <FormField
                 control={form.control}
                 name="quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Quantity *</FormLabel>
+                    <FormLabel>Quantity</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -209,8 +274,8 @@ useEffect(() => {
                 name="unit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Unit *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Unit</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select unit" />
@@ -232,13 +297,14 @@ useEffect(() => {
                 name="price"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Price (LKR) *</FormLabel>
+                    <FormLabel>Price (LKR)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="1" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        placeholder="0.00"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -251,23 +317,26 @@ useEffect(() => {
                 name="batch_number"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Batch Number *</FormLabel>
+                    <FormLabel>Batch Number</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Batch number" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Storage Conditions */}
               <FormField
                 control={form.control}
                 name="storage_condition"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Storage Condition *</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormLabel>Storage Condition</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      defaultValue="refrigerated"
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select Storage Condition" />
@@ -276,14 +345,13 @@ useEffect(() => {
                       <SelectContent>
                         <SelectItem value="refrigerated">Refrigerated</SelectItem>
                         <SelectItem value="frozen">Frozen</SelectItem>
-                        <SelectItem value="room_temperature">Room Temperature</SelectItem>
+                        <SelectItem value="room_temp">Room Temperature</SelectItem>
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="optimal_temperature_min"
@@ -291,11 +359,13 @@ useEffect(() => {
                   <FormItem>
                     <FormLabel>Min Temperature (°C)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.1" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="-30"
+                        max="30"
+                        placeholder="0"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -310,11 +380,13 @@ useEffect(() => {
                   <FormItem>
                     <FormLabel>Max Temperature (°C)</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        step="0.1" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        step="0.1"
+                        min="-30"
+                        max="30"
+                        placeholder="0"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -322,19 +394,16 @@ useEffect(() => {
                 )}
               />
 
-              {/* Dates */}
               <FormField
                 control={form.control}
                 name="manufacturing_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Manufacturing Date *</FormLabel>
+                    <FormLabel>Manufacturing Date</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="date" 
-                        required
+                      <Input
+                        type="date"
                         {...field}
-                        value={field.value || new Date().toISOString().split('T')[0]}
                         max={new Date().toISOString().split('T')[0]}
                       />
                     </FormControl>
@@ -348,7 +417,7 @@ useEffect(() => {
                 name="expiry_date"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Expiry Date *</FormLabel>
+                    <FormLabel>Expiry Date</FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>
@@ -357,16 +426,15 @@ useEffect(() => {
                 )}
               />
 
-              {/* Supplier and Reorder Info */}
               <FormField
                 control={form.control}
                 name="supplier"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Supplier *</FormLabel>
-                    <Select 
-                      onValueChange={(value) => field.onChange(Number(value))}
-                      defaultValue={field.value?.toString()}
+                    <FormLabel>Supplier</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -374,14 +442,19 @@ useEffect(() => {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {suppliers?.map((supplier) => (
-                          <SelectItem 
-                            key={supplier.id} 
-                            value={supplier.id.toString()}
-                          >
-                            {supplier.name} ({supplier.contact_person})
-                          </SelectItem>
-                        ))}
+                        {suppliers && suppliers.length > 0 ? (
+                          suppliers.map((supplier) => (
+                            <SelectItem
+                              key={supplier.id}
+                              value={String(supplier.id)}
+                            >
+                              {supplier.name} {supplier.contact_person && `(${supplier.contact_person})`}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          // Optionally display a message outside the SelectContent or disable the whole Select
+                          <p className="px-2 text-sm text-muted-foreground">No suppliers available</p>
+                        )}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -394,12 +467,13 @@ useEffect(() => {
                 name="reorder_point"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Reorder Point *</FormLabel>
+                    <FormLabel>Reorder Point</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        min="0"
+                        placeholder="0"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -412,12 +486,13 @@ useEffect(() => {
                 name="minimum_order_quantity"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Minimum Order Quantity *</FormLabel>
+                    <FormLabel>Minimum Order Quantity</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="number" 
-                        {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                      <Input
+                        type="number"
+                        min="1"
+                        placeholder="1"
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -427,10 +502,12 @@ useEffect(() => {
             </div>
 
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button type="button" variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button type="submit">Edit Item</Button>
+              <Button type="submit">
+                {defaultValues ? 'Update Item' : 'Add Item'}
+              </Button>
             </DialogFooter>
           </form>
         </Form>
