@@ -1,175 +1,152 @@
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import * as z from 'zod';
-import { useAuth } from '@/hooks/useAuth';
-import {
-  Form, FormControl, FormField, FormItem, FormLabel, FormMessage,
-} from '@/components/ui/form';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
+import { useState } from "react";
+import { useUserSettings } from "@/hooks/useUserSettings";
+import Sidebar from "@/components/layout/sidebar";
+import TopNavbar from "@/components/layout/top-navbar";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { AlertCircle, RefreshCcw } from "lucide-react";
+import { ProfileCard } from "@/components/settings/ProfileCard";
+import { LocationCard } from "@/components/settings/LocationCard";
+import { ContactCard } from "@/components/settings/ContactCard";
+import { PrivacyCard } from "@/components/settings/PrivacyCard";
+import { ChangePasswordCard } from "@/components/settings/ChangePasswordCard";
 
-import Sidebar from '@/components/layout/sidebar';
-import TopNavbar from '@/components/layout/top-navbar';
-
-const profileSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  first_name: z.string().min(2, 'First name is required'),
-  last_name: z.string().min(2, 'Last name is required'),
-  role: z.enum(['admin', 'manager', 'staff']),
-  is_active: z.boolean(),
-});
-
-const USER_ROLES = [
-  { value: 'admin', label: 'Administrator' },
-  { value: 'manager', label: 'Manager' },
-  { value: 'staff', label: 'Staff' },
-];
-
-export default function ProfileSettings({ onSave, isLoading }) {
-  const { user } = useAuth();
-
-  const form = useForm({
-    resolver: zodResolver(profileSchema),
-    defaultValues: {
-      email: '',
-      first_name: '',
-      last_name: '',
-      role: 'staff',
-      is_active: true,
-    },
+export default function Settings() {
+  const [passwordData, setPasswordData] = useState({
+    old_password: '',
+    new_password: '',
+    confirm_password: ''
   });
 
-  useEffect(() => {
-    if (user) {
-      // Split full_name into first and last names
-      const nameParts = user.full_name?.trim().split(' ') ?? [];
-      const first_name = nameParts[0] || '';
-      const last_name = nameParts.slice(1).join(' ') || '';
+  const { 
+    settings, 
+    isLoading, 
+    error, 
+    refetch,
+    updateSpecificPreference,
+    updateProfile,
+    updateContact,
+    updateLocation,
+    addLocation,
+    setPrimaryLocation,
+    deleteLocation
+  } = useUserSettings();
 
-      form.reset({
-        email: user.email || '',
-        first_name,
-        last_name,
-        role: user.role || 'staff',
-        is_active: user.is_active ?? true,
-      });
-    }
-  }, [user, form]);
-
-  const handleSubmit = async (data) => {
+  const handlePreferenceToggle = async (type, key, value) => {
     try {
-      await onSave?.(data);
+      await updateSpecificPreference(type, {
+        [key]: typeof value === 'boolean' ? !value : value
+      });
     } catch (error) {
-      console.error('Profile update failed:', error);
+      // Error handling is done in the hook
     }
   };
 
-  if (!user) return null;
+  const handlePasswordChange = async () => {
+    if (passwordData.new_password !== passwordData.confirm_password) {
+      toast.error("New passwords don't match");
+      return;
+    }
+    try {
+      await updateSpecificPreference('password', {
+        old_password: passwordData.old_password,
+        new_password: passwordData.new_password
+      });
+      setPasswordData({
+        old_password: '',
+        new_password: '',
+        confirm_password: ''
+      });
+    } catch (error) {
+      // Error handling is done in the hook
+    }
+  };
+
+  const handlePasswordDataChange = (field, value) => {
+    setPasswordData(prev => ({ ...prev, [field]: value }));
+  };
+
+  if (isLoading) {
+      return (
+        <div className="flex h-screen bg-background">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNavbar />
+            <div className="flex items-center justify-center flex-1">
+              <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+  
+    if (error) {
+      return (
+        <div className="flex h-screen bg-background">
+          <Sidebar />
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <TopNavbar />
+            <div className="p-6">
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error loading sales</AlertTitle>
+                <AlertDescription className="flex items-center justify-between">
+                  <span>{error.message}</span>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => refetch()}
+                    className="ml-4"
+                  >
+                    <RefreshCcw className="h-4 w-4 mr-2" />
+                    Retry
+                  </Button>
+                </AlertDescription>
+              </Alert>
+            </div>
+          </div>
+        </div>
+      );
+    }
 
   return (
     <div className="flex h-screen bg-background">
       <Sidebar />
       <div className="flex-1 flex flex-col overflow-hidden">
         <TopNavbar />
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="max-w-2xl mx-auto p-6 bg-white rounded-xl shadow-md">
-            <h2 className="text-2xl font-semibold mb-2 text-center">Profile Settings</h2>
-            <p className="text-gray-600 mb-6 text-center">
-              Update your personal information and account status.
-            </p>
-
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-6">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="first_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>First Name</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="last_name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Last Name</FormLabel>
-                        <FormControl><Input {...field} /></FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Email Address</FormLabel>
-                      <FormControl><Input type="email" {...field} /></FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="role"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Role</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select role" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {USER_ROLES.map((role) => (
-                              <SelectItem key={role.value} value={role.value}>
-                                {role.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-
-                  <FormField
-                    control={form.control}
-                    name="is_active"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-row items-end space-x-3 space-y-0 mt-2">
-                        <FormControl>
-                          <Checkbox
-                            checked={field.value}
-                            onCheckedChange={field.onChange}
-                          />
-                        </FormControl>
-                        <FormLabel>Active Account</FormLabel>
-                      </FormItem>
-                    )}
-                  />
-                </div>
-
-                <Button type="submit" disabled={isLoading}>
-                  {isLoading ? 'Saving...' : 'Save Changes'}
-                </Button>
-              </form>
-            </Form>
+        <main className="flex-1 overflow-y-auto">
+          <div className="container mx-auto py-6 space-y-6">
+            <h1 className="text-3xl font-bold">Settings</h1>
+              <p className="text-muted-foreground mt-1">
+                Manage your account settings, preferences, and privacy options.
+              </p>
+            
+            <div className="max-w-4xl mx-auto space-y-6">
+              <ProfileCard 
+                settings={settings} 
+                updateProfile={updateProfile} 
+              />
+              <ContactCard 
+                settings={settings} 
+                updateContact={updateContact} 
+              />
+              <LocationCard 
+                settings={settings} 
+                updateLocation={updateLocation}
+                addLocation={addLocation}
+                setPrimaryLocation={setPrimaryLocation}
+                deleteLocation={deleteLocation}
+              />
+              <PrivacyCard 
+                settings={settings} 
+                onToggle={handlePreferenceToggle} 
+              />
+              <ChangePasswordCard
+                passwordData={passwordData}
+                onPasswordChange={handlePasswordChange}
+                onPasswordDataChange={handlePasswordDataChange}
+              />
+            </div>
           </div>
         </main>
       </div>

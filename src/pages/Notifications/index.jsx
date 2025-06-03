@@ -99,18 +99,6 @@ export default function Notifications() {
     }
   };
 
-  const handleClick = async () => {
-    try {
-      const redirectUrl = await onNotificationClick(notifications);
-      
-      if (redirectUrl) {
-        navigate(redirectUrl);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex h-screen bg-background">
