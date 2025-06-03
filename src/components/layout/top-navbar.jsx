@@ -19,14 +19,16 @@ import { useNotifications } from "@/hooks/useNotifications";
 export default function TopNavbar() {
   const { user, logoutMutation } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-  const { data: notifications, refetch: refetchNotifications } = useNotifications();
+  const { 
+    data: notifications, refetch: 
+    refetchNotifications 
+  } = useNotifications();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logoutMutation.mutate();
   };
 
-  // Format role name for display
   const formatRole = (role) => {
     if (typeof role === 'string') {
       return role.replace(/_/g, ' ').toLowerCase();
@@ -95,11 +97,11 @@ export default function TopNavbar() {
             <Button variant="ghost" className="flex items-center gap-3 h-auto p-2">
               <div className="hidden md:block text-right">
                 <div className="text-sm font-medium text-foreground">
-                  {user?.username || "User"}
+                  {user?.full_name || "User"}
                 </div>
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
-                  New York, NY
+                  {user.is_verified ? "Verified" : "Unverified"}
                 </div>
               </div>
               <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
