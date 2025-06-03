@@ -14,16 +14,17 @@ import { Badge } from "@/components/ui/badge";
 import { Search, Bell, User, Settings, LogOut, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export default function TopNavbar() {
   const { user, logoutMutation } = useAuth();
   const [searchQuery, setSearchQuery] = useState("");
-
+  const { data: notifications, refetch: refetchNotifications } = useNotifications();
   const navigate = useNavigate();
 
-const handleLogout = () => {
-  logoutMutation.mutate(); // let it handle everything
-};
+  const handleLogout = () => {
+    logoutMutation.mutate();
+  };
 
   // Format role name for display
   const formatRole = (role) => {
@@ -36,11 +37,12 @@ const handleLogout = () => {
     return 'user'; // default fallback
   };
 
-  
-
   const handleNotify = () => {
+    refetchNotifications();
     navigate("/notifications"); 
   };
+
+  const unreadCount = notifications?.data?.stats?.unread_count || 0;
 
   const handleSettings = () => {
     navigate("/settings");
@@ -70,14 +72,21 @@ const handleLogout = () => {
       {/* Right side */}
       <div className="flex items-center gap-4">
         {/* Notifications */}
-        <Button variant="ghost" size="sm" className="relative" onClick={handleNotify}>
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          className="relative" 
+          onClick={handleNotify}
+        >
           <Bell className="h-5 w-5"/>
-          <Badge 
-            variant="destructive" 
-            className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
-          >
-            3
-          </Badge>
+          {unreadCount > 0 && (
+            <Badge 
+              variant="destructive" 
+              className="absolute -top-1 -right-1 h-5 w-5 rounded-full p-0 text-xs flex items-center justify-center"
+            >
+              {unreadCount}
+            </Badge>
+          )}
         </Button>
 
         {/* User menu */}

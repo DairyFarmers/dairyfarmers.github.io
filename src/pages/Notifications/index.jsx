@@ -38,7 +38,6 @@ export default function Notifications() {
     isLoading,
     error,
     refetch,
-    markAsRead,
     deleteNotification,
     markAllAsRead,
     handleNotificationClick
@@ -85,15 +84,6 @@ export default function Notifications() {
       toast.success('All notifications marked as read');
     } catch (error) {
       toast.error('Failed to mark all notifications as read');
-    }
-  };
-
-  const handleMarkAsRead = async (id) => {
-    try {
-      await markAsRead.mutateAsync(id);
-      toast.success('Notification marked as read');
-    } catch (error) {
-      toast.error('Failed to mark notification as read');
     }
   };
 
@@ -220,7 +210,7 @@ export default function Notifications() {
                               {new Date(notification.created_at).toLocaleTimeString()}
                             </span>
                           </div>
-                          <h3 className="font-semibold">{notification.title}</h3>
+                          <h3 className="font-semibold">{notification.notification_title}</h3>
                           <p className="text-muted-foreground">{notification.message}</p>
                         </div>
                         <div className="flex items-center space-x-2">
