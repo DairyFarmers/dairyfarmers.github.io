@@ -33,41 +33,17 @@ export function useNotifications({
         throw new Error('Failed to fetch notifications');
       }
     },
-    refetchOnMount: true,
-    refetchOnWindowFocus: false,
+    refetchOnMount: false,
+    refetchOnWindowFocus: true,
     staleTime: 30000,
     keepPreviousData: true,
   });
 
-  // Mark as read mutation
-  const markAsRead = useMutation({
-    mutationFn: async (id) => {
-      try {
-        const response = await api.get(`/api/v1/notifications/${id}`);
-        
-        if (!response?.status) {
-          throw new Error('Failed to mark as read');
-        }
-
-        const { redirect_url } = response.data;
-        queryClient.invalidateQueries(['notifications']);
-        return redirect_url;
-      } catch (error) {
-        throw new Error('Failed to mark as read');
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries(['notifications']);
-    }
-  });
-
   // Mark multiple notifications as read
   const markAllAsRead = useMutation({
-    mutationFn: async (notificationIds) => {
+    mutationFn: async () => {
       try {
-        const response = await api.post('/api/v1/notifications/mark-all', {
-          notification_ids: notificationIds
-        });
+        const response = await api.post('/api/v1/notifications/mark-all/');
 
         if (!response?.status) {
           throw new Error('Failed to mark notifications as read');
@@ -151,7 +127,6 @@ export function useNotifications({
     isLoading,
     error,
     refetch,
-    markAsRead,
     deleteNotification,
     markAllAsRead,
     handleNotificationClick
