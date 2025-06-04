@@ -75,19 +75,41 @@ export const logoutUser = createAsyncThunk(
 
 export const verifyEmail = createAsyncThunk(
   'user/verifyEmail',
-  async ({ token }, { rejectWithValue }) => {
+  async ({ passcode }, { rejectWithValue }) => {
     try {
-      const response = await api.post(AUTH_ENDPOINTS.VERIFY_EMAIL, { token });
+      const response = await api.post(AUTH_ENDPOINTS.VERIFY_EMAIL, { 
+         passcode
+      });
       
-      if (!response?.data?.status) {
+      if (!response?.status) {
         return rejectWithValue(response?.data?.message || 'Email verification failed');
       }
       
       return response.data;
     } catch (error) {
       return rejectWithValue(
-        error.response?.data?.message || 
+        error.response?.message || 
         'Email verification failed - please try again'
+      );
+    }
+  }
+);
+
+export const sendOTP = createAsyncThunk(
+  'user/sendOTP',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await api.get(AUTH_ENDPOINTS.SEND_OTP);
+      
+      if (!response?.status) {
+        return rejectWithValue(response?.message || 'Failed to send OTP');
+      }
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.message || 
+        'Failed to send verification code'
       );
     }
   }
@@ -155,11 +177,25 @@ const userSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(verifyEmail.fulfilled, (state) => {
+      .addCase(verifyEmail.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.is_verified = action.payload.is_verified;
       })
       .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(sendOTP.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(sendOTP.fulfilled, (state, action) => {
+        state.loading = false;
+        state.error = null;
+        state.is_verified = action.payload.is_verified;
+      })
+      .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

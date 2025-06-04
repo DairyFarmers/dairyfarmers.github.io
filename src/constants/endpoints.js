@@ -7,6 +7,8 @@ export const AUTH_ENDPOINTS = {
   FORGOT_PASSWORD: '/api/v1/users/forgot-password',
   RESET_PASSWORD: '/api/v1/users/reset-password',
   CHANGE_PASSWORD: '/api/v1/users/change-password',
+  SEND_OTP: '/api/v1/users/send-otp',
+  VERIFY_EMAIL: '/api/v1/users/verify-email',
 };
 
 // User management endpoints
