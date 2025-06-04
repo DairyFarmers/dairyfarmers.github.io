@@ -1,12 +1,7 @@
-import React, { useEffect } from 'react';
-import { 
-  useNavigate, 
-  useLocation, 
-  useSearchParams,
-  Link
-} from 'react-router-dom';
+import React from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { loginUser, clearError } from '@/redux/slices/userSlice';
+import { resetPassword } from '@/redux/slices/userSlice';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -16,66 +11,63 @@ import {
   CardDescription,
   CardContent,
 } from '@/components/ui/card';
+import { Loader2, Warehouse, Lock } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { 
-  Form, 
-  FormControl, 
-  FormField, 
-  FormItem, 
-  FormLabel, 
-  FormMessage 
+    Form, 
+    FormControl, 
+    FormField, 
+    FormItem, 
+    FormLabel, 
+    FormMessage 
 } from "@/components/ui/form";
 import { z } from "zod";
-import { Loader2, Warehouse } from "lucide-react";
 
-const loginSchema = z.object({
-  email: z.string().email("Invalid email address"),
-  password: z.string().min(1, "Password is required"),
+const resetPasswordSchema = z.object({
+  password: z.string()
+    .min(8, "Password must be at least 8 characters")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number"),
+  confirmPassword: z.string()
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ["confirmPassword"],
 });
 
-const Login = () => {
+export default function ResetPassword() {
+  const { uid, token } = useParams();
   const dispatch = useDispatch();
-  const { 
-    isLoggedIn, 
-    loading, 
-    error,
-  } = useSelector((state) => state.user);
   const navigate = useNavigate();
-  const location = useLocation();
-  const [searchParams] = useSearchParams();
-
+  const { loading, error } = useSelector((state) => state.user);
+  
   const form = useForm({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
-      email: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  // Clear errors on unmount
-  useEffect(() => {
-    return () => {
-      dispatch(clearError());
-    };
-  }, [dispatch]);
-
   const onSubmit = async (data) => {
     try {
-      await dispatch(loginUser(data)).unwrap();
-    } catch (err) {
-      form.setError("root", {
-        message: err.message || "Login failed - please try again"
+      await dispatch(resetPassword({ 
+        uid, 
+        token, 
+        password: data.password 
+      })).unwrap();
+      navigate('/login', { 
+        replace: true,
+        state: { 
+            message: 'Password reset successful. Please login with your new password.' 
+        }
       });
+    } catch (err) {
+        navigate('/error', { replace: true });
+        return;
     }
   };
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      const redirectPath = searchParams.get("redirect") || "/";
-      navigate(redirectPath, { replace: true });
-    }
-  }, [isLoggedIn, navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">
@@ -94,28 +86,27 @@ const Login = () => {
           
           <div className="space-y-4">
             <h2 className="text-4xl font-bold leading-tight text-foreground">
-              Streamline Your Inventory Operations
+              Reset Your Password
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Manage inventory, track orders, sales, and optimize your inventory 
-              operations with our comprehensive management platform designed for 
-              modern businesses.
+              Choose a strong password that you haven't used before. 
+              A good password is long, unique, and easy to remember but hard to guess.
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4 pt-8">
             <div className="p-4 bg-card border border-border rounded-lg">
-              <h3 className="font-semibold text-foreground mb-2">Real-time Tracking</h3>
-              <p className="text-sm text-muted-foreground">Monitor inventory levels and receive alerts for low stock items.</p>
+              <h3 className="font-semibold text-foreground mb-2">Strong Password</h3>
+              <p className="text-sm text-muted-foreground">Use a combination of letters, numbers, and symbols.</p>
             </div>
             <div className="p-4 bg-card border border-border rounded-lg">
-              <h3 className="font-semibold text-foreground mb-2">Role-based Access</h3>
-              <p className="text-sm text-muted-foreground">Secure access controls for different team members and partners.</p>
+              <h3 className="font-semibold text-foreground mb-2">Keep it Safe</h3>
+              <p className="text-sm text-muted-foreground">Never share your password or store it in plain text.</p>
             </div>
           </div>
         </div>
 
-        {/* Login Form */}
+        {/* Reset Form */}
         <div className="w-full max-w-md mx-auto">
           <Card className="border-border shadow-lg">
             <CardHeader className="text-center">
@@ -125,9 +116,12 @@ const Login = () => {
                 </div>
                 <span className="text-xl font-bold">DFI</span>
               </div>
-              <CardTitle className="text-2xl font-bold">Welcome Back</CardTitle>
+              <div className="mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                <Lock className="h-8 w-8 text-primary" />
+              </div>
+              <CardTitle className="text-2xl font-bold">Create New Password</CardTitle>
               <CardDescription>
-                Sign in to your account to continue
+                Enter your new password below
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -140,14 +134,14 @@ const Login = () => {
                   )}
                   <FormField
                     control={form.control}
-                    name="email"
+                    name="password"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel>New Password</FormLabel>
                         <FormControl>
                           <Input 
-                            placeholder="Enter your email" 
-                            type="email"
+                            type="password" 
+                            placeholder="Enter new password"
                             {...field} 
                             disabled={loading}
                           />
@@ -158,22 +152,14 @@ const Login = () => {
                   />
                   <FormField
                     control={form.control}
-                    name="password"
+                    name="confirmPassword"
                     render={({ field }) => (
                       <FormItem>
-                        <div className="flex items-center justify-between">
-                          <FormLabel>Password</FormLabel>
-                          <Link 
-                            to="/forgot-password"
-                            className="text-sm text-primary hover:text-primary/90"
-                          >
-                            Forgot Password?
-                          </Link>
-                        </div>
+                        <FormLabel>Confirm Password</FormLabel>
                         <FormControl>
                           <Input 
                             type="password" 
-                            placeholder="Enter your password" 
+                            placeholder="Confirm new password"
                             {...field} 
                             disabled={loading}
                           />
@@ -190,7 +176,7 @@ const Login = () => {
                     {loading && (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     )}
-                    Sign In
+                    Reset Password
                   </Button>
                 </form>
               </Form>
@@ -200,6 +186,4 @@ const Login = () => {
       </div>
     </div>
   );
-};
-
-export default Login; 
+}
