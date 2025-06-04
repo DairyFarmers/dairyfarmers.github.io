@@ -29,7 +29,8 @@ export default function Settings() {
     updateLocation,
     addLocation,
     setPrimaryLocation,
-    deleteLocation
+    deleteLocation,
+    changePassword
   } = useUserSettings();
 
   const handlePreferenceToggle = async (type, key, value) => {
@@ -142,9 +143,7 @@ export default function Settings() {
                 onToggle={handlePreferenceToggle} 
               />
               <ChangePasswordCard
-                passwordData={passwordData}
-                onPasswordChange={handlePasswordChange}
-                onPasswordDataChange={handlePasswordDataChange}
+                changePassword={changePassword}
               />
             </div>
           </div>

@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { api } from '@/services/api';
 import { AUTH_ENDPOINTS } from '@/constants/endpoints';
+import { toast } from 'sonner';
 
 const initialState = {
   user_id: null,
@@ -12,7 +13,6 @@ const initialState = {
   loading: false,
   error: null,
   permissions: {},
-  tokenChecked: false
 };
 
 export const loginUser = createAsyncThunk(
@@ -22,12 +22,12 @@ export const loginUser = createAsyncThunk(
       const response = await api.post(AUTH_ENDPOINTS.LOGIN, credentials, {
         withCredentials: true
       });
-      if (response?.status && response?.data) {
-        return response.data;
-      }
-      return rejectWithValue(response?.message || 'Login failed');
+      
+      return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Login failed');
+      return rejectWithValue(
+        error.response?.data?.message || 'Login failed - please try again'
+      );
     }
   }
 );
@@ -37,12 +37,17 @@ export const verifyToken = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await api.get(AUTH_ENDPOINTS.VERIFY_TOKEN);
-      if (response?.status && response?.data) {
-        return response.data;
+      
+      if (!response?.status) {
+        return rejectWithValue(response?.message || 'Token verification failed');
       }
-      return rejectWithValue('Token verification failed');
+
+      return {
+        ...response.data,
+        tokenChecked: true
+      };
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || 'Token verification failed');
+      return rejectWithValue(error.response?.message || 'Token verification failed');
     }
   }
 );
@@ -54,11 +59,36 @@ export const logoutUser = createAsyncThunk(
       await api.post(AUTH_ENDPOINTS.LOGOUT, {}, {
         withCredentials: true
       });
+
+      if (!response?.status) {
+        return rejectWithValue(response?.message || 'Logout failed');
+      }
+
       return true;
     } catch (error) {
       console.error('Logout error:', error);
       // Still clear the state even if the API call fails
       return true;
+    }
+  }
+);
+
+export const verifyEmail = createAsyncThunk(
+  'user/verifyEmail',
+  async ({ token }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(AUTH_ENDPOINTS.VERIFY_EMAIL, { token });
+      
+      if (!response?.data?.status) {
+        return rejectWithValue(response?.data?.message || 'Email verification failed');
+      }
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || 
+        'Email verification failed - please try again'
+      );
     }
   }
 );
@@ -80,49 +110,58 @@ const userSlice = createSlice({
       })
       .addCase(loginUser.fulfilled, (state, action) => {
         const { id, email, full_name, is_verified, role } = action.payload;
+        state.loading = false;
+        state.isLoggedIn = true;
         state.user_id = id;
         state.email = email;
         state.full_name = full_name;
-        state.is_verified = is_verified;
-        state.isLoggedIn = true;
         state.role = role.name;
         state.permissions = role.permissions;
-        state.loading = false;
+        state.is_verified = is_verified;
         state.error = null;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload || 'Login failed';
         state.isLoggedIn = false;
       })
       // Token verification cases
       .addCase(verifyToken.pending, (state) => {
         state.loading = true;
         state.error = null;
-        state.tokenChecked = false;
       })
       .addCase(verifyToken.fulfilled, (state, action) => {
         const { id, email, full_name, is_verified, role } = action.payload;
+        state.isLoggedIn = true;
         state.user_id = id;
         state.email = email;
         state.full_name = full_name;
         state.is_verified = is_verified;
-        state.isLoggedIn = true;
         state.role = role.name;
         state.permissions = role.permissions;
         state.loading = false;
         state.error = null;
-        state.tokenChecked = true;
       })
       .addCase(verifyToken.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
         state.isLoggedIn = false;
-        state.tokenChecked = true;
       })
-      // Logout cases
       .addCase(logoutUser.fulfilled, (state) => {
         return initialState;
+      })
+      .
+      addCase(verifyEmail.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(verifyEmail.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(verifyEmail.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });
