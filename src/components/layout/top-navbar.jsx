@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "@/hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import { logoutUser } from "@/redux/slices/userSlice";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -12,21 +13,24 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Search, Bell, User, Settings, LogOut, MapPin } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 import { useNotifications } from "@/hooks/useNotifications";
 
 export default function TopNavbar() {
-  const { user, logoutMutation } = useAuth();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.user);
+  const logoutLoading = useSelector((state) => state.user.loading);
   const [searchQuery, setSearchQuery] = useState("");
+  
   const { 
     data: notifications, refetch: 
     refetchNotifications 
   } = useNotifications();
-  const navigate = useNavigate();
-
+  
   const handleLogout = () => {
-    logoutMutation.mutate();
+    dispatch(logoutUser());
+    navigate("/login", { replace: true });
   };
 
   const formatRole = (role) => {
@@ -99,10 +103,12 @@ export default function TopNavbar() {
                 <div className="text-sm font-medium text-foreground">
                   {user?.full_name || "User"}
                 </div>
+                {/*
                 <div className="text-xs text-muted-foreground flex items-center gap-1">
                   <MapPin className="h-3 w-3" />
                   {user.is_verified ? "Verified" : "Unverified"}
                 </div>
+                */}
               </div>
               <div className="h-8 w-8 bg-primary rounded-full flex items-center justify-center">
                 <User className="h-4 w-4 text-primary-foreground" />
@@ -132,7 +138,7 @@ export default function TopNavbar() {
             <DropdownMenuItem 
               onClick={handleLogout}
               className="text-destructive focus:text-destructive"
-              //disabled={logoutMutation.isPending}
+              disabled={logoutLoading}
             >
               <LogOut className="mr-2 h-4 w-4" />
               Logout

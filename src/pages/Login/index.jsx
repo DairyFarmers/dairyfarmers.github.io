@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
+import { Navigate, useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginUser, clearError } from '@/redux/slices/userSlice';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,11 @@ const loginSchema = z.object({
 
 const Login = () => {
   const dispatch = useDispatch();
-  const { isLoggedIn, loading, error } = useSelector((state) => state.user);
+  const { 
+    isLoggedIn, 
+    loading, 
+    error,
+  } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
@@ -37,35 +41,29 @@ const Login = () => {
     },
   });
 
-  // Clear any existing errors when unmounting
+  // Clear errors on unmount
   useEffect(() => {
     return () => {
       dispatch(clearError());
     };
   }, [dispatch]);
 
-  // If user is already authenticated, redirect them
-  useEffect(() => {
-    if (isLoggedIn) {
-      const redirect = searchParams.get('redirect') || '/';
-      navigate(redirect, { replace: true });
-    }
-  }, [isLoggedIn, navigate, searchParams]);
-
   const onSubmit = async (data) => {
     try {
-      const resultAction = await dispatch(loginUser(data)).unwrap();
-      if (!resultAction) {
-        form.setError("root", {
-          message: "Login failed - please try again"
-        });
-      }
+      await dispatch(loginUser(data)).unwrap();
     } catch (err) {
       form.setError("root", {
         message: err.message || "Login failed - please try again"
       });
     }
   };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      const redirectPath = searchParams.get("redirect") || "/";
+      navigate(redirectPath, { replace: true });
+    }
+  }, [isLoggedIn, navigate, searchParams]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">

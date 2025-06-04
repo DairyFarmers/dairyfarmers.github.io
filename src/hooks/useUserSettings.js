@@ -18,7 +18,7 @@ export function useUserSettings() {
         if (!response?.status) {
           throw new Error(response?.data?.message || 'Failed to fetch settings');
         }
-        console.log('Fetched settings:', response.data);
+
         return response.data;
       } catch (error) {
         const errorMessage = error?.response?.data?.message || 'Failed to fetch settings';
@@ -96,14 +96,20 @@ export function useUserSettings() {
   // Change password
   const changePassword = useMutation({
     mutationFn: async (data) => {
-      const response = await api.post('/api/v1/users/password-reset', data);
+      const response = await api.post('/api/v1/users/change-password', data);
+
+      if (!response?.status) {
+        throw new Error('Failed to change password');
+      }
+      
       return response.data;
     },
     onSuccess: () => {
+      queryClient.invalidateQueries(['user-settings']);
       toast.success('Password changed successfully');
     },
     onError: (error) => {
-      toast.error(error?.response?.data?.message || 'Failed to change password');
+      toast.error('Failed to change password');
     }
   });
 
