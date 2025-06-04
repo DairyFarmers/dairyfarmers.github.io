@@ -6,7 +6,6 @@ import ActivitySection from './ActivitySection';
 
 export default function DashboardContent({ data, timeRange, user, isLoading }) {
   console.log('Rendering DashboardContent with timeRange:', timeRange);
-  console.log('User role:', user?.role?.name);
 
   if (isLoading) {
     return (

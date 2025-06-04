@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { Loader2, Warehouse } from "lucide-react";
+import { toast } from 'sonner';
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -40,10 +41,19 @@ const Login = () => {
     isLoggedIn, 
     loading, 
     error,
+    initialized
   } = useSelector((state) => state.user);
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    if (initialized && isLoggedIn) {
+      const from = location.state?.from?.pathname;
+      const redirectPath = from || searchParams.get("redirect") || "/";
+      navigate(redirectPath, { replace: true });
+    }
+  }, [initialized, isLoggedIn, navigate, location, searchParams]);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -53,7 +63,6 @@ const Login = () => {
     },
   });
 
-  // Clear errors on unmount
   useEffect(() => {
     return () => {
       dispatch(clearError());
@@ -62,7 +71,13 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      await dispatch(loginUser(data)).unwrap();
+      const result = await dispatch(loginUser(data)).unwrap();
+      if (result?.id){
+        toast.success("Login successful!");
+        const from = location.state?.from?.pathname;
+        const redirectPath = "/";
+        navigate(redirectPath, { replace: true });
+      }
     } catch (err) {
       form.setError("root", {
         message: err.message || "Login failed - please try again"
@@ -70,12 +85,9 @@ const Login = () => {
     }
   };
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      const redirectPath = searchParams.get("redirect") || "/";
-      navigate(redirectPath, { replace: true });
-    }
-  }, [isLoggedIn, navigate, searchParams]);
+  if (initialized && isLoggedIn) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20 flex items-center justify-center p-4">

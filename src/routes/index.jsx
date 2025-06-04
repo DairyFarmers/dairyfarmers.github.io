@@ -1,7 +1,5 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-import { PrivateRoute } from '@/components/common/PrivateRoute';
-import { EmailVerification } from '@/components/common/EmailVerification';
 import Login from '@/pages/Login';
 import Dashboard from '@/pages/Dashboard';
 import UserManagement from '@/pages/UserManagement';
@@ -17,6 +15,7 @@ import VerifyEmail from '@/pages/VerifyEmail';
 import ForgotPassword from '@/pages/ForgotPassword';
 import ResetPassword from '@/pages/ResetPassword';
 import ErrorPage from '@/pages/ErrorPage';
+import { AuthWrapper } from '@/utils/AuthWrapper';
 
 const AppRoutes = () => {
   return (
@@ -29,99 +28,81 @@ const AppRoutes = () => {
       <Route path="/error" element={<ErrorPage />} />
       
       <Route path="/" element={
-        <PrivateRoute>
-          <EmailVerification>
-            <Dashboard />
-          </EmailVerification>
-        </PrivateRoute>
+        <AuthWrapper>
+          <Dashboard />
+        </AuthWrapper>
       } />
 
       <Route path="/users" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_manage_users', 'can_view_users']}
           requireAll={false}
         >
-          <EmailVerification>
-            <UserManagement />
-          </EmailVerification>
-        </PrivateRoute>
+          <UserManagement />
+        </AuthWrapper>
       } />
 
       <Route path="/inventory" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_manage_inventory', 'can_view_inventory']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Inventory />
-          </EmailVerification>
-        </PrivateRoute>
+          <Inventory />
+        </AuthWrapper>
       } />
 
       <Route path="/suppliers" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_manage_suppliers', 'can_view_suppliers']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Suppliers />
-          </EmailVerification>
-        </PrivateRoute>
+          <Suppliers />
+        </AuthWrapper>
       } />
 
       <Route path="/orders" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_manage_orders', 'can_view_orders']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Orders />
-          </EmailVerification>
-        </PrivateRoute>
+          <Orders />
+        </AuthWrapper>
       } />
 
       <Route path="/sales" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_manage_sales', 'can_view_sales']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Sales />
-          </EmailVerification>
-        </PrivateRoute>
+          <Sales />
+        </AuthWrapper>
       } />
 
       <Route path="/reports" element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_view_reports']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Reports />
-          </EmailVerification>
-        </PrivateRoute>
+          <Reports />
+        </AuthWrapper>
       } />
       <Route path='/notifications' element={
-        <PrivateRoute
+        <AuthWrapper
           requiredPermissions={['can_view_notifications']}
           requireAll={false}
         >
-          <EmailVerification>
-            <Notifications />
-          </EmailVerification>
-        </PrivateRoute>
+          <Notifications />
+        </AuthWrapper>
       } />
 
       <Route path="/settings"
         element={
-          <PrivateRoute
+          <AuthWrapper
             requiredPermissions={['can_manage_settings']}
-            requireAll={true}
+            requireAll={false}
           >
-            <EmailVerification>
-              <Settings />
-            </EmailVerification>
-          </PrivateRoute>
+            <Settings />
+          </AuthWrapper>
         }
       />
     </Routes>

@@ -4,15 +4,13 @@ import { AUTH_ENDPOINTS } from '@/constants/endpoints';
 import { toast } from 'sonner';
 
 const initialState = {
-  user_id: null,
-  email: null,
-  full_name: null,
-  is_verified: false,
   isLoggedIn: false,
-  role: null,
   loading: false,
   error: null,
+  user: null,
+  is_verified: false,
   permissions: {},
+  initialized: false
 };
 
 export const loginUser = createAsyncThunk(
@@ -178,44 +176,49 @@ const userSlice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action) => {
-        const { id, email, full_name, is_verified, role } = action.payload;
         state.loading = false;
         state.isLoggedIn = true;
-        state.user_id = id;
-        state.email = email;
-        state.full_name = full_name;
-        state.role = role.name;
-        state.permissions = role.permissions;
-        state.is_verified = is_verified;
+        state.is_verified = action.payload.is_verified;
         state.error = null;
+        state.user = {
+          id: action.payload.id,
+          email: action.payload.email,
+          full_name: action.payload.full_name,
+        };
+        state.permissions = action.payload.role.permissions;
+        state.initialized = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || 'Login failed';
         state.isLoggedIn = false;
+        state.user = null;
+        state.is_verified = false;
+        state.permissions = {};
       })
       // Token verification cases
-      .addCase(verifyToken.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(verifyToken.fulfilled, (state, action) => {
-        const { id, email, full_name, is_verified, role } = action.payload;
+        state.loading = false;
         state.isLoggedIn = true;
-        state.user_id = id;
-        state.email = email;
-        state.full_name = full_name;
-        state.is_verified = is_verified;
-        state.role = role.name;
-        state.permissions = role.permissions;
-        state.loading = false;
+        state.is_verified = action.payload.is_verified;
         state.error = null;
+        state.user = {
+          id: action.payload.id,
+          email: action.payload.email,
+          full_name: action.payload.full_name,
+        };
+        state.permissions = action.payload.role.permissions;
+        state.initialized = true;
       })
-      .addCase(verifyToken.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+      .addCase(verifyToken.rejected, (state) => {
         state.isLoggedIn = false;
+        state.user = null;
+        state.is_verified = false;
+        state.permissions = {};
+        state.initialized = true;
+        state.loading = false;
       })
+      // Logout cases
       .addCase(logoutUser.fulfilled, (state) => {
         return initialState;
       })
@@ -227,6 +230,7 @@ const userSlice = createSlice({
       .addCase(verifyEmail.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
+        state.isLoggedIn = true;
         state.is_verified = action.payload.is_verified;
       })
       .addCase(verifyEmail.rejected, (state, action) => {
