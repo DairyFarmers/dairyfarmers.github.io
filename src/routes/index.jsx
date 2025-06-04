@@ -14,6 +14,9 @@ import Reports from '@/pages/reports';
 import Notifications from '@/pages/Notifications';
 import Settings from '@/pages/Settings';
 import VerifyEmail from '@/pages/VerifyEmail';
+import ForgotPassword from '@/pages/ForgotPassword';
+import ResetPassword from '@/pages/ResetPassword';
+import ErrorPage from '@/pages/ErrorPage';
 
 const AppRoutes = () => {
   return (
@@ -21,7 +24,10 @@ const AppRoutes = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path='/reset-password/:uid/:token' element={<ResetPassword />} />
+      <Route path="/error" element={<ErrorPage />} />
+      
       <Route path="/" element={
         <PrivateRoute>
           <EmailVerification>

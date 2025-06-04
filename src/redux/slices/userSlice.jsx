@@ -115,6 +115,53 @@ export const sendOTP = createAsyncThunk(
   }
 );
 
+export const requestPasswordReset = createAsyncThunk(
+  'user/requestPasswordReset',
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        AUTH_ENDPOINTS.FORGOT_PASSWORD_REQUEST, 
+        { email }
+      );
+      
+      if (!response?.status) {
+        return rejectWithValue('Failed to process request');
+      }
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        'Something went wrong. Please try again.'
+      );
+    }
+  }
+);
+
+export const resetPassword = createAsyncThunk(
+  'user/resetPassword',
+  async ({ uid, token, password }, { rejectWithValue }) => {
+    try {
+      const response = await api.post(
+        AUTH_ENDPOINTS.RESET_PASSWORD, 
+      {
+        uid,
+        token,
+        password
+      });
+      
+      if (!response?.status) {
+        return rejectWithValue('Password reset failed');
+      }
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        'Failed to reset password. Please try again.'
+      );
+    }
+  }
+);
+
 const userSlice = createSlice({
   name: 'user',
   initialState,
@@ -169,11 +216,12 @@ const userSlice = createSlice({
         state.error = action.payload;
         state.isLoggedIn = false;
       })
+      // Logout cases
       .addCase(logoutUser.fulfilled, (state) => {
         return initialState;
       })
-      .
-      addCase(verifyEmail.pending, (state) => {
+      // Email verification cases
+      .addCase(verifyEmail.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
@@ -186,6 +234,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+      // Send OTP cases
       .addCase(sendOTP.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -198,6 +247,36 @@ const userSlice = createSlice({
       .addCase(sendOTP.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+      // Password reset request cases
+      .addCase(requestPasswordReset.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(requestPasswordReset.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+      })
+      .addCase(requestPasswordReset.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Reset password cases
+      .addCase(resetPassword.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      }
+      )
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.loading = false;
+        state.error = null;
+        toast.success(
+          'Password reset successful. Please login with your new password.'
+        );
+      })
+      .addCase(resetPassword.rejected, (state) => {
+        state.loading = false;
+        state.error = 'Failed to reset password';
       });
   },
 });

@@ -95,8 +95,8 @@ export default function VerifyEmail () {
             <Warehouse className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-foreground">DFI</h1>
-            <p className="text-muted-foreground">Digital Factory Inventory</p>
+            <h1 className="text-3xl font-bold text-foreground">Dairy Farmers</h1>
+            <p className="text-muted-foreground">Next-Gen Inventory Management Platform</p>
           </div>
         </div>
         
@@ -131,7 +131,7 @@ export default function VerifyEmail () {
               </div>
               <span className="text-xl font-bold">DFI</span>
             </div>
-            
+
               <div className="mx-auto bg-primary/10 w-16 h-16 rounded-full flex items-center justify-center mb-4">
                 <Mail className="h-8 w-8 text-primary" />
               </div>
