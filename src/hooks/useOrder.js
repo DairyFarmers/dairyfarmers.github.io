@@ -2,7 +2,11 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { api } from '@/services/api';
 import { queryClient } from '@/lib/queryClient';
 
-export function useOrder({ currentPage = 1, pageSize = 10 } = {}) {
+export function useOrder({ 
+  currentPage = 1, 
+  pageSize = 10, 
+  fetchAll = false 
+} = {}) {
   // Fetch orders with pagination
   const {
     data,
@@ -57,15 +61,17 @@ export function useOrder({ currentPage = 1, pageSize = 10 } = {}) {
 
   // Update order
   const updateOrder = useMutation({
-    mutationFn: async ({ id, data: updateData }) => {
+    mutationFn: async ({ id, status }) => {
       try {
-        const response = await api.put(`/api/v1/orders/${id}/`, updateData);
+        const response = await api.patch(`/api/v1/orders/${id}/update_status/`, {
+          status,
+        });
         
         if (!response?.status) {
           throw new Error('Invalid response from server');
         }
         
-        return response.data;
+        return response;
       } catch (error) {
         throw new Error('Failed to update order');
       }
@@ -121,5 +127,42 @@ export function useOrder({ currentPage = 1, pageSize = 10 } = {}) {
     addOrder,
     updateOrder,
     deleteOrder
+  };
+}
+
+export function useOrderDetails(orderId) {
+  const {
+    data = {},
+    isLoading,
+    error,
+    refetch
+  } = useQuery({
+    queryKey: ['order', orderId],
+    queryFn: async () => {
+      if (!orderId) return null;
+
+      try {
+        const response = await api.get(`/api/v1/orders/${orderId}/`);
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response;
+      } catch (error) {
+        throw new Error('Failed to fetch order details');
+      }
+    },
+    enabled: !!orderId,
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
+    staleTime: 30000,
+  });
+
+  return {
+    data: data,
+    isLoading,
+    error,
+    refetch
   };
 }
