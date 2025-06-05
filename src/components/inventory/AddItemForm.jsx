@@ -70,7 +70,9 @@ const createFormSchema = (suppliers = []) => {
 };
 
 export function AddItemForm({ isOpen, onClose, onSubmit }) {
-  const { suppliers: { results: suppliers = []} } = useSupplier({ fetchAll: true })
+    const { suppliers: { results: suppliers = []} } = useSupplier({ 
+      fetchAll: true 
+    })
    const formSchema = createFormSchema(suppliers);
 
   const form = useForm({

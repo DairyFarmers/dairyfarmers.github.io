@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -28,7 +28,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { useInventory } from '@/hooks/useInventory';
+import { useInventoryItem } from '@/hooks/useInventory';
+import { useSupplier } from '@/hooks/useSupplier';
+import { AlertDialogBox } from '@/components/shared/AlertDialogBox';
+import { toast } from 'sonner';
 
 const createFormSchema = (suppliers = []) => {
   return z.object({
@@ -54,12 +57,11 @@ const createFormSchema = (suppliers = []) => {
       .max(30, 'Maximum temperature cannot exceed 30°C'),
     manufacturing_date: z.string().min(1, 'Manufacturing date is required'),
     expiry_date: z.string().min(1, 'Expiry date is required'),
-    supplier: z.coerce
-      .number()
-      .positive('Supplier is required')
-      .refine((val) => suppliers.some(s => s.id === val), {
+    supplier: z.string()
+      .min(1, 'Supplier is required')
+      .refine((val) => suppliers.some(s => s.id.toString() === val), {
         message: 'Please select a valid supplier'
-      }),
+    }),
     reorder_point: z.number().min(0, 'Reorder point must be non-negative'),
     minimum_order_quantity: z.number().positive('Minimum order quantity must be positive'),
   }).refine(data => {
@@ -70,9 +72,33 @@ const createFormSchema = (suppliers = []) => {
   });
 };
 
-export function EditItemForm({ isOpen, onClose, onSubmit, defaultValues }) {
-  const { suppliers } = useInventory();
-   const formSchema = createFormSchema(suppliers);
+export function EditItemForm({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  itemId
+}) {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [pendingData, setPendingData] = useState(null);
+
+  const { 
+    suppliers: { results: suppliers = []} ,
+    isLoading: suppliersLoading,
+    error: suppliersError
+  } = useSupplier({ 
+      fetchAll: true 
+  })
+
+  const { 
+    data: item, 
+    isLoading: itemLoading, 
+    error: itemError 
+  } = useInventoryItem(itemId);
+
+  const isLoading = suppliersLoading || itemLoading;
+  const error = suppliersError || itemError;
+  
+  const formSchema = createFormSchema(suppliers || []);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -96,31 +122,82 @@ export function EditItemForm({ isOpen, onClose, onSubmit, defaultValues }) {
     },
   });
 
-  // Reset form when dialog opens
-useEffect(() => {
-  if (isOpen && defaultValues) {
-    form.reset({
-      ...defaultValues,
-      supplier: defaultValues.supplier?.toString(), // ensure supplier is a string for Select
-      manufacturing_date: defaultValues.manufacturing_date?.split('T')[0],
-      expiry_date: defaultValues.expiry_date?.split('T')[0],
-    });
-  }
-}, [isOpen, defaultValues, form]);
+  // Update form when item data is fetched
+  useEffect(() => {
+    if (isOpen && item) {
+      form.reset({
+        ...item,
+        quantity: Number(item.quantity),
+        price: Number(item.price),
+        optimal_temperature_min: Number(item.optimal_temperature_min),
+        optimal_temperature_max: Number(item.optimal_temperature_max),
+        reorder_point: Number(item.reorder_point),
+        minimum_order_quantity: Number(item.minimum_order_quantity),
+        supplier: item?.supplier,
+        manufacturing_date: item.manufacturing_date?.split('T')[0],
+        expiry_date: item.expiry_date?.split('T')[0],
+      });
+    }
+  }, [isOpen, item, form]);
 
   const handleSubmit = async (data) => {
+    setPendingData(data);
+    setIsConfirmOpen(true);
+  };
+
+  const handleConfirm = async () => {
     try {
-      await onSubmit(data);
+      await onSubmit(pendingData);
+      setIsConfirmOpen(false);
       form.reset();
       onClose();
     } catch (error) {
-      console.error('Form submission error:', error);
+      toast.error('Failed to update item. Please try again.');
+    } finally {
+      setPendingData(null);
     }
   };
 
+  if (isLoading) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <div className="flex items-center justify-center p-6">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  if (error) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription className="flex items-center justify-between">
+              Failed to load item details
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => queryClient.invalidateQueries(['inventory', 'item', itemId])}
+              >
+                <RefreshCcw className="h-4 w-4 mr-2" />
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Inventory Item</DialogTitle>
           <DialogDescription>
@@ -196,7 +273,11 @@ useEffect(() => {
                       <Input 
                         type="number" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -238,7 +319,11 @@ useEffect(() => {
                         type="number" 
                         step="1" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -295,7 +380,11 @@ useEffect(() => {
                         type="number" 
                         step="0.1" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -314,7 +403,11 @@ useEffect(() => {
                         type="number" 
                         step="0.1" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -366,7 +459,7 @@ useEffect(() => {
                     <FormLabel>Supplier *</FormLabel>
                     <Select 
                       onValueChange={(value) => field.onChange(Number(value))}
-                      defaultValue={field.value?.toString()}
+                      value={field.value?.toString()}
                     >
                       <FormControl>
                         <SelectTrigger>
@@ -399,7 +492,11 @@ useEffect(() => {
                       <Input 
                         type="number" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -417,7 +514,11 @@ useEffect(() => {
                       <Input 
                         type="number" 
                         {...field} 
-                        onChange={e => field.onChange(Number(e.target.value))}
+                        value={field.value || ''}
+                        onChange={e => {
+                          const value = e.target.value === '' ? '' : Number(e.target.value);
+                          field.onChange(value);
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -434,7 +535,26 @@ useEffect(() => {
             </DialogFooter>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialogBox
+        isOpen={isConfirmOpen}
+        onClose={() => {
+          setIsConfirmOpen(false);
+          setPendingData(null);
+        }}
+        onConfirm={handleConfirm}
+        title="Confirm Edit"
+        description={
+          <div className="space-y-2">
+            <p>Are you sure you want to save these changes?</p>
+            <p className="text-sm text-muted-foreground">
+              This will update the inventory item details. This action cannot be undone.
+            </p>
+          </div>
+        }
+      />
+    </>    
   );
 }
