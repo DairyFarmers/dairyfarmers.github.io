@@ -52,6 +52,11 @@ export function useInventory({
   const updateItem = useMutation({
     mutationFn: async ({ id, data }) => {
       const response = await api.put(`/api/v1/inventory/items/${id}`, data);
+
+      if (!response?.status) {
+        throw new Error('Failed to update inventory item');
+      }
+      
       return response.data;
     },
     onSuccess: () => {
@@ -96,4 +101,22 @@ export function useInventory({
       outOfStock: outOfStockItems.length
     }
   };
+}
+
+export function useInventoryItem(itemId) {
+  return useQuery({
+    queryKey: ['inventory', 'item', itemId],
+    queryFn: async () => {
+      if (!itemId) return null;
+
+      const response = await api.get(`/api/v1/inventory/items/${itemId}`);
+      
+      if (!response?.status) {
+        throw new Error('Failed to fetch inventory item');
+      }
+
+      return response?.data;
+    },
+    enabled: !!itemId
+  });
 }

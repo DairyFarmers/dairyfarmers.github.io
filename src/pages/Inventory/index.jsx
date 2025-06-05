@@ -1,12 +1,26 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Alert, 
+  AlertDescription, 
+  AlertTitle 
+} from "@/components/ui/alert";
+import { 
+  AlertCircle, 
+  Plus, 
+  Pencil, 
+  Trash2, 
+  RefreshCcw 
+} from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -26,6 +40,7 @@ import { Badge } from "@/components/ui/badge";
 import { useInventory } from '@/hooks/useInventory';
 import { AddItemForm } from '@/components/inventory/AddItemForm.jsx';
 import { EditItemForm } from '@/components/inventory/EditItemForm';
+import { DeleteItemDialog } from '@/components/inventory/DeleteItemDialog';
 import { toast } from 'sonner';
 
 export default function Inventory() {
@@ -34,6 +49,9 @@ export default function Inventory() {
   const [selectedItem, setSelectedItem] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [itemToDelete, setItemToDelete] = useState(null);
+  const [selectedItemId, setSelectedItemId] = useState(null);
 
   const {
     inventory: {
@@ -70,9 +88,18 @@ export default function Inventory() {
     }
   };
 
-  const handleUpdateItem = async (formData) => {
+  const handleItemUpdate = (itemId) => {
+    setSelectedItemId(itemId);
+    setEditDialogOpen(true);
+  };
+
+  const handleItemUpdateConfirm = async (formData) => {
     try {
-      await updateItem.mutateAsync({ id: selectedItem.id, data: formData });
+      console.log("Updating item with data:", formData);
+      await updateItem.mutateAsync({ 
+        id: selectedItemId, 
+        data: formData 
+      });
       setEditDialogOpen(false);
       setSelectedItem(null);
       toast.success('Item updated successfully');
@@ -87,6 +114,20 @@ export default function Inventory() {
       toast.success('Item added successfully');
     } catch (error) {
       console.error('Failed to add item:', error);
+    }
+  };
+
+  const handleDeleteClick = (item) => {
+    setItemToDelete(item);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (itemToDelete) {
+      deleteItem.mutate(itemToDelete.id);
+      toast.success(`${itemToDelete.name} deleted successfully`);
+      setDeleteDialogOpen(false);
+      setItemToDelete(null);
     }
   };
 
@@ -167,7 +208,7 @@ export default function Inventory() {
                   <CardTitle className="text-sm font-medium">Total Items</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">{stats.total}</div>
+                  <div className="text-2xl font-bold">{stats?.total}</div>
                 </CardContent>
               </Card>
               <Card>
@@ -176,7 +217,7 @@ export default function Inventory() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-yellow-600">
-                    {stats.lowStock}
+                    {stats?.lowStock}
                   </div>
                 </CardContent>
               </Card>
@@ -186,7 +227,7 @@ export default function Inventory() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-red-600">
-                    {stats.outOfStock}
+                    {stats?.outOfStock}
                   </div>
                 </CardContent>
               </Card>
@@ -217,29 +258,36 @@ export default function Inventory() {
                   </TableHeader>
                   <TableBody>
                     {inventory?.map((item) => (
-                      <TableRow key={item.id}>
-                        <TableCell>{item.batch_number}</TableCell>
-                        <TableCell>{item.name}</TableCell>
-                        <TableCell>{item.description}</TableCell>
-                        <TableCell>{item.dairy_type}</TableCell>
+                      <TableRow key={item?.id}>
+                        <TableCell>{item?.batch_number}</TableCell>
+                        <TableCell>{item?.name}</TableCell>
+                        <TableCell>{item?.description}</TableCell>
+                        <TableCell>{item?.dairy_type}</TableCell>
                         <TableCell>
                           <span className={
-                            item.quantity === 0 ? 'text-red-600 font-bold'
-                              : item.quantity <= 10 ? 'text-yellow-600 font-medium'
+                            item?.quantity === 0 ? 'text-red-600 font-bold'
+                              : item?.quantity <= 10 ? 'text-yellow-600 font-medium'
                                 : ''
                           }>
-                            {item.quantity}
+                            {Number(item?.quantity)}
                           </span>
                         </TableCell>
-                        <TableCell>{item.unit}</TableCell>
-                        <TableCell>${item.price}</TableCell>
                         <TableCell>
-                          <Badge variant={item.is_active ? "default" : "secondary"}>
-                            {item.is_active ? 'Active' : 'Inactive'}
+                          {item?.unit === 'kg' ? 'Kilograms' :
+                            item?.unit === 'l' ? 'Liters' :
+                            item?.unit === 'pcs' ? 'Pieces' : item?.unit}
+                        </TableCell>
+                        <TableCell>LKR {item?.price}</TableCell>
+                        <TableCell>
+                          <Badge variant={item?.is_active ? "default" : "secondary"}>
+                            {item?.is_active ? 'Active' : 'Inactive'}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {item.expiry_date ? new Date(item.expiry_date).toLocaleDateString() : 'N/A'}
+                          {item?.expiry_date ? 
+                            new Date(item?.expiry_date).toLocaleDateString() 
+                            : 'N/A'
+                          }
                         </TableCell>
                         <TableCell className="text-right">
                           <PermissionGuard permissions="can_manage_inventory">
@@ -247,35 +295,18 @@ export default function Inventory() {
                               variant="ghost"
                               size="icon"
                               className="mr-2"
-                              onClick={() => {
-                                setSelectedItem(item);
-                                setEditDialogOpen(true);
-                              }}
+                              onClick={() => {handleItemUpdate(item.id)}}
                             >
                               <Pencil className="h-4 w-4" />
                             </Button>
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => {
-                                if (window.confirm(`Are you sure you want to delete "${item.name}"?`)) {
-                                  deleteItem.mutate(item.id);
-                                  toast.error(`${item.name} deleted successfully`);
-                                }
-                              }}
+                              onClick={() => handleDeleteClick(item)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </PermissionGuard>
-                          <EditItemForm
-                            isOpen={editDialogOpen}
-                            onClose={() => {
-                              setEditDialogOpen(false);
-                              setSelectedItem(null);
-                            }}
-                            onSubmit={handleUpdateItem}
-                            defaultValues={selectedItem}
-                          />
                         </TableCell>
                       </TableRow>
                     ))}
@@ -341,6 +372,26 @@ export default function Inventory() {
           </div>
         </main>
       </div>
+
+      <EditItemForm
+        isOpen={editDialogOpen}
+        onClose={() => {
+          setEditDialogOpen(false);
+          setSelectedItemId(null);
+        }}
+        onSubmit={handleItemUpdateConfirm}
+        itemId={selectedItemId}
+      />
+
+      <DeleteItemDialog
+        isOpen={deleteDialogOpen}
+        onClose={() => {
+          setDeleteDialogOpen(false);
+          setItemToDelete(null);
+        }}
+          onConfirm={handleDeleteConfirm}
+          itemName={itemToDelete?.name}
+        />
     </div>
   );
 }
