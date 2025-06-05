@@ -6,7 +6,8 @@ import { current } from '@reduxjs/toolkit';
 export function useInventory({ 
   currentPage = 1, 
   pageSize = 10, 
-  fetchAll = false } = {}
+  fetchAll = false 
+} = {}
 ) {
   const {
     data = [],

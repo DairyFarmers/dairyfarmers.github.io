@@ -3,9 +3,24 @@ import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Trash2, RefreshCcw } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Alert, 
+  AlertDescription, 
+  AlertTitle 
+} from "@/components/ui/alert";
+import { 
+  AlertCircle, 
+  Plus, 
+  Trash2, 
+  RefreshCcw, 
+  Eye 
+} from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -25,11 +40,18 @@ import { Badge } from "@/components/ui/badge";
 import { useOrder } from '@/hooks/useOrder';
 import { toast } from 'sonner';
 import { AddOrderForm } from '@/components/orders/AddOrderForm.jsx';
+import { OrderDetailsDialog } from '@/components/orders/OrderDetails.jsx';
+import { UpdateStatusDialog } from '@/components/orders/UpdateStatus.jsx';
+import { CancelOrderDialog } from '@/components/orders/CancelOrder.jsx';
+import { get } from 'react-hook-form';
 
 export default function Orders() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [detailsDialogOpen, setDetailsDialogOpen] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [orderToCancel, setOrderToCancel] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -47,8 +69,43 @@ export default function Orders() {
     stats,
     addOrder,
     updateOrder,
-    deleteOrder
+    deleteOrder,
   } = useOrder({ currentPage, pageSize });
+
+  const getOrderStatusColor = (status) => {
+    const colors = {
+      draft: 'secondary',
+      pending: 'warning',
+      confirmed: 'primary',
+      processing: 'info',
+      shipped: 'info',
+      delivered: 'success',
+      cancelled: 'destructive',
+      returned: 'destructive'
+    };
+    return colors[status?.toLowerCase()] || 'default';
+  };
+
+  const getPaymentStatusColor = (status) => {
+    const colors = {
+        paid: 'success',
+        pending: 'warning',
+        failed: 'destructive',
+        refunded: 'secondary',
+        partially_paid: 'info',
+      };
+      return colors[status?.toLowerCase()] || 'default';
+  };
+
+const getPriorityColor = (priority) => {
+    const colors = {
+      urgent: 'destructive',
+      high: 'warning',
+      medium: 'default',
+      low: 'secondary'
+    };
+    return colors[priority?.toLowerCase()] || 'default';
+  };
 
   const handleNextPage = () => {
     if (next) {
@@ -90,9 +147,8 @@ export default function Orders() {
         ...formData,
         order_number: orderNumber,
         order_date: new Date().toISOString(),
-        status: 'draft',
+        status: 'pending',
         payment_status: 'pending',
-        // Calculate totals
         subtotal: formData.items.reduce((sum, item) =>
           sum + ((item.quantity * item.unit_price) - item.discount), 0
         ),
@@ -100,10 +156,9 @@ export default function Orders() {
 
       orderData.total_amount = orderData.subtotal + (orderData.shipping_cost || 0);
       await addOrder.mutateAsync(orderData);
-      toast.success('Order created successfully');
+      toast.success('Order placed successfully');
       setIsAddDialogOpen(false);
     } catch (error) {
-      console.error('Failed to create order:', error);
       toast.error(error?.response?.data?.message || 'Failed to create order');
     }
   };
@@ -122,14 +177,56 @@ export default function Orders() {
           sum + ((item.quantity * item.unit_price) - item.discount), 0),
       };
       sanitizedData.total_amount = sanitizedData.subtotal + (sanitizedData.shipping_cost || 0);
-      console.log("Sanitized update data:", sanitizedData);
       await updateOrder.mutateAsync({ id: selectedOrder.id, data: sanitizedData });
       toast.success('Order updated successfully');
       setEditDialogOpen(false);
       setSelectedOrder(null);
     } catch (error) {
-      console.error("Failed to update order:", error.response?.data || error.message);
+      toast.error(error?.response?.message || 'Failed to update order');
     }
+  };
+
+  const handleViewDetails = (order) => {
+    setSelectedOrder(order);
+    setDetailsDialogOpen(true);
+  };
+
+  const handleStatusUpdateConfirm = async (newStatus) => {
+    try {
+        await updateOrder.mutateAsync({
+            id: selectedOrder.id,
+            status: newStatus
+        });
+        toast.success('Order status updated successfully');
+        setStatusDialogOpen(false);
+        await refetch();
+    } catch (error) {
+        toast.error('Failed to update order status');
+    }
+  };
+
+  const handleCancelConfirm = async () => {
+    try {
+      if (!orderToCancel) return;
+      
+      await updateOrder.mutateAsync({
+        id: orderToCancel.id,
+        status: 'cancelled'
+      });
+      
+      toast.success('Order cancelled successfully');
+      setCancelDialogOpen(false);
+      setDetailsDialogOpen(false);
+      setOrderToCancel(null);
+      await refetch(); // Refresh the orders list
+    } catch (error) {
+      toast.error('Failed to cancel order');
+    }
+  };
+
+  const handleCancelOrder = (order) => {
+    setOrderToCancel(order);
+    setCancelDialogOpen(true);
   };
 
   if (isLoading) {
@@ -267,29 +364,24 @@ export default function Orders() {
                   </TableHeader>
                   <TableBody>
                     {orders.map((order) => (
-                      <TableRow key={order.id}>
-                        <TableCell>{order.order_number}</TableCell>
-                        <TableCell>{order.customer_name}</TableCell>
-                        <TableCell>{new Date(order.order_date).toLocaleDateString()}</TableCell>
-                        <TableCell>${(Number(order.total_amount) || 0).toFixed(2)}</TableCell>
+                      <TableRow key={order?.id}>
+                        <TableCell>{order?.order_number}</TableCell>
+                        <TableCell>{order?.customer_name}</TableCell>
+                        <TableCell>{new Date(order?.order_date).toLocaleDateString()}</TableCell>
+                        <TableCell>LKR {(Number(order?.total_amount) || 0).toFixed(2)}</TableCell>
                         <TableCell>
-                          <Badge variant={getStatusColor(order.status)}>
-                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          <Badge variant={getOrderStatusColor(order?.status)}>
+                            {order?.status?.charAt(0).toUpperCase() + order?.status.slice(1)}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={order.payment_status === 'paid' ? 'success' : 'warning'}>
-                            {order.payment_status}
+                          <Badge variant={getPaymentStatusColor(order?.payment_status)}>
+                            {order?.payment_status?.charAt(0).toUpperCase() + order?.payment_status.slice(1)}
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          <Badge variant={
-                            order.priority === 'urgent' ? 'destructive' :
-                              order.priority === 'high' ? 'warning' :
-                                order.priority === 'medium' ? 'default' :
-                                  'secondary'
-                          }>
-                            {order.priority}
+                          <Badge variant={getPriorityColor(order?.priority)}>
+                            {order?.priority?.charAt(0).toUpperCase() + order?.priority.slice(1)}
                           </Badge>
                         </TableCell>
                         <TableCell className="text-right">
@@ -297,14 +389,10 @@ export default function Orders() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="hover:bg-destructive/10"
-                              onClick={() => {
-                                if (window.confirm(`Are you sure you want to delete "${order.customer_name}"?`)) {
-                                  deleteOrder.mutate(order.id);
-                                }
-                              }}
+                              onClick={() => handleViewDetails(order)}
+                              className="hover:bg-accent"
                             >
-                              <Trash2 className="h-4 w-4 text-destructive" />
+                              <Eye className="h-4 w-4" />
                             </Button>
                           </PermissionGuard>
                         </TableCell>
@@ -372,6 +460,38 @@ export default function Orders() {
           </div>
         </main>
       </div>
+
+      <OrderDetailsDialog
+        isOpen={detailsDialogOpen}
+        onClose={() => {
+          setDetailsDialogOpen(false);
+        }}
+        order={selectedOrder}
+        onUpdateStatus={(order) => {
+          setSelectedOrder(order);
+          setStatusDialogOpen(true);
+        }}
+        onCancelOrder={handleCancelOrder}
+      />
+
+      <UpdateStatusDialog
+        isOpen={statusDialogOpen}
+        onConfirm={handleStatusUpdateConfirm}
+        onCancel={() => {
+          setStatusDialogOpen(false);
+        }}
+        order={selectedOrder}
+      />
+
+      <CancelOrderDialog
+        isOpen={cancelDialogOpen}
+        onConfirm={handleCancelConfirm}
+        onCancel={() => {
+          setCancelDialogOpen(false);
+          setOrderToCancel(null);
+        }}
+        order={orderToCancel}
+      />
     </div>
   );
 }

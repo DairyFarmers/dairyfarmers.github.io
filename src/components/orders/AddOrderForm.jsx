@@ -29,7 +29,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { Plus, Minus, Trash2 } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
+import { OrderConfirmationDialog } from './ConfirmOrder';
+import { toast } from 'sonner';
 
 const orderFormSchema = z.object({
   // Customer Information
@@ -47,7 +49,7 @@ const orderFormSchema = z.object({
 
   // Order Items
   items: z.array(z.object({
-    inventory_item: z.number().positive('Item is required'),
+    inventory_item: z.string().uuid('Invalid item selected'),
     quantity: z.number().positive('Quantity must be positive'),
     unit_price: z.number().positive('Unit price must be positive'),
     discount: z.number().min(0, 'Discount cannot be negative'),
@@ -60,7 +62,8 @@ const orderFormSchema = z.object({
 
 export function AddOrderForm({ isOpen, onClose, onSubmit }) {
   const { inventory } = useInventory({ fetchAll: true });
-  const [items, setItems] = useState([{ id: 0 }]);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [formData, setFormData] = useState(null);
 
   const form = useForm({
     resolver: zodResolver(orderFormSchema),
@@ -96,30 +99,49 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
 
   const calculateSubtotal = (items) => {
     return items.reduce((sum, item) => {
-      return sum + ((item.quantity * item.unit_price) - item.discount);
+      const quantity = parseFloat(item.quantity) || 0;
+    const unitPrice = parseFloat(item.unit_price) || 0;
+    const discount = parseFloat(item.discount) || 0;
+    
+    // Calculate totals using numeric operations
+    const itemTotal = parseFloat((quantity * unitPrice).toFixed(2));
+    const discountedTotal = parseFloat((itemTotal - discount).toFixed(2));
+    
+    return parseFloat((sum + discountedTotal).toFixed(2));
     }, 0);
   };
 
   const handleSubmit = async (data) => {
-    try {
-      const subtotal = calculateSubtotal(data.items);
+      const subtotal = parseFloat(calculateSubtotal(data.items).toFixed(2));
+      const shippingCost = parseFloat(data.shipping_cost) || 0;
+      const total = parseFloat((subtotal + shippingCost).toFixed(2));
+      
       const formattedData = {
         ...data,
         subtotal,
-        total_amount: subtotal + data.shipping_cost,
-        status: 'draft',
+        shipping_cost: shippingCost,
+        total_amount: total,
+        status: 'pending',
         payment_status: 'pending',
       };
-      await onSubmit(formattedData);
+      setFormData(formattedData);
+      setShowConfirmation(true);
+  };
+
+  const handleConfirm = async () => {
+    try {
+      await onSubmit(formData);
+      setShowConfirmation(false);
       form.reset();
       onClose();
     } catch (error) {
-      console.error('Form submission error:', error);
+      toast.error('Failed to place an order. Please try again.');
     }
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <>
+  <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Order</DialogTitle>
@@ -251,8 +273,8 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                       <FormItem>
                         <FormLabel>Item *</FormLabel>
                         <Select 
-                          onValueChange={(value) => field.onChange(Number(value))}
-                          defaultValue={field.value?.toString()}
+                          onValueChange={field.onChange}
+                          value={field.value}
                         >
                           <FormControl>
                             <SelectTrigger>
@@ -263,14 +285,14 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                             {inventory?.results?.map((item) => (
                               <SelectItem 
                                 key={item.id} 
-                                value={item.id.toString()}
+                                value={item.id}
                               >
                                 {item.name} (LKR {item.price})
                               </SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
-                        <FormMessage />
+                      <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -303,7 +325,7 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                         <FormControl>
                           <Input 
                             type="number" 
-                            step="0.01"
+                            step="1"
                             {...field}
                             onChange={e => field.onChange(Number(e.target.value))}
                           />
@@ -323,7 +345,7 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                           <FormControl>
                             <Input 
                               type="number" 
-                              step="0.01"
+                              step="1"
                               min="0"
                               {...field}
                               onChange={e => field.onChange(Number(e.target.value))}
@@ -377,7 +399,7 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
                       <FormControl>
                         <Input 
                           type="number" 
-                          step="0.01"
+                          step="1"
                           min="0"
                           {...field}
                           onChange={e => field.onChange(Number(e.target.value))}
@@ -414,5 +436,13 @@ export function AddOrderForm({ isOpen, onClose, onSubmit }) {
         </Form>
       </DialogContent>
     </Dialog>
+
+      <OrderConfirmationDialog
+        isOpen={showConfirmation}
+        onConfirm={handleConfirm}
+        onCancel={() => setShowConfirmation(false)}
+        orderData={formData}
+      />        
+    </>
   );
 }
