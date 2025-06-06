@@ -39,8 +39,17 @@ export function useSales({
   // Create sale from order
   const addSale = useMutation({
     mutationFn: async (saleData) => {
-      const response = await api.post('/api/v1/sales/', saleData);
-      return response.data;
+      try {
+        const response = await api.post('/api/v1/sales/', saleData);
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to create sale');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);
@@ -50,8 +59,12 @@ export function useSales({
   // Update sale
   const updateSale = useMutation({
     mutationFn: async ({ id, data: updateData }) => {
-      const response = await api.patch(`/api/v1/sales/${id}/`, updateData);
-      return response.data;
+      try {
+        const response = await api.patch(`/api/v1/sales/${id}/`, updateData);
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to update sale');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);
@@ -61,8 +74,12 @@ export function useSales({
   // Delete sale
   const deleteSale = useMutation({
     mutationFn: async (id) => {
-      await api.delete(`/api/v1/sales/${id}/`);
-      return id;
+      try {
+        await api.delete(`/api/v1/sales/${id}/`);
+        return id;
+      } catch (error) {
+        throw new Error('Failed to delete sale');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['sales']);

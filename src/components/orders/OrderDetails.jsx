@@ -153,11 +153,11 @@ export function OrderDetailsDialog({
                 <div className="flex gap-2">
                     { canUpdateStatus && (
                         <Badge variant={getPaymentStatusColor(data?.payment_status)}>
-                            {data?.payment_status?.charAt(0).toUpperCase() + data?.payment_status.slice(1)}
+                            {data?.payment_status?.charAt(0).toUpperCase() + data?.payment_status?.slice(1)}
                       </Badge>
                     )}
                   <Badge variant={getPriorityColor(data?.priority)}>
-                    {data?.priority?.charAt(0).toUpperCase() + data?.priority.slice(1)}
+                    {data?.priority?.charAt(0).toUpperCase() + data?.priority?.slice(1)}
                   </Badge>
                 </div>
               </DialogTitle>
@@ -252,7 +252,7 @@ export function OrderDetailsDialog({
             <DialogFooter className="flex justify-between items-center mt-6">
               <div className="flex items-center gap-2">
                 <Badge variant={getOrderStatusColor(data?.status)}>
-                    {data?.status?.charAt(0).toUpperCase() + data?.status.slice(1)}
+                    {data?.status?.charAt(0).toUpperCase() + data?.status?.slice(1)}
                 </Badge>
                 {canUpdateStatus && (
                     <PermissionGuard permissions="can_manage_orders">

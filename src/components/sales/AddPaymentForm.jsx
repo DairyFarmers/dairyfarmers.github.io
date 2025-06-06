@@ -19,7 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
-export function AddPaymentForm({ saleId, remainingAmount, onSuccess, onSubmit }) {
+export function AddPaymentForm({ 
+  saleId, 
+  remainingAmount, 
+  onSuccess, 
+  onSubmit 
+}) {
   const form = useForm({
     defaultValues: {
       amount: remainingAmount,

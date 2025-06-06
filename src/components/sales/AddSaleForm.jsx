@@ -29,6 +29,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 const saleFormSchema = z.object({
   order_id: z.string().min(1, "Order is required"),
@@ -60,12 +61,12 @@ export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
 
   const handleSubmit = async (data) => {
     try {
-        console.log('Form data:', data);
+      console.log("Submitting Sale Data:", data);
       await onSubmit(data);
       form.reset();
       onClose();
     } catch (error) {
-      console.error('Form submission error:', error);
+      toast.error("Failed to create sale. Please try again.");
     }
   };
 
@@ -99,7 +100,7 @@ export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
                       <SelectContent>
                         {orders?.results?.map((order) => (
                           <SelectItem key={order.id} value={order.id.toString()}>
-                            Order #{order.id} - {order.customer_name}
+                            Order #{order.order_number} - {order.customer_name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -166,7 +167,7 @@ export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
                       <FormControl>
                         <Input 
                           type="number" 
-                          step="0.01"
+                          step="1"
                           min="0"
                           {...field}
                           onChange={e => field.onChange(Number(e.target.value))}
@@ -186,7 +187,7 @@ export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
                       <FormControl>
                         <Input 
                           type="number" 
-                          step="0.01"
+                          step="1"
                           min="0"
                           {...field}
                           onChange={e => field.onChange(Number(e.target.value))}
@@ -206,7 +207,7 @@ export function AddSaleForm({ isOpen, onClose, onSubmit, isLoading }) {
                       <FormControl>
                         <Input 
                           type="number" 
-                          step="0.01"
+                          step="1"
                           min="0"
                           {...field}
                           onChange={e => field.onChange(Number(e.target.value))}

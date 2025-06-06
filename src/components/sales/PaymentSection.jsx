@@ -53,6 +53,9 @@ export function PaymentSection({ saleId, totalAmount }) {
     stats 
   } = usePayments(saleId, { currentPage, pageSize });
 
+  console.log("Payments Data:", payments);
+  console.log("Stats Data:", stats);
+
   const remainingAmount = totalAmount - stats.totalPaid;
 
   const handleNextPage = () => {
@@ -88,18 +91,18 @@ export function PaymentSection({ saleId, totalAmount }) {
           <div className="grid grid-cols-3 gap-4">
             <div>
               <p className="text-sm text-muted-foreground">Total Amount</p>
-              <p className="text-2xl font-bold">${totalAmount}</p>
+              <p className="text-2xl font-bold">LKR {totalAmount}</p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Paid Amount</p>
               <p className="text-2xl font-bold text-green-600">
-                ${stats.totalPaid?.toFixed(2)}
+                LKR {stats.totalPaid?.toFixed(2)}
               </p>
             </div>
             <div>
               <p className="text-sm text-muted-foreground">Remaining</p>
               <p className="text-2xl font-bold text-yellow-600">
-                ${remainingAmount?.toFixed(2)}
+                LKR {remainingAmount?.toFixed(2)}
               </p>
             </div>
           </div>
@@ -151,8 +154,8 @@ export function PaymentSection({ saleId, totalAmount }) {
                   <TableCell>
                     {new Date(payment.payment_date).toLocaleDateString()}
                   </TableCell>
-                  <TableCell>${payment.amount.toFixed(2)}</TableCell>
-                  <TableCell>{payment.payment_method}</TableCell>
+                  <TableCell>${payment.amount}</TableCell>
+                  <TableCell>{payment.payment_method_display}</TableCell>
                   <TableCell>{payment.reference_number || '-'}</TableCell>
                   <TableCell>
                     <Badge variant={payment.is_active ? "success" : "destructive"}>

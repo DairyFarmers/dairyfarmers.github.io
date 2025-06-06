@@ -41,8 +41,12 @@ export function useInventory({
 
   const addItem = useMutation({
     mutationFn: async (newItem) => {
-      const response = await api.post('/api/v1/inventory/items/', newItem);
-      return response.data;
+      try {
+        const response = await api.post('/api/v1/inventory/items/', newItem);
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to add inventory item');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['inventory', 'items']);
@@ -56,7 +60,7 @@ export function useInventory({
       if (!response?.status) {
         throw new Error('Failed to update inventory item');
       }
-      
+
       return response.data;
     },
     onSuccess: () => {
@@ -66,8 +70,12 @@ export function useInventory({
 
   const deleteItem = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/api/v1/inventory/items/${id}`);
-      return response.data;
+      try {
+        const response = await api.delete(`/api/v1/inventory/items/${id}`);
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to delete inventory item');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['inventory', 'items']);

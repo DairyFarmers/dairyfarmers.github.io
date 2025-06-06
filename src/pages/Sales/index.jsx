@@ -176,7 +176,7 @@ export default function Sales() {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-green-600">
-                    ${stats.totalAmount.toFixed(2)}
+                    LKR {stats.totalAmount.toFixed(2)}
                   </div>
                 </CardContent>
               </Card>
@@ -226,11 +226,11 @@ export default function Sales() {
                   <TableBody>
                     {sales?.map((sale) => (
                       <TableRow key={sale.id}>
-                        <TableCell>{sale.id}</TableCell>
+                        <TableCell>{sale.id.slice(0, 6)}</TableCell>
                         <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
                         <TableCell>{sale.seller.email || '-'}</TableCell>
                         <TableCell>{(sale.order.items.length || []).length} items</TableCell>
-                        <TableCell>${stats.totalAmount || 0}</TableCell>
+                        <TableCell>LKR {stats.totalAmount || 0}</TableCell>
                         <TableCell>
                           <Badge variant={
                             sale.order.status === 'completed' ? 'default' :

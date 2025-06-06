@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
-export function SaleInformation({ sale, stats }) {
+export function SaleInformation({ sale }) {
   return (
     <Card>
       <CardContent className="space-y-4 pt-4">
@@ -37,7 +37,7 @@ export function SaleInformation({ sale, stats }) {
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Amount</p>
-            <p className="font-medium">${stats?.total_amount?.toFixed(2)}</p>
+            <p className="font-medium">LKR {sale?.total_amount}</p>
           </div>
         </div>
 

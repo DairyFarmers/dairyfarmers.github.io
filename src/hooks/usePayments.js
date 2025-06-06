@@ -42,15 +42,18 @@ export function usePayments(
   // Add new payment
   const addPayment = useMutation({
     mutationFn: async (paymentData) => {
-      const response = await api.post('/api/v1/payments/', {
-        sale_id: saleId,
-        amount: paymentData.amount,
-        payment_method: paymentData.paymentMethod,
-        payment_date: paymentData.paymentDate || new Date().toISOString(),
-        reference_number: paymentData.referenceNumber,
-        notes: paymentData.notes
-      });
-      return response.data;
+      try {
+        console.log("Adding payment data:", paymentData);
+        const response = await api.post('/api/v1/payments/', paymentData);
+
+        if (!response?.status) {
+          throw new Error('Invalid response from server');
+        }
+
+        return response.data;
+      } catch (error) {
+        throw new Error(error?.response?.message || 'Failed to add payment');
+      }
     },
     onSuccess: () => {
       // Invalidate both payments and sales queries to update status
