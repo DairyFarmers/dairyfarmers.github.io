@@ -8,18 +8,32 @@ export const PermissionGuard = ({
   requireAll = true,
 }) => {
   const { permissions: userPermissions, loading } = useSelector((state) => state.user);
-  if (loading) {
+  
+  if (loading || !userPermissions) {
     return null;
   }
 
-  if (permissions) {
-    return children;
+  const hasPermission = () => {
+    // Handle single permission
+    if (typeof permissions === 'string') {
+      return userPermissions[permissions] === true;
+    }
+
+    // Handle array of permissions
+    if (Array.isArray(permissions)) {
+      if (requireAll) {
+        return permissions.every(permission => userPermissions[permission] === true);
+      } else {
+        return permissions.some(permission => userPermissions[permission] === true);
+      }
+    }
+
+    return false;
+  };
+
+  if (!hasPermission()) {
+    return fallback;
   }
 
-  const permsArray = Array.isArray(permissions) ? permissions : [permissions];
-  const hasRequiredPermissions = requireAll
-    ? permsArray.every((perm) => userPermissions[perm])
-    : permsArray.some((perm) => userPermissions[perm]);
-
-  return hasRequiredPermissions ? children : fallback;
+  return children;
 };

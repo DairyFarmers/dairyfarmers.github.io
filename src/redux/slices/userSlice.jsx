@@ -184,6 +184,7 @@ const userSlice = createSlice({
           id: action.payload.id,
           email: action.payload.email,
           full_name: action.payload.full_name,
+          role: action.payload.role,
         };
         state.permissions = action.payload.role.permissions;
         state.initialized = true;
@@ -206,6 +207,7 @@ const userSlice = createSlice({
           id: action.payload.id,
           email: action.payload.email,
           full_name: action.payload.full_name,
+          role: action.payload.role,
         };
         state.permissions = action.payload.role.permissions;
         state.initialized = true;

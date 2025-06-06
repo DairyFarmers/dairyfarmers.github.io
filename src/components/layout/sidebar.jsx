@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { 
@@ -8,69 +10,27 @@ import {
   ShoppingCart, 
   Users, 
   FileText, 
-  Settings, 
   Menu,
   Milk,
   Truck,
-  BarChart3
 } from "lucide-react";
+import { navigationConfig } from "../../config/nav-config";
 import { PermissionGuard } from "@/components/common/PermissionGuard";
-
-const navigation = [
-  { 
-    name: "Dashboard", 
-    href: "/", 
-    icon: LayoutDashboard, 
-    current: true,
-    permission: "can_view_analytics" 
-  },
-  { 
-    name: "Inventory", 
-    href: "/inventory", 
-    icon: Package, 
-    current: false,
-    permission: "can_view_inventory"
-  },
-  { 
-    name: "Sales", 
-    href: "/sales", 
-    icon: TrendingUp, 
-    current: false,
-    permission: "can_view_sales"
-  },
-  { 
-    name: "Orders", 
-    href: "/orders", 
-    icon: ShoppingCart, 
-    current: false,
-    permission: "can_view_orders"
-  },
-  { 
-    name: "Suppliers", 
-    href: "/suppliers", 
-    icon: Truck, 
-    current: false,
-    permission: "can_view_suppliers"
-  },
-  { 
-    name: "Users", 
-    href: "/users", 
-    icon: Users, 
-    current: false,
-    permission: "can_manage_users"
-  },
-  { 
-    name: "Reports", 
-    href: "/reports", 
-    icon: FileText, 
-    current: false,
-    permission: "can_view_reports"
-  },
-];
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
+  const { user } = useSelector((state) => state.user);
+
+  const navigation = navigationConfig[
+    user?.role?.name || 'farmer'
+  ] || [];
+
+  const navigationWithCurrent = navigation.map(item => ({
+    ...item,
+    current: item.href === location.pathname
+  }));
 
   return (
     <>
@@ -117,7 +77,7 @@ export default function Sidebar() {
 
         {/* Navigation */}
         <nav className="p-4 space-y-2">
-          {navigation.map((item) => {
+          {navigationWithCurrent?.map((item) => {
             const Icon = item.icon;
             return (
               <PermissionGuard 

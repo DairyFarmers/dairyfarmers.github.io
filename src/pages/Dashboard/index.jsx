@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import DashboardContent from '@/components/dashboard/DashboardContent';
+import FarmerDashboardContent from '@/components/dashboard/farmer/FarmerDashboardContent';
 import { useDashboard } from '@/hooks/useDashboard';
 
 const TIME_RANGES = [
@@ -19,6 +20,19 @@ export default function Dashboard() {
   const [timeRange, setTimeRange] = useState('week');
   const { user } = useSelector((state) => state.user);
   const { data, isLoading, error, refetch } = useDashboard(timeRange);
+
+  const getDashboardComponent = () => {
+    switch (user?.role?.name) {
+      case 'admin':
+        return DashboardContent;
+      case 'farmer':
+        return FarmerDashboardContent;
+      default:
+        return DashboardContent;
+    }
+  };
+
+  const DashboardComponent = getDashboardComponent();
 
   if (isLoading) {
     return (
@@ -99,7 +113,7 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <DashboardContent 
+            <DashboardComponent 
               data={data}
               timeRange={timeRange}
               user={user}
