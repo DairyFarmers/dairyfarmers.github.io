@@ -4,9 +4,12 @@ import StatsCards from './StatsCards';
 import ChartSection from './ChartSection';
 import ActivitySection from './ActivitySection';
 
-export default function DashboardContent({ data, timeRange, user, isLoading }) {
-  console.log('Rendering DashboardContent with timeRange:', timeRange);
-
+export default function DashboardContent({ 
+  data, 
+  timeRange, 
+  user, 
+  isLoading 
+}) {
   if (isLoading) {
     return (
       <div className="space-y-6">
