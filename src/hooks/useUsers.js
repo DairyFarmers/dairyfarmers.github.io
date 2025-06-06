@@ -47,7 +47,12 @@ export function useUsers({
   const addUser = useMutation({
     mutationFn: async (userData) => {
       const response = await api.post('/api/v1/users/registration', userData);
-      return response;
+      
+      if (!response?.status) {
+        throw new Error('Failed to add user');
+      }
+      
+      return response.data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
@@ -61,8 +66,19 @@ export function useUsers({
   // Update user mutation
   const updateUser = useMutation({
     mutationFn: async ({ userId, data }) => {
-      const response = await api.patch(`/api/v1/users/detail/${userId}`, data);
-      return response;
+      try {
+        const response = await api.patch(`/api/v1/users/${userId}/`, data);
+        console.log('Update response:', response);
+        if (!response?.status) {
+          throw new Error('Failed to update user');
+        }
+        
+        return response;
+      } catch (error) {
+        const errorMessage = error.response?.message || 'Failed to update user';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
@@ -73,16 +89,19 @@ export function useUsers({
   // Delete user mutation
   const deleteUser = useMutation({
     mutationFn: async (id) => {
-      await api.delete(`/api/v1/users/detail/${id}`);
+      try {
+        await api.delete(`/api/v1/users/${id}/`);
+      } catch (error) {
+        const errorMessage = error.response?.data?.message || 'Failed to delete user';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['users']);
       toast.success('User deleted successfully');
     }
   });
-
-  console.log('user roles', roles);
-  console.log('users data', users);
 
   const stats = {
     total: users.results?.length || 0,
@@ -113,4 +132,26 @@ export function useUsers({
     updateUser,
     deleteUser
   };
+}
+
+export function useUserDetails(userId) {
+  return useQuery({
+    queryKey: ['users', 'details', userId],
+    queryFn: async () => {
+      try {
+        const response = await api.get(`/api/v1/users/${userId}/`);
+      
+        if (!response?.status) {
+          throw new Error('Failed to fetch user details');
+        }
+
+        return response.data;
+      } catch (error) {
+        const errorMessage = 'Failed to fetch user details';
+        toast.error(errorMessage);
+        throw new Error(errorMessage);
+      }
+    },
+    enabled: !!userId
+  });
 }

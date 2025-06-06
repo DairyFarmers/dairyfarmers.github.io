@@ -28,60 +28,90 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useRoles } from '@/hooks/useRoles';
+import { toast } from 'sonner';
 
-const userFormSchema = z.object({
-  email: z.string().email('Invalid email address'),
-  password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  first_name: z.string().min(2, 'First name is required'),
-  last_name: z.string().min(2, 'Last name is required'),
-  role: z.enum(['admin', 'manager', 'staff'], {
-    required_error: 'Role is required',
-  }),
-  is_active: z.boolean().default(true),
-  permissions: z.array(z.string()).optional(),
-});
+const createUserFormSchema = (roles = []) => {
+  return z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string()
+      .min(8, 'Password must be at least 8 characters')
+      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Password must contain at least one number'),
+    first_name: z.string().min(2, 'First name is required'),
+    last_name: z.string().min(2, 'Last name is required'),
+    role: z.string({
+      required_error: "Role is required",
+    }).refine(
+      (value) => {
+        return Array.isArray(roles) && 
+          roles.some(role => role.id.toString() === value.toString());
+      },
+      'Please select a valid role'
+    ),
+    is_active: z.boolean().default(true),
+  });
+};
 
-const USER_ROLES = [
-  { value: 'admin', label: 'Administrator' },
-  { value: 'manager', label: 'Manager' },
-  { value: 'staff', label: 'Staff' },
-];
+export function AddUserForm({ 
+  isOpen, 
+  onClose, 
+  onSubmit, 
+  isLoading 
+}) {
+  const { 
+    data: rolesData = { results: [] }, 
+    isLoading: rolesLoading, 
+    error, 
+    refetch 
+  } = useRoles();
 
-const USER_PERMISSIONS = [
-  { id: 'can_manage_users', label: 'Manage Users' },
-  { id: 'can_manage_sales', label: 'Manage Sales' },
-  { id: 'can_manage_inventory', label: 'Manage Inventory' },
-  { id: 'can_manage_orders', label: 'Manage Orders' },
-  { id: 'can_view_reports', label: 'View Reports' },
-];
+  const roles = rolesData?.results || [];
 
-export function AddUserForm({ isOpen, onClose, onSubmit, isLoading }) {
   const form = useForm({
-    resolver: zodResolver(userFormSchema),
+    resolver: zodResolver(createUserFormSchema(roles)),
     defaultValues: {
       email: '',
       password: '',
       first_name: '',
       last_name: '',
-      role: 'staff',
+      role: '',
       is_active: true,
-      permissions: [],
     },
   });
 
   const handleSubmit = async (data) => {
     try {
-      await onSubmit(data);
+      const roleId = roles.find(r => r.id.toString() === data.role.toString())?.id;
+      
+      if (!roleId) {
+        toast.error('Invalid role selected');
+        return;
+      }
+      
+      await onSubmit({
+        ...data,
+        role: roleId
+      });
       form.reset();
       onClose();
     } catch (error) {
-      console.error('Form submission error:', error);
+      toast.error('Failed to create user. Please try again.');
     }
   };
+
+  if (rolesLoading) {
+    return (
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent>
+          <div className="flex items-center justify-center p-4">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -163,16 +193,27 @@ export function AddUserForm({ isOpen, onClose, onSubmit, isLoading }) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Role</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select 
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={rolesLoading}
+                    >
                       <FormControl>
                         <SelectTrigger>
-                          <SelectValue placeholder="Select role" />
+                        <SelectValue placeholder={
+                          rolesLoading ? "Loading roles..." : "Select role"
+                        } />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {USER_ROLES.map((role) => (
-                          <SelectItem key={role.value} value={role.value}>
-                            {role.label}
+                        {roles?.map((role) => (
+                          <SelectItem 
+                            key={role.id} 
+                            value={role.id.toString()}
+                          >
+                            {role.name.split('_').map(word =>
+                              word.charAt(0).toUpperCase() + word.slice(1)
+                            ).join(' ')}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -199,54 +240,18 @@ export function AddUserForm({ isOpen, onClose, onSubmit, isLoading }) {
               />
             </div>
 
-            {/* Permissions */}
-            <FormField
-              control={form.control}
-              name="permissions"
-              render={() => (
-                <FormItem>
-                  <FormLabel>Permissions</FormLabel>
-                  <div className="grid grid-cols-2 gap-4 mt-2">
-                    {USER_PERMISSIONS.map((permission) => (
-                      <FormField
-                        key={permission.id}
-                        control={form.control}
-                        name="permissions"
-                        render={({ field }) => {
-                          return (
-                            <FormItem
-                              key={permission.id}
-                              className="flex flex-row items-start space-x-3 space-y-0"
-                            >
-                              <FormControl>
-                                <Checkbox
-                                  checked={field.value?.includes(permission.id)}
-                                  onCheckedChange={(checked) => {
-                                    const values = field.value || [];
-                                    return checked
-                                      ? field.onChange([...values, permission.id])
-                                      : field.onChange(values.filter((value) => value !== permission.id));
-                                  }}
-                                />
-                              </FormControl>
-                              <FormLabel className="font-normal">
-                                {permission.label}
-                              </FormLabel>
-                            </FormItem>
-                          );
-                        }}
-                      />
-                    ))}
-                  </div>
-                </FormItem>
-              )}
-            />
-
             <DialogFooter>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={onClose}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
+              <Button 
+                type="submit" 
+                disabled={isLoading || rolesLoading}
+              >
                 {isLoading ? "Creating..." : "Create User"}
               </Button>
             </DialogFooter>
