@@ -1,12 +1,27 @@
 import React, { useState } from 'react';
-import { useSelector } from 'react-redux';
 import Sidebar from '@/components/layout/sidebar';
 import TopNavbar from '@/components/layout/top-navbar';
 import { PermissionGuard } from '@/components/common/PermissionGuard';
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Plus, Pencil, Trash2, RefreshCcw, Shield } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { 
+  Alert, 
+  AlertDescription, 
+  AlertTitle 
+} from "@/components/ui/alert";
+import { 
+  AlertCircle, 
+  Plus, 
+  Eye, 
+  Trash2, 
+  RefreshCcw, 
+  Shield 
+} from "lucide-react";
+import { 
+  Card, 
+  CardContent, 
+  CardHeader, 
+  CardTitle 
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -22,15 +37,21 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { toast } from 'sonner';
 import { Badge } from "@/components/ui/badge";
 import { useUsers } from '@/hooks/useUsers';
 import { AddUserForm } from '@/components/users/AddUserForm';
+import { AlertDialogBox } from '@/components/shared/AlertDialogBox';
+import { UserDetailsDialog } from '@/components/users/UserDetailsDialog';
 
 export default function Users() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  const { user } = useSelector((state) => state.user);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [showUserDetails, setShowUserDetails] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   const { 
     users: {
@@ -80,26 +101,34 @@ export default function Users() {
     }
   };
 
-  const handleDeleteUser = (user) => {
-    if (window.confirm(`Are you sure you want to delete "${user.first_name}"?`)) {
-      deleteUser.mutate(user.id, {
-        onSuccess: () => {
-          toast.error(`"${user.first_name}" deleted successfully`);
-        },
-        onError: (error) => {
-          console.error(error);
-          toast.error(`Failed to delete "${user.first_name}"`);
-        }
-      });
+  const handleDeleteClick = (user) => {
+    setUserToDelete(user);
+    setShowDeleteConfirm(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    try {
+      await deleteUser.mutateAsync(userToDelete.id);
+      setShowDeleteConfirm(false);
+      setUserToDelete(null);
+      toast.success('User deleted successfully');
+    } catch (error) {
+      console.error('Delete error:', error);
+      toast.error('Failed to delete user');
     }
   };
 
-  console.log('User:', deleteUser);
-  const toggleUserStatus = (userId, isActive) => {
-    updateUser.mutate({
-      userId,
-      data: { is_active: !isActive }
-    });
+  const handleStatusChange = async (user) => {
+    try {
+      await updateUser.mutateAsync({
+        userId: user.id,
+        data: { is_active: !user.is_active }
+      });
+      toast.success(`User ${user.is_active ? 'disabled' : 'enabled'} successfully`);
+    } catch (error) {
+      console.error('Status update error:', error);
+      toast.error('Failed to update user status');
+    }
   };
 
    if (isLoading) {
@@ -246,24 +275,26 @@ export default function Users() {
                         </TableCell>
                         <TableCell className="text-right">
                           <PermissionGuard permissions="can_manage_users">
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="icon"
-                              className="mr-2"
-                              onClick={() => toggleUserStatus(user.id, user.is_active)}
+                              onClick={() => {
+                                setSelectedUserId(user.id);
+                                setShowUserDetails(true);
+                              }}
                             >
-                              <Badge variant={user.is_active ? "destructive" : "default"}>
-                                {user.is_active ? 'Disable' : 'Enable'}
-                              </Badge>
+                              <Eye className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            {/*                            
+                            <Button
+                              variant="ghost"
                               size="icon"
                               className="hover:bg-destructive/10"
-                              onClick={() => handleDeleteUser(user)}
+                              onClick={() => handleDeleteClick(user)}
                             >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </Button>
+                            */}
                           </PermissionGuard>
                         </TableCell>
                       </TableRow>
@@ -330,6 +361,34 @@ export default function Users() {
           </div>
         </main>
       </div>
+
+      <UserDetailsDialog
+        isOpen={showUserDetails}
+        onClose={() => {
+          setShowUserDetails(false);
+          setSelectedUserId(null);
+        }}
+        userId={selectedUserId}
+        onStatusChange={handleStatusChange}
+      />
+
+      <AlertDialogBox
+        isOpen={showDeleteConfirm}
+        onClose={() => {
+          setShowDeleteConfirm(false);
+          setUserToDelete(null);
+        }}
+        onConfirm={handleDeleteConfirm}
+        title="Delete User Account"
+        description={
+          <div className="space-y-2">
+            <p>{`Are you sure you want to delete ${userToDelete?.first_name}'s account?`}</p>
+            <p className="text-sm text-muted-foreground">
+              This action cannot be undone. All data associated with this user will be permanently removed.
+            </p>
+          </div>
+        }
+      />
     </div>
   );
 }
