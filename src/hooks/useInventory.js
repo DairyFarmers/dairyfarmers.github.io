@@ -60,7 +60,6 @@ export function useInventory({
       if (!response?.status) {
         throw new Error('Failed to update inventory item');
       }
-
       return response.data;
     },
     onSuccess: () => {
