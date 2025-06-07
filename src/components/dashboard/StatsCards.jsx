@@ -3,6 +3,29 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FaBox, FaShoppingCart, FaUsers, FaMoneyBillWave } from "react-icons/fa";
 
 export default function StatsCards({ metrics }) {
+  metrics = {
+    system: {
+      total_users: 9,
+      active_users: 6,
+      system_health: {
+        system_status: "Operational"
+      }
+    },
+    financial: {
+      total_revenue: 15000,
+      revenue_trends: [{ value: 10 }]
+    },
+    inventory: {
+      total_items: { count: 12 },
+      low_stock_items: [/* Array of low stock items */],
+      stock_value: 25000
+    },
+    orders: {
+      total_orders: 8,
+      pending_orders: 4,
+      order_status_distribution: [{ count: 12 }]
+    }
+  }
   const { system, financial, inventory, orders } = metrics;
 
   const stats = [
@@ -11,7 +34,7 @@ export default function StatsCards({ metrics }) {
       value: inventory?.total_items?.count || 0,
       description: `${inventory?.low_stock_items?.length || 0} items low in stock`,
       icon: FaBox,
-      secondaryValue: `$${inventory?.stock_value?.toLocaleString() || 0}`,
+      secondaryValue: `LKR ${inventory?.stock_value?.toLocaleString() || 0}`,
     },
     {
       title: "Total Orders",
@@ -32,7 +55,7 @@ export default function StatsCards({ metrics }) {
       value: financial?.total_revenue || 0,
       description: "Total revenue",
       icon: FaMoneyBillWave,
-      prefix: "$",
+      prefix: "LKR ",
       secondaryValue: financial?.revenue_trends?.length > 0 
         ? `${financial.revenue_trends[0]?.value || 0}%`
         : '0%',

@@ -18,7 +18,6 @@ export default function ActivitySection({
     if (!dateString) return 'Never';
     try {
       const date = new Date(dateString);
-      // Check if date is valid
       if (isNaN(date.getTime())) {
         return 'Invalid date';
       }
@@ -28,6 +27,14 @@ export default function ActivitySection({
       return 'Invalid date';
     }
   };
+
+  lastLogin = '2025-06-07T12:00:00Z'; // Example date, replace with actual data
+  notifications = [
+    { id: 2, message: 'Admin Alert: Product Expiry', created_at: '2025-06-03T08:00:00Z' },
+    { id: 3, message: 'New order placed', created_at: '2025-06-04T09:30:00Z' },
+    { id: 4, message: 'System maintenance scheduled', created_at: '2025-06-05T10:15:00Z' },
+    { id: 5, message: 'New user registered', created_at: '2025-06-02T11:45:00Z' }
+  ]; // Example notifications, replace with actual data
 
   return (
     <div className="space-y-6">
@@ -69,7 +76,7 @@ export default function ActivitySection({
         </CardContent>
       </Card>
 
-      {/* Recent Activities */}
+      {/* Recent Activities *
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">Recent Activities</CardTitle>
@@ -92,6 +99,7 @@ export default function ActivitySection({
           </ScrollArea>
         </CardContent>
       </Card>
+      */}
     </div>
   );
 }

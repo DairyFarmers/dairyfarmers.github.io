@@ -25,6 +25,10 @@ export default function Dashboard() {
     switch (user?.role?.name) {
       case 'admin':
         return DashboardContent;
+      case 'inventory_manager':
+        return DashboardContent;
+      case 'sales_representative':
+        return DashboardContent
       case 'farmer':
         return FarmerDashboardContent;
       default:

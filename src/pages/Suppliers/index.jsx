@@ -27,11 +27,13 @@ import { useSupplier } from '@/hooks/useSupplier';
 import { AddSupplierForm } from '@/components/suppliers/AddSupplierForm.jsx';
 import { toast } from 'sonner';
 import { EditSupplierForm } from '@/components/suppliers/EditSupplierForm';
+import { AlertDialogBox } from '@/components/shared/AlertDialogBox';
 
 export default function Suppliers() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState(null);
+  const [supplierToDelete, setSupplierToDelete] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
 
@@ -82,26 +84,29 @@ export default function Suppliers() {
 
   const handleUpdateSupplier = async (formData) => {
     try {
-      await updateSupplier.mutateAsync({ id: selectedSupplier.id, data: formData });
+      await updateSupplier.mutateAsync({ 
+        id: selectedSupplier.id, 
+        data: {
+          ...formData,
+          rating: formData.rating || null
+        }
+      });
       setEditDialogOpen(false);
       setSelectedSupplier(null);
       toast.success('Supplier updated successfully');
     } catch (error) {
-      console.error("Failed to update item:", error);
+      toast.error(error.response?.data?.message || 'Failed to update supplier');
     }
   };
 
-  const handleDeleteSupplier = (supplier) => {
-    if (window.confirm(`Are you sure you want to delete "${supplier.name}"?`)) {
-      deleteSupplier.mutate(supplier.id, {
-        onSuccess: () => {
-          toast.error(`"${supplier.name}" deleted successfully`);
-        },
-        onError: (error) => {
-          console.error(error);
-          toast.error(`Failed to delete "${supplier.name}"`);
-        }
-      });
+  const handleDelete = async () => {
+    if (supplierToDelete) {
+      try{
+        await deleteSupplier.mutateAsync(supplierToDelete.id);
+        setSupplierToDelete(null);
+      } catch (error) {
+        toast.error('Failed to delete supplier');
+      } 
     }
   };
 
@@ -261,7 +266,7 @@ export default function Suppliers() {
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleDeleteSupplier(supplier)}
+                              onClick={() => setSupplierToDelete(supplier)}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -277,7 +282,7 @@ export default function Suppliers() {
                         setSelectedSupplier(null);
                       }}
                       onSubmit={handleUpdateSupplier}
-                      defaultValues={selectedSupplier}
+                      supplierId={selectedSupplier?.id}
                     />
                   </TableBody>
                 </Table>
@@ -341,6 +346,17 @@ export default function Suppliers() {
           </div>
         </main>
       </div>
+
+      <AlertDialogBox
+        isOpen={!!supplierToDelete}
+        onClose={() => setSupplierToDelete(null)}
+        onConfirm={handleDelete}
+        title="Delete Supplier"
+        description={`Are you sure you want to delete ${supplierToDelete?.name}? This action cannot be undone.`}
+        confirmText="Delete"
+        confirmVariant="destructive"
+        isLoading={deleteSupplier.isLoading}
+      />
     </div>
   );
 }

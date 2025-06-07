@@ -67,6 +67,8 @@ export default function Sales() {
     deleteSale 
   } = useSales({ currentPage, pageSize });
 
+  console.log('sales:', sales);
+
   const handleNextPage = () => {
     if (next) {
       setCurrentPage(prev => prev + 1);
@@ -216,6 +218,7 @@ export default function Sales() {
                       <TableHead>ID</TableHead>
                       <TableHead>Date</TableHead>
                       <TableHead>Customer</TableHead>
+                      <TableHead>Seller</TableHead>
                       <TableHead>Items</TableHead>
                       <TableHead>Total Amount</TableHead>
                       <TableHead>Status</TableHead>
@@ -228,9 +231,10 @@ export default function Sales() {
                       <TableRow key={sale.id}>
                         <TableCell>{sale.id.slice(0, 6)}</TableCell>
                         <TableCell>{new Date(sale.created_at).toLocaleDateString()}</TableCell>
-                        <TableCell>{sale.seller.email || '-'}</TableCell>
+                        <TableCell>{sale.order.customer_name || '-'}</TableCell>
+                        <TableCell>{sale.seller.first_name || '-'}</TableCell>
                         <TableCell>{(sale.order.items.length || []).length} items</TableCell>
-                        <TableCell>LKR {stats.totalAmount || 0}</TableCell>
+                        <TableCell>LKR {sale.order.total_amount || '0.00'}</TableCell>
                         <TableCell>
                           <Badge variant={
                             sale.order.status === 'completed' ? 'default' :

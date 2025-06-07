@@ -335,7 +335,7 @@ const getPriorityColor = (priority) => {
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold text-blue-600">
-                    ${(stats?.totalRevenue || 0).toFixed(2)}
+                    LKR {(stats?.totalRevenue || 0).toFixed(2)}
                   </div>
                 </CardContent>
               </Card>

@@ -41,6 +41,7 @@ import { useInventoryItem } from '@/hooks/useInventory';
 import { useSupplier } from '@/hooks/useSupplier';
 import { AlertDialogBox } from '@/components/shared/AlertDialogBox';
 import { toast } from 'sonner';
+import { queryClient } from '@/lib/queryClient';
 
 const createFormSchema = (suppliers = []) => {
   return z.object({

@@ -19,9 +19,9 @@ import {
       <AlertDialog open={isOpen} onOpenChange={onClose}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogTitle>Remove Inventory Item</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete{" "}
+              This action cannot be undone. This will permanently remove{" "}
               <span className="font-medium">{itemName}</span> from the inventory.
             </AlertDialogDescription>
           </AlertDialogHeader>

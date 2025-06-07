@@ -88,7 +88,7 @@ const AppRoutes = () => {
       } />
       <Route path='/notifications' element={
         <AuthWrapper
-          requiredPermissions={['can_view_notifications']}
+          requiredPermissions={[]}
           requireAll={false}
         >
           <Notifications />
@@ -98,7 +98,7 @@ const AppRoutes = () => {
       <Route path="/settings"
         element={
           <AuthWrapper
-            requiredPermissions={['can_manage_settings']}
+            requiredPermissions={[]}
             requireAll={false}
           >
             <Settings />

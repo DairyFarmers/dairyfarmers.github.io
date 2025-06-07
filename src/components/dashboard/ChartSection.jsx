@@ -19,6 +19,27 @@ import { PieChart, Pie, Cell } from 'recharts';
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
 export default function ChartSection({ metrics, timeRange, role }) {
+  metrics = {
+    orders: {
+      order_status_distribution: [
+        { status: 'pending', count: 30 },
+        { status: 'processing', count: 45 },
+        { status: 'completed', count: 80 },
+        { status: 'cancelled', count: 15 }
+      ]
+    },
+    financial: {
+      revenue_trends: [
+        { date: '2025-05-01', value: 2500 },
+        { date: '2025-05-02', value: 3200 },
+        { date: '2025-05-03', value: 2800 },
+        { date: '2025-05-04', value: 4100 },
+        { date: '2025-05-05', value: 3600 },
+        { date: '2025-05-06', value: 3900 },
+        { date: '2025-05-07', value: 4500 }
+      ]
+    }
+  }
   const { orders, financial } = metrics;
   
   const orderStatusData = orders?.order_status_distribution?.map(status => ({

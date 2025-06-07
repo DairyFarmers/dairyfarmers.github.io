@@ -55,8 +55,12 @@ export function useSupplier({
 
   const deleteSupplier = useMutation({
     mutationFn: async (id) => {
-      const response = await api.delete(`/api/v1/suppliers/${id}`);
-      return response.data;
+      try {
+        const response = await api.delete(`/api/v1/suppliers/${id}`);
+        return response.data;
+      } catch (error) {
+        throw new Error('Failed to delete supplier');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries(['suppliers']);
@@ -67,10 +71,18 @@ export function useSupplier({
   const totalSuppliers = suppliers.length;
   const averageRating = suppliers.length > 0 
     ? (suppliers
-        .filter(supplier => supplier.rating != null)
-        .reduce((sum, supplier) => sum + supplier.rating, 0) / 
-        suppliers.filter(supplier => supplier.rating != null).length) || 0
-    : 0;
+      .filter(supplier => supplier.rating !== null && supplier.rating !== undefined)
+      .reduce((sum, supplier) => {
+        const rating = parseFloat(supplier.rating);
+        return isNaN(rating) ? sum : sum + rating;
+      }, 0) / 
+      suppliers.filter(supplier => 
+        supplier.rating !== null && 
+        supplier.rating !== undefined && 
+        !isNaN(parseFloat(supplier.rating))
+      ).length
+    ) || 0
+  : 0;
   const topRatedSuppliers = suppliers.filter(s => (s.rating || 0) >= 4.0);
 
   return {
@@ -95,5 +107,28 @@ export function useSupplier({
       averageRating: averageRating.toFixed(2),
       topRated: topRatedSuppliers.length
     }
+  };
+}
+
+export function useSupplierDetails(supplierId) {
+  const { 
+    data: supplier,
+    isLoading,
+    error
+  } = useQuery({
+    queryKey: ['suppliers', 'detail', supplierId],
+    queryFn: async () => {
+      if (!supplierId) return null;
+      const response = await api.get(`/api/v1/suppliers/${supplierId}`);
+      console.log('Supplier Details Response:', response);
+      return response.data;
+    },
+    enabled: !!supplierId
+  });
+
+  return {
+    supplier,
+    isLoading,
+    error
   };
 }
