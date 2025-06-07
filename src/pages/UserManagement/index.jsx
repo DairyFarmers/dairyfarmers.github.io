@@ -234,7 +234,7 @@ export default function Users() {
               <CardHeader>
                 <CardTitle>Users List</CardTitle>
                 <div className="text-sm text-muted-foreground">
-                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} users
                 </div>
               </CardHeader>
               <CardContent>
@@ -259,7 +259,7 @@ export default function Users() {
                             <Shield className="h-3 w-3 mr-1" />
                             {roles.find(
                               role => role.id === user.role
-                            )?.name.split(' ').map(
+                            )?.name.split('_').map(
                               word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ') 
                               || 'Unknown'
                             }

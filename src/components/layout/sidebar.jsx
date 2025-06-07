@@ -64,10 +64,26 @@ export default function Sidebar() {
         mobileOpen ? "block w-64 shadow-xl" : "hidden"
       )}>
         {/* Logo and brand */}
-        <div className="flex items-center gap-3 p-6 border-b border-sidebar-border">
-          <div className="flex items-center justify-center w-10 h-10 bg-sidebar-primary rounded-lg">
-            <div className="p-3 bg-primary rounded-xl">
-              <Warehouse className="h-6 w-6 text-primary-foreground" />
+        <div className={cn(
+          "flex items-center border-b border-sidebar-border",
+          // Adjust padding based on collapsed state
+          collapsed ? "p-3 justify-center" : "p-6 gap-3"
+        )}>
+          <div className={cn(
+            "flex items-center justify-center bg-sidebar-primary rounded-lg",
+            // Adjust logo size based on collapsed state
+            collapsed ? "w-8 h-8" : "w-10 h-10"
+          )}>
+            <div className={cn(
+              "bg-primary rounded-xl",
+              // Adjust inner padding based on collapsed state
+              collapsed ? "p-2" : "p-3"
+            )}>
+              <Warehouse className={cn(
+                "text-primary-foreground",
+                // Adjust icon size based on collapsed state
+                collapsed ? "h-4 w-4" : "h-6 w-6"
+              )} />
             </div>
           </div>
           {(!collapsed || mobileOpen) && (
@@ -77,7 +93,7 @@ export default function Sidebar() {
             </div>
           )}
         </div>
-
+        
         {/* Navigation */}
         <nav className="p-4 space-y-2">
           {navigationWithCurrent?.map((item) => {

@@ -196,7 +196,7 @@ export default function Reports() {
               <CardHeader>
                 <CardTitle>Report History</CardTitle>
                 <div className="text-sm text-muted-foreground">
-                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} orders
+                  Showing {((currentPage - 1) * pageSize) + 1} to {Math.min(currentPage * pageSize, count)} of {count} reports
                 </div>
               </CardHeader>
               <CardContent>
