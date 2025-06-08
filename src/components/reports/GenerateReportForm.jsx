@@ -27,12 +27,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PermissionGuard } from '../common/PermissionGuard';
 
 const reportFormSchema = z.object({
-  report_type: z.enum(['sales', 'inventory', 'orders', 'users']),
+  report_type: z.enum(['sales', 'inventory', 'orders']),
   date_from: z.string().min(1, 'Start date is required'),
   date_to: z.string().min(1, 'End date is required'),
-  format: z.enum(['pdf', 'excel', 'csv'])
+  format: z.enum(['pdf', 'csv'])
 }).refine((data) => {
   const start = new Date(data.date_from);
   const end = new Date(data.date_to);
@@ -87,17 +88,25 @@ export function GenerateReportForm({ isOpen, onClose, onSubmit }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Report Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <Select onValueChange={field.onChange} defaultValue="Select report type">
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select report type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="sales">Sales Report</SelectItem>
-                      <SelectItem value="inventory">Inventory Report</SelectItem>
-                      <SelectItem value="orders">Orders Report</SelectItem>
-                      <SelectItem value="users">Users Report</SelectItem>
+                      <PermissionGuard permissions="can_generate_sales_report">
+                        <SelectItem value="sales">Sales Report</SelectItem>
+                      </PermissionGuard>
+                      <PermissionGuard permissions="can_generate_inventory_report">
+                        <SelectItem value="inventory">Inventory Report</SelectItem>
+                      </PermissionGuard>
+                      <PermissionGuard permissions="can_generate_orders_report">
+                        <SelectItem value="orders">Orders Report</SelectItem>
+                      </PermissionGuard>
+                      <PermissionGuard permissions="can_generate_users_report">
+                        <SelectItem value="customers">Users Report</SelectItem>
+                      </PermissionGuard>
                     </SelectContent>
                   </Select>
                   <FormMessage />
@@ -149,7 +158,6 @@ export function GenerateReportForm({ isOpen, onClose, onSubmit }) {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="pdf">PDF</SelectItem>
-                      <SelectItem value="excel">Excel</SelectItem>
                       <SelectItem value="csv">CSV</SelectItem>
                     </SelectContent>
                   </Select>

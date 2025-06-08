@@ -19,8 +19,6 @@ export const AuthWrapper = ({
     initialized 
   } = useSelector((state) => state.user);
 
-  console.log('permissions', permissions);
-
   useEffect(() => {
     const initializeAuth = async () => {
       if (!initialized) {
