@@ -27,7 +27,6 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { PermissionGuard } from '../common/PermissionGuard';
 
 const reportFormSchema = z.object({
   report_type: z.enum(['sales', 'inventory', 'orders']),
@@ -88,25 +87,16 @@ export function GenerateReportForm({ isOpen, onClose, onSubmit }) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Report Type</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue="Select report type">
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="Select report type" />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <PermissionGuard permissions="can_generate_sales_report">
-                        <SelectItem value="sales">Sales Report</SelectItem>
-                      </PermissionGuard>
-                      <PermissionGuard permissions="can_generate_inventory_report">
-                        <SelectItem value="inventory">Inventory Report</SelectItem>
-                      </PermissionGuard>
-                      <PermissionGuard permissions="can_generate_orders_report">
-                        <SelectItem value="orders">Orders Report</SelectItem>
-                      </PermissionGuard>
-                      <PermissionGuard permissions="can_generate_users_report">
-                        <SelectItem value="customers">Users Report</SelectItem>
-                      </PermissionGuard>
+                      <SelectItem value="sales">Sales Report</SelectItem>
+                      <SelectItem value="inventory">Inventory Report</SelectItem>
+                      <SelectItem value="orders">Orders Report</SelectItem>
                     </SelectContent>
                   </Select>
                   <FormMessage />

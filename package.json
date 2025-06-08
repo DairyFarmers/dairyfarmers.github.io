@@ -1,7 +1,8 @@
 {
   "name": "dfi-frontend",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "homepage": "https://dairyfarmers.github.io/",
   "dependencies": {
     "@emotion/react": "^11.13.5",
     "@emotion/styled": "^11.13.5",
@@ -50,7 +51,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "vitest"
+    "test": "vitest",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
+
   },
   "eslintConfig": {
     "extends": [
@@ -79,6 +83,7 @@
     "autoprefixer": "^10.4.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "gh-pages": "^6.3.0",
     "jsdom": "^26.1.0",
     "lucide-react": "^0.511.0",
     "postcss": "^8.5.3",

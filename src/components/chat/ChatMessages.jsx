@@ -148,7 +148,9 @@ export function ChatMessages({
         </Avatar>
         <div>
           <p className="font-medium">{user?.first_name}</p>
-          <p className="text-xs text-muted-foreground">{user?.role_name}</p>
+          <p className="text-xs text-muted-foreground">
+            {user?.role_name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+          </p>
         </div>
       </div>
 

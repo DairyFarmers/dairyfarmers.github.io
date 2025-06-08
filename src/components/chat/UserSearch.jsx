@@ -67,7 +67,9 @@ export function UserSearch({ query, onSelectUser }) {
               {user.first_name ? `${user.first_name} ${user.last_name || ''}` : user.email}
             </p>
             <p className="text-xs text-muted-foreground">{user.email}</p>
-            <p className="text-xs text-muted-foreground/70">{user.role_name}</p>
+            <p className="text-xs text-muted-foreground/70">
+              {user.role_name.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+            </p>
           </div>
         </button>
       ))}

@@ -24,8 +24,8 @@ export function OrderItems({ items = [] }) {
           <TableRow key={item.id}>
             <TableCell>{item.inventory_item.name}</TableCell>
             <TableCell>{item.quantity}</TableCell>
-            <TableCell>${item.unit_price}</TableCell>
-            <TableCell>${(item.quantity * item.unit_price).toFixed(2)}</TableCell>
+            <TableCell>LKR {item.unit_price}</TableCell>
+            <TableCell>LKR {(item.quantity * item.unit_price).toFixed(2)}</TableCell>
           </TableRow>
         ))}
       </TableBody>

@@ -241,23 +241,7 @@ export default function Reports() {
                                 ? 'Report is being generated' 
                                 : 'Download report'}
                             >
-                              {report.report_type === 'sales' ? (
-                                <PermissionGuard permissions="can_download_sales_report">
-                                  <Download className="h-4 w-4" />
-                                </PermissionGuard>
-                              ) : report.report_type === 'inventory' ? (
-                                <PermissionGuard permissions="can_download_inventory_report">
-                                  <Download className="h-4 w-4" />
-                                </PermissionGuard>
-                              ) : report.report_type === 'orders' ? (
-                                <PermissionGuard permissions="can_download_orders_report">
-                                  <Download className="h-4 w-4" />
-                                </PermissionGuard>
-                              ) : report.report_type === 'users' ? (
-                                <PermissionGuard permissions="can_download_users_report">
-                                  <Download className="h-4 w-4" />
-                                </PermissionGuard>
-                              ) : null }
+                              <Download className="h-4 w-4" />
                             </Button>
                           </PermissionGuard>
                           <PermissionGuard permissions="can_delete_reports">

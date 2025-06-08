@@ -50,12 +50,6 @@ export const navigationConfig = {
         icon: Users, 
         permission: "can_manage_users"
       },
-      { 
-        name: "Reports", 
-        href: "/reports", 
-        icon: FileText, 
-        permission: "can_view_reports"
-      },
     ],
     inventory_manager: [
       { 
